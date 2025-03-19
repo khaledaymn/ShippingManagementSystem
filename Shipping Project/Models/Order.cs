@@ -18,13 +18,12 @@ namespace Shipping_Project.Models
         public bool IsDeleted { get; set; }=false;
         public bool ShippingToVillage { get; set; }
         public double AmountReceived { get; set; }
-        //[ForeignKey("City")]
-        //public int CityId { get; set; }
-        //public virtual City? City { get; set; }
+        [ForeignKey("City")]
+        public int CityId { get; set; }
+        public virtual City? City { get; set; }
         [ForeignKey("ChargeType")]
         public int ChargeTypeId { get; set; }
         public virtual ChargeType? ChargeType { get; set; }
-        public virtual List<Product>? Products { get; }=new List<Product>();
         [ForeignKey("RejectedReason")]
         public int? RrjectedResonId { get; set; } = null;
         public virtual RejectedReason? RejectedReason { get; set; }
@@ -37,6 +36,7 @@ namespace Shipping_Project.Models
         [ForeignKey("ShippigRepresentive")]
         public int ShippigRepresentiveId { get; set; }
         public virtual ShippigRepresentive? ShippigRepresentive { get; set; }
+        public virtual List<Product>? Products { get; }=new List<Product>();
 
     }
     public enum OrderState

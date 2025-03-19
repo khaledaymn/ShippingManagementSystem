@@ -35,7 +35,7 @@ namespace Shipping_Project.Repository
 
         public void Update(T obj)
         {
-            db.Entry(obj).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            db.Entry(obj).State = EntityState.Modified;
         }
     }
 }

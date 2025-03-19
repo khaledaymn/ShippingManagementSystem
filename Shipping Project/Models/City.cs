@@ -8,10 +8,11 @@ namespace Shipping_Project.Models
         public double ChargePrice { get; set; }
         public double PickUpPrice { get; set; }
         public bool IsDeleted { get; set; }=false;
-        public virtual List<MerchentCity>? MerchentCities { get; } = new List<MerchentCity>();
-        public virtual List<Branches>? Branches { get; }=new List<Branches>();
         [ForeignKey("Governorate")]
         public int GovernorateId { get; set; }
         public virtual Governorate? Governorate { get; set; }
+        public virtual List<MerchentCity>? MerchentCities { get; } = new List<MerchentCity>();
+        public virtual List<Branches>? Branches { get; }=new List<Branches>();
+        public virtual List<Order>? Orders { get; }=new List<Order>();
     }
 }
