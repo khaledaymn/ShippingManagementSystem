@@ -30,7 +30,7 @@ public class TestController : ControllerBase
     [Produces("Application/json")]
     public IActionResult Test()
     {
-        throw new Exception();
+       
         try
         {
             return Ok("Hello World");
