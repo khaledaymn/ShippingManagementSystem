@@ -1,6 +1,9 @@
 #region Usings
 
+using APIsLayer.Errors;
+using APIsLayer.MiddleWares;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -95,6 +98,17 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddScoped<UnitOfWork>();
 #endregion
 
+#region ValidationError
+builder.Services.Configure<ApiBehaviorOptions>(Options =>
+{
+    Options.InvalidModelStateResponseFactory = (ActionContext) =>
+    {
+        var errors = ActionContext.ModelState.Where(p => p.Value.Errors.Count() > 0).SelectMany(p => p.Value.Errors).Select(e => e.ErrorMessage).ToArray();
+        var reponse = new APIResponseValidationError(errors);
+        return new BadRequestObjectResult(reponse);
+    };
+});
+#endregion
 //builder.Services.AddAutoMapper(typeof(Program));
 
 #region Database Configration
@@ -167,7 +181,7 @@ if (app.Environment.IsDevelopment())
 #endregion
 
 #region Middlewares
-
+app.UseMiddleware<ConvensionExceptionMiddleWare>();
 app.UseAuthorization();
 
 app.MapControllers();
