@@ -212,10 +212,10 @@ namespace Shipping_Project.Controllers
                 existingUser.UserName = updatedMerchant.UserName;
                 existingUser.Email = updatedMerchant.Email;
                 existingUser.PhoneNumber = updatedMerchant.PhoneNumber;
-               
+                existingUser.Name = updatedMerchant.Name;
 
 
-                var userUpdateResult = await user.UpdateAsync(existingUser);
+                 var userUpdateResult = await user.UpdateAsync(existingUser);
                 if (!userUpdateResult.Succeeded)
                 {
                     return StatusCode(500, new APIResponse(500, "Failed to update user."));

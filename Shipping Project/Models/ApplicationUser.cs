@@ -16,7 +16,7 @@ namespace Shipping_Project.Models
             this.Email=Merchant.Email;
             this.UserName   =Merchant.UserName;
             this.PasswordHash = Merchant.Password;
-          
+            this.Name = Merchant.Name;
             this.Address= Merchant.Address;
         }
         public string Name { get; set; }
