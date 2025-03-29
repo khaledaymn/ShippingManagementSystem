@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shipping_Project.DTOs;
-
+using Shipping_Project.DTOs.MerchantDtos;
 using Shipping_Project.Models;
 using Shipping_Project.Specifications;
 using Shipping_Project.Specifications.Params;
