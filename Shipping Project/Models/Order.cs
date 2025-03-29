@@ -4,11 +4,12 @@ namespace Shipping_Project.Models
 {
     public class Order :BaseModel
     {
+        public DateTime orderDate { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone1 { get; set; }
         public string? CustomerPhone2 { get; set; }
         public string VillageAndStreet { get; set; }
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         public double ChargePrice { get; set; }
         public OrderState OrderState { get; set; }
         public OrderType OrderType { get; set; }
@@ -23,7 +24,7 @@ namespace Shipping_Project.Models
         public virtual City? City { get; set; }
         [ForeignKey("ChargeType")]
         public int ChargeTypeId { get; set; }
-        public virtual ChargeType? ChargeType { get; set; }
+        public virtual ChargeType ChargeType { get; set; }
         public virtual List<RejectedReasonOrder>? RejectedReasons { get; set; }
         [ForeignKey("Branches")]
         public int BranchId { get; set; }
@@ -32,7 +33,7 @@ namespace Shipping_Project.Models
         public string MerchantId { get; set; }
         public virtual Merchant? Merchant { get; set; }
         [ForeignKey("ShippigRepresentative")]
-        public string ShippigRepresentativeId { get; set; }
+        public string? ShippigRepresentativeId { get; set; }
         public virtual ShippigRepresentative? ShippigRepresentative { get; set; }
         public virtual List<Product>? Products { get; }=new List<Product>();
 

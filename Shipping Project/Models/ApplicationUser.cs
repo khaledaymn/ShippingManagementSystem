@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Shipping_Project.DTOs;
+using Shipping_Project.DTOs.MerchantDtos;
 
 namespace Shipping_Project.Models
 {

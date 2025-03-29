@@ -1,7 +1,7 @@
 ﻿using Shipping_Project.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace Shipping_Project.DTOs
+namespace Shipping_Project.DTOs.MerchantDtos
 {
     public class MerchantDTO
     {
@@ -11,16 +11,16 @@ namespace Shipping_Project.DTOs
         }
         public MerchantDTO(Merchant Merchant)
         {
-            this.Id = Merchant.UserID;
-            this.Address = Merchant.User.Address;
-            this.Email = Merchant.User.Email;
-            this.PhoneNumber = Merchant.User.PhoneNumber;
-            this.StartWorkDDate = Merchant.User.HiringDate;
-            this.UserName = Merchant.User.UserName;
-            this.StoreName = Merchant.StoreName;
-            this.RejectedOrderPrecentage =(float)Merchant.RejectedOrederPercentage;
-            this.IsDeleted = Merchant.User.IsDeleted;
-            this.Name = Merchant.User.Name;
+            Id = Merchant.UserID;
+            Address = Merchant.User.Address;
+            Email = Merchant.User.Email;
+            PhoneNumber = Merchant.User.PhoneNumber;
+            StartWorkDDate = Merchant.User.HiringDate;
+            UserName = Merchant.User.UserName;
+            StoreName = Merchant.StoreName;
+            RejectedOrderPrecentage =(float)Merchant.RejectedOrederPercentage;
+            IsDeleted = Merchant.User.IsDeleted;
+            Name = Merchant.User.Name;
 
         }
         public string Name { get; set; }

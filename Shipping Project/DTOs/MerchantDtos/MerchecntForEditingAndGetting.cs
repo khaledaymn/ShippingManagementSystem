@@ -1,7 +1,7 @@
 ﻿using Shipping_Project.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace Shipping_Project.DTOs
+namespace Shipping_Project.DTOs.MerchantDtos
 {
     public class MerchecntForEditingAndGetting
     {

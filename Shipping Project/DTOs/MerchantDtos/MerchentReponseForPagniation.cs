@@ -1,13 +1,13 @@
-﻿namespace Shipping_Project.DTOs
+﻿namespace Shipping_Project.DTOs.MerchantDtos
 {
     public class MerchantReponseForPagniation<T> 
     {
         public MerchantReponseForPagniation(int pagesize, int pageindex, int count, IReadOnlyList<T> data)
         {
-            this.PageSize = pagesize;
-            this.PageIndex = pageindex;
-            this.Count = count;
-            this.Data = data;
+            PageSize = pagesize;
+            PageIndex = pageindex;
+            Count = count;
+            Data = data;
         }
         public int PageSize { get; set; }
         public int PageIndex { get; set; }
