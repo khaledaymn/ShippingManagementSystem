@@ -17,7 +17,6 @@ namespace Shipping_Project.IGenaricRepository
         {
             return await db.Citys
                 .Where(c => c.GovernorateId == governorateId && !c.IsDeleted)
-                .Include(c => c.Governorate)
                 .ToListAsync();
         }
     }

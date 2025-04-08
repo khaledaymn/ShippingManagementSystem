@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shipping_Project.DTOs;
 using Shipping_Project.DTOs.MerchantDtos;
+using Shipping_Project.Helper;
 using Shipping_Project.Extend;
 using Shipping_Project.Models;
 using Shipping_Project.Specifications;
@@ -127,7 +128,7 @@ namespace Shipping_Project.Controllers
         //        return StatusCode(500, new APIResponse(500, "An error occurred while processing your request."));
         //    }
         //}
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult> Add(MerchantDtoForAdding AddingMerchant)
         {
            
@@ -135,8 +136,12 @@ namespace Shipping_Project.Controllers
             {
                 return BadRequest(new APIResponse(400, "Invalid request data"));
             }
+            if(AddingMerchant.Email.CheckEmailExists(user).Result)
+            {
+                return BadRequest(new APIResponse(400, "Email already exists"));
+            }
 
-            
+
             using var transaction = await unit.BeginTransactionAsync();
             try
             {
@@ -186,73 +191,80 @@ namespace Shipping_Project.Controllers
                 return StatusCode(500, new APIResponse(500, "An error occurred while creating merchant"));
             }
         }
-        [HttpPut]
-        public async Task<ActionResult> Edit( MerchecntForEditingAndGetting updatedMerchant)
+        [HttpPut("edit/{id}")]
+        public async Task<ActionResult> Edit([FromRoute] string id, MerchecntForEditingAndGetting updatedMerchant)
         {
-            
-            try
+          if(id== updatedMerchant.Id)
             {
-                var existingMerchant = await unit.Repository<Merchant>().GetAsyncBySpec(new MerchantSpecfications(m => m.UserID == updatedMerchant.Id));
-                if (existingMerchant == null)
+                try
                 {
-                    return NotFound(new APIResponse(404, "Merchant not found."));
+                    var existingMerchant = await unit.Repository<Merchant>().GetAsyncBySpec(new MerchantSpecfications(m => m.UserID == updatedMerchant.Id));
+                    if (existingMerchant == null)
+                    {
+                        return NotFound(new APIResponse(404, "Merchant not found."));
+                    }
+
+
+                    existingMerchant.StoreName = updatedMerchant.StoreName;
+                    existingMerchant.RejectedOrederPercentage = updatedMerchant.RejectedOrderPrecentage;
+                    existingMerchant.SpecialPickUp = updatedMerchant.SpecialPickUp;
+
+
+                    var existingUser = await user.FindByIdAsync(updatedMerchant.Id);
+                    if (existingUser == null)
+                    {
+                        return NotFound(new APIResponse(404, "User not found."));
+                    }
+                    existingUser.Address = updatedMerchant.Address;
+                    existingUser.UserName = updatedMerchant.UserName;
+                    existingUser.Email = updatedMerchant.Email;
+                    existingUser.PhoneNumber = updatedMerchant.PhoneNumber;
+                    existingUser.Name = updatedMerchant.Name;
+
+
+                    var userUpdateResult = await user.UpdateAsync(existingUser);
+                    if (!userUpdateResult.Succeeded)
+                    {
+                        return StatusCode(500, new APIResponse(500, "Failed to update user."));
+                    }
+
+
+                    var existingUserBranches = await unit.Repository<UserBranches>().GetAllAsyncBySpec(new BaseSpecifiction<UserBranches>(u => u.UserId == existingMerchant.UserID));
+                    unit.Repository<UserBranches>().DeleteRange(existingUserBranches);
+                    var newUserBranches = updatedMerchant.BranchesIds.Select(b => new UserBranches(updatedMerchant.Id, b)).ToList();
+                    await unit.Repository<UserBranches>().AddRange(newUserBranches);
+
+
+                    var existingMerchantCities = await unit.Repository<MerchantCity>().GetAllAsyncBySpec(new BaseSpecifiction<MerchantCity>(c => c.MerchantId == existingMerchant.UserID));
+                    if (existingMerchantCities.Count > 0)
+                        unit.Repository<MerchantCity>().DeleteRange(existingMerchantCities);
+                    if (updatedMerchant.SpecialDeliveryPrices.Count > 0)
+                    {
+                        var newMerchantCities = updatedMerchant.SpecialDeliveryPrices.Select(s => new MerchantCity(existingMerchant.UserID, s)).ToList();
+                        await unit.Repository<MerchantCity>().AddRange(newMerchantCities);
+                    }
+
+
+                    unit.Repository<Merchant>().Update(existingMerchant);
+                    await unit.Save();
+
+
+                    return Ok();
                 }
-
-               
-                existingMerchant.StoreName = updatedMerchant.StoreName;
-                existingMerchant.RejectedOrederPercentage = updatedMerchant.RejectedOrderPrecentage;
-                existingMerchant.SpecialPickUp = updatedMerchant.SpecialPickUp;
-
-                
-                var existingUser = await user.FindByIdAsync(updatedMerchant.Id);
-                if (existingUser == null)
+                catch (Exception ex)
                 {
-                    return NotFound(new APIResponse(404, "User not found."));
+
+                    return StatusCode(500, new APIResponse(500, "An error occurred while processing your request."));
                 }
-                existingUser.Address = updatedMerchant.Address;
-                existingUser.UserName = updatedMerchant.UserName;
-                existingUser.Email = updatedMerchant.Email;
-                existingUser.PhoneNumber = updatedMerchant.PhoneNumber;
-                existingUser.Name = updatedMerchant.Name;
-
-
-                 var userUpdateResult = await user.UpdateAsync(existingUser);
-                if (!userUpdateResult.Succeeded)
-                {
-                    return StatusCode(500, new APIResponse(500, "Failed to update user."));
-                }
-
-                
-                var existingUserBranches = await unit.Repository<UserBranches>().GetAllAsyncBySpec( new BaseSpecifiction<UserBranches>(u=>u.UserId==existingMerchant.UserID));
-                unit.Repository<UserBranches>().DeleteRange(existingUserBranches);
-                var newUserBranches = updatedMerchant.BranchesIds.Select(b => new UserBranches(updatedMerchant.Id, b)).ToList();
-                await unit.Repository<UserBranches>().AddRange(newUserBranches);
-
-               
-                var existingMerchantCities = await unit.Repository<MerchantCity>().GetAllAsyncBySpec(new BaseSpecifiction<MerchantCity>(c => c.MerchantId == existingMerchant.UserID));
-                if(existingMerchantCities.Count>0)
-                    unit.Repository<MerchantCity>().DeleteRange(existingMerchantCities);
-                if(updatedMerchant.SpecialDeliveryPrices.Count>0)
-                {
-                    var newMerchantCities = updatedMerchant.SpecialDeliveryPrices.Select(s => new MerchantCity(existingMerchant.UserID, s)).ToList();
-                    await unit.Repository<MerchantCity>().AddRange(newMerchantCities);
-                }
-                
-
-                unit.Repository<Merchant>().Update(existingMerchant);
-                await unit.Save();
-               
-
-                return Ok();
             }
-            catch (Exception ex)
+          else
             {
-               
-                return StatusCode(500, new APIResponse(500, "An error occurred while processing your request."));
+                return BadRequest(new APIResponse(400, "Invalid request data"));
             }
+           
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> Delete(string id)
         {
             try

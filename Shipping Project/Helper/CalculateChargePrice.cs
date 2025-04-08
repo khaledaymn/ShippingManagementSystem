@@ -10,7 +10,6 @@ namespace Shipping_Project.Helper
     public  static class CalculateChargePrice
     {
         
-
        
         public static async Task<double> CalculatePrice(this AddedOrderDto model, UnitOfWork.UnitOfWork unit)
         {

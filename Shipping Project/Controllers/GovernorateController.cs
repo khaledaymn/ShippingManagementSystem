@@ -13,6 +13,7 @@ namespace Shipping_Project.Controllers
     public class GovernorateController : ControllerBase
     {
         private readonly IGenaricRepo<Governorate> _governorate;
+        private readonly Shipping_Project.UnitOfWork.UnitOfWork _unitOfWork;
 
         public GovernorateController(IGenaricRepo<Governorate> GenaricRepo)
         {
@@ -24,6 +25,7 @@ namespace Shipping_Project.Controllers
         public async Task<IActionResult> GetAll()
         {
             var governorates = await _governorate.GetAll();
+            var g = _unitOfWork.Repository<Governorate>().GetAll();
             return Ok(governorates);
         }
 

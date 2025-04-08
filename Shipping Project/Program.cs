@@ -2,18 +2,24 @@
 
 using APIsLayer.Errors;
 using APIsLayer.MiddleWares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shipping_Project.Extend;
+using Shipping_Project.IdentityServices.contracts;
+using Shipping_Project.IdentityServices.ServiceImplementation;
 using Shipping_Project.IGenaricRepository;
 using Shipping_Project.Mapping;
 using Shipping_Project.Models;
 using Shipping_Project.Repository;
 using Shipping_Project.UnitOfWork;
 using System.Reflection;
+using System.Text;
 
 #endregion
 
@@ -100,6 +106,10 @@ builder.Services.AddSwaggerGen(option =>
 #region Dependancy Injection Configration
 builder.Services.AddScoped<UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenaricRepo<>), typeof(GenaricRepo<>));
+
+
+
+
 #endregion
 
 
@@ -128,22 +138,53 @@ builder.Services.AddDbContext<ShippingContext>(op =>
 
 
 #region Identity Configration
+//builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+//{
+//    options.Password.RequireLowercase = false;
+//    options.Password.RequireUppercase = false;
+//    options.Password.RequireNonAlphanumeric = false;
+//    //options.Password.RequireDigit = true;
+//    //options.Password.RequireLowercase = true;
+//    //options.Password.RequireNonAlphanumeric = true;
+//    //options.Password.RequireUppercase = true;
+//    //options.Password.RequiredLength = 8;
+//    //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
+//    //options.Lockout.MaxFailedAccessAttempts = 5;
+//    //options.Lockout.AllowedForNewUsers = true;
+//    //options.User.RequireUniqueEmail = true;
+//}).AddEntityFrameworkStores<ShippingContext>()
+// .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
+
+builder.Services.AddScoped<ITokenServices, TokenServices>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
-    //options.Password.RequireDigit = true;
-    //options.Password.RequireLowercase = true;
-    //options.Password.RequireNonAlphanumeric = true;
-    //options.Password.RequireUppercase = true;
-    //options.Password.RequiredLength = 8;
-    //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
-    //options.Lockout.MaxFailedAccessAttempts = 5;
-    //options.Lockout.AllowedForNewUsers = true;
-    //options.User.RequireUniqueEmail = true;
-}).AddEntityFrameworkStores<ShippingContext>()
- .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
+    options.Tokens.PasswordResetTokenProvider = "passwordreset";
+}).AddEntityFrameworkStores<ShippingContext>().AddDefaultTokenProviders().AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("passwordreset"); ;
+builder.Services.AddAuthentication(o =>
+{
+    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o => {
+    o.TokenValidationParameters
+    = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+    };
+});
+builder.Services.AddDistributedMemoryCache();
+builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailServicescs, EmailServices>();
+builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
+
 #endregion
 
 

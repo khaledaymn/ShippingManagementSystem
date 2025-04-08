@@ -1,6 +1,6 @@
 ﻿namespace Shipping_Project.Helper
 {
-    public class HelperClass
+    public class Roles
     {
         public const string AdminRole = "Admin";
         public const string ShippingRepresentativeRole = "ShippingRepresentative";
