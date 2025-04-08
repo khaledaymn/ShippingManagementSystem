@@ -11,8 +11,8 @@ namespace CoreLayer.Specifications
 {
     public class BaseSpecifiction<T> : IspecificationContract<T> where T : class
     {
-        public Expression<Func<T, bool>>? Criteria { get; set; }
-       
+        public Expression<Func<T, bool>>? Criteria { get; set; } 
+
         public Expression<Func<T, object>>? OrderBy { get ; set ; }
         public Expression<Func<T, object>>? OrderByDesc { get ; set ; }
         public int skip { get; set; }

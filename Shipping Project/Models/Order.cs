@@ -36,7 +36,6 @@ namespace Shipping_Project.Models
         public string? ShippigRepresentativeId { get; set; }
         public virtual ShippigRepresentative? ShippigRepresentative { get; set; }
         public virtual List<Product>? Products { get; }=new List<Product>();
-
     }
     public enum OrderState
     {
@@ -61,6 +60,6 @@ namespace Shipping_Project.Models
     {
         CashOnDelivery,
         PaidInAdvance,
-        ExchangeOrder,
+        ExchangeOrder
     }
 }

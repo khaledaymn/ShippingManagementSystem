@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Shipping_Project.DTOs.MerchantDtos;
+using Shipping_Project.Models;
 
-namespace Shipping_Project.Models
+namespace Shipping_Project.Extend
 {
     public class ApplicationUser :IdentityUser
     {
@@ -9,16 +10,18 @@ namespace Shipping_Project.Models
         {
             
         }
+
         public ApplicationUser(MerchantDtoForAdding Merchant)
         {
-            this.HiringDate=Merchant.StartWorkDDate;
-            this.PhoneNumber=Merchant.PhoneNumber;
-            this.Email=Merchant.Email;
-            this.UserName   =Merchant.UserName;
-            this.PasswordHash = Merchant.Password;
-            this.Name = Merchant.Name;
-            this.Address= Merchant.Address;
+            HiringDate = Merchant.StartWorkDDate;
+            PhoneNumber = Merchant.PhoneNumber;
+            Email = Merchant.Email;
+            UserName = Merchant.UserName;
+            PasswordHash = Merchant.Password;
+            Name = Merchant.Name;
+            Address = Merchant.Address;
         }
+
         public string Name { get; set; }
         public string? Address { get; set; }
         public bool IsDeleted { get; set; } = false;

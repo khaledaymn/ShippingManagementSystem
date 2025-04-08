@@ -1,6 +1,7 @@
 ﻿using Castle.Components.DictionaryAdapter;
 using Microsoft.EntityFrameworkCore;
 using Shipping_Project.DTOs.MerchantDtos;
+using Shipping_Project.Extend;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

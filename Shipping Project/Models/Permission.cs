@@ -4,6 +4,5 @@
     {
         public string Name { get; set; }
         public virtual List<PermissionGroup>? PermissionGroup { get; set; }
-
     }
 }

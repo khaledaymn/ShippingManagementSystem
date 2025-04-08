@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Shipping_Project.Extend;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shipping_Project.Models

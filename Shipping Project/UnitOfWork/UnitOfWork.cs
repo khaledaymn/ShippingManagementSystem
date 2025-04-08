@@ -12,13 +12,15 @@ namespace Shipping_Project.UnitOfWork
         private readonly ShippingContext context;
         private readonly ConcurrentDictionary<string, object> Repos;
         //private readonly ConcurrentDictionary<Type, object> Repos;
+
         private ICityRepository _cityRepository;
+
         public UnitOfWork(ShippingContext _context)
         {
-
             context = _context;
             Repos = new();
         }
+
         public ICityRepository CityRepository
         {
             get
@@ -44,10 +46,12 @@ namespace Shipping_Project.UnitOfWork
         {
           return  await context.SaveChangesAsync();
         }
+
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await context.Database.BeginTransactionAsync();
         }
+
         public void Dispose()
         {
             context.Dispose();

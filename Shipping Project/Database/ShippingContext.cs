@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Shipping_Project.Extend;
 
 namespace Shipping_Project.Models
 {
-    public class ShippingContext :IdentityDbContext<ApplicationUser>
+    public class ShippingContext : IdentityDbContext<ApplicationUser>
     {
         public ShippingContext(DbContextOptions<ShippingContext> options):base(options) { }
-
         public DbSet<Branches> Branches { get; set; }
         public DbSet<ChargeType> ChargeTypes { get; set; }
         public DbSet<City> Citys { get; set; }  
