@@ -28,17 +28,15 @@ namespace Shipping_Project.Controllers
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IEmailServicescs emailServices;
         private readonly IOptions<AppSetting> appsetting;
-        private readonly IDistributedCache _cache;
         private readonly AppSetting _appsetting;
 
-        public AccountController(UserManager<ApplicationUser> _userManager, ITokenServices _token, SignInManager<ApplicationUser> _signInManager,IEmailServicescs emailServices, IOptions<AppSetting> appsetting, IDistributedCache cache)
+        public AccountController(UserManager<ApplicationUser> _userManager, ITokenServices _token, SignInManager<ApplicationUser> _signInManager,IEmailServicescs emailServices, IOptions<AppSetting> appsetting)
         {
             userManager = _userManager;
             token = _token;
             signInManager = _signInManager;
             this.emailServices = emailServices;
             this.appsetting = appsetting;
-            _cache = cache;
             _appsetting = appsetting.Value;
         }
         
@@ -47,7 +45,10 @@ namespace Shipping_Project.Controllers
         {
             var user = await userManager.FindByEmailAsync(model.Email);
             if (user == null) { return Unauthorized(new APIResponse(401)); }
-          
+            if (user.IsDeleted)
+            {
+                return Unauthorized(new { message = "user Not authorized" });
+            }
             var result = await signInManager.PasswordSignInAsync(
                 user,
                 model.Password,
