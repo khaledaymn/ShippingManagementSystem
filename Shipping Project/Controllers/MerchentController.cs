@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shipping_Project.DTOs;
 using Shipping_Project.DTOs.MerchantDtos;
+using Shipping_Project.Helper;
 using Shipping_Project.Models;
 using Shipping_Project.Specifications;
 using Shipping_Project.Specifications.Params;
@@ -126,7 +127,7 @@ namespace Shipping_Project.Controllers
         //        return StatusCode(500, new APIResponse(500, "An error occurred while processing your request."));
         //    }
         //}
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult> Add(MerchantDtoForAdding AddingMerchant)
         {
            
@@ -134,8 +135,12 @@ namespace Shipping_Project.Controllers
             {
                 return BadRequest(new APIResponse(400, "Invalid request data"));
             }
+            if(AddingMerchant.Email.CheckEmailExists(user).Result)
+            {
+                return BadRequest(new APIResponse(400, "Email already exists"));
+            }
 
-            
+
             using var transaction = await unit.BeginTransactionAsync();
             try
             {
@@ -185,7 +190,7 @@ namespace Shipping_Project.Controllers
                 return StatusCode(500, new APIResponse(500, "An error occurred while creating merchant"));
             }
         }
-        [HttpPut("{id}")]
+        [HttpPut("edit/{id}")]
         public async Task<ActionResult> Edit([FromRoute] string id, MerchecntForEditingAndGetting updatedMerchant)
         {
           if(id== updatedMerchant.Id)
@@ -258,7 +263,7 @@ namespace Shipping_Project.Controllers
            
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> Delete(string id)
         {
             try
