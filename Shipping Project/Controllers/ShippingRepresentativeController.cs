@@ -57,7 +57,7 @@ namespace Shipping_Project.Controllers
                 UserID = user.Id,
                 DiscountType = Enum.Parse<DiscountType>(dto.DiscountType.ToLower()),
                 CompanyPersentage = dto.CompanyPersentage
-            };
+            };              
 
             await _unitOfWork.Repository<ShippigRepresentative>().ADD(shippingRepresentative);
             await _unitOfWork.Save();
@@ -124,6 +124,7 @@ namespace Shipping_Project.Controllers
             if (user == null)
                 return NotFound("User not found.");
 
+               
             if (!string.IsNullOrEmpty(dto.Name))
             {
                 user.Name = dto.Name;

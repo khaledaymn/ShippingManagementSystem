@@ -35,5 +35,4 @@
         [Range(0, 100, ErrorMessage = "Company percentage must be between 0 and 100.")]
         public double CompanyPersentage { get; set; }
     }
-
 }

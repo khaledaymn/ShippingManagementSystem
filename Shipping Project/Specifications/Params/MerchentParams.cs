@@ -17,7 +17,7 @@
         public int PageSize
         {
             get { return _pagesize; }
-            set { _pagesize = (value == 0 || value > 10) ? 10 : value; }
+            set { _pagesize = (value == 0 || value > 10) ? 10 : value; }   
         }
         public int PageIndex { get; set; } = 1;
     }
