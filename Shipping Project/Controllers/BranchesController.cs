@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Shipping_Project.DTOs;
 using Shipping_Project.Models;
 using Shipping_Project.UnitOfWork;
-
+using Shipping_Project.Specifications.Params;
+using Shipping_Project.Specifications;
 namespace Shipping_Project.Controllers
 {
     [Route("api/[controller]")]
@@ -33,11 +34,13 @@ namespace Shipping_Project.Controllers
             }
             return BadRequest(); 
         }
-        [HttpGet("Get ALL Branches")]
-        public async Task< ActionResult> GetAll()
+        [HttpGet]
+        public async Task< ActionResult> GetAll([FromQuery]BranchParams Params)
         {
-           List <BrancheDTO> brancheDTO = new List<BrancheDTO>();
-           List<Branches> branches = await unit.Repository<Branches>().GetAll();
+            var Spec = new BranchSpecification(Params);
+           var branches = await unit.Repository<Branches>().GetAllAsyncBySpec(Spec);
+
+           List <BrancheDTO> brancheDTO = new List<BrancheDTO>(); 
            if(branches is not null)
             {
                 foreach (var branche in branches)

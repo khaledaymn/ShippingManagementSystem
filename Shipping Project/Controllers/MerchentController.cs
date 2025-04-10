@@ -35,7 +35,6 @@ namespace Shipping_Project.Controllers
             {
                 MerchantSpecfications spec = new MerchantSpecfications(Params);
                 var Merchants = await unit.Repository<Merchant>().GetAllAsyncBySpec(spec);
-
                 var merchantsDTO = Merchants.Select(m => new MerchantDTO(m)).ToList();
                 var countSpec = new MerchantPaginationForCount(Params);
                 var count = await unit.Repository<Merchant>().GetCountAsync(countSpec);
@@ -48,8 +47,9 @@ namespace Shipping_Project.Controllers
 
             }
         }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<MerchecntForEditingAndGetting>> Get(string id)
+        public async Task<ActionResult<MerchecntForEditingAndGetting>> Get(string id) 
         {
             MerchantSpecfications spec = new MerchantSpecfications(m => m.UserID == id);
             var Merchant = await unit.Repository<Merchant>().GetAsyncBySpec(spec);
@@ -60,10 +60,8 @@ namespace Shipping_Project.Controllers
                 {
                     return NotFound(new APIResponse(404, "User not found."));
                 }
-
                 var userBranches = await unit.Repository<UserBranches>().GetAllAsyncBySpec(new BaseSpecifiction<UserBranches>(u => u.UserId == id));
                 var branchIds = userBranches.Select(ub => ub.BranchId).ToList();
-
                 var MerchantCities = await unit.Repository<MerchantCity>().GetAllAsyncBySpec(new BaseSpecifiction<MerchantCity>(c => c.MerchantId == Merchant.User.Id));
                 
                 var specialDeliveryPrices = MerchantCities.Select(mc => new SpecialDeliveryPriceForMerchant { cityId = mc.CityId }).ToList();
@@ -140,8 +138,6 @@ namespace Shipping_Project.Controllers
             {
                 return BadRequest(new APIResponse(400, "Email already exists"));
             }
-
-
             using var transaction = await unit.BeginTransactionAsync();
             try
             {
@@ -155,13 +151,13 @@ namespace Shipping_Project.Controllers
                 }
 
                 
-                var newMerchant = new Merchant(newUser.Id, AddingMerchant);
+                var newMerchant = new Merchant(newUser.Id, AddingMerchant);       
                 await unit.Repository<Merchant>().ADD(newMerchant);
 
                
                 if (AddingMerchant.BranchesIds?.Count > 0)
                 {
-                    var userBranches = AddingMerchant.BranchesIds
+                    var userBranches = AddingMerchant.BranchesIds 
                         .Select(branchId => new UserBranches(newUser.Id, branchId))
                         .ToList();
 
@@ -191,6 +187,7 @@ namespace Shipping_Project.Controllers
                 return StatusCode(500, new APIResponse(500, "An error occurred while creating merchant"));
             }
         }
+
         [HttpPut("edit/{id}")]
         public async Task<ActionResult> Edit([FromRoute] string id, MerchecntForEditingAndGetting updatedMerchant)
         {
@@ -208,6 +205,7 @@ namespace Shipping_Project.Controllers
                     existingMerchant.StoreName = updatedMerchant.StoreName;
                     existingMerchant.RejectedOrederPercentage = updatedMerchant.RejectedOrderPrecentage;
                     existingMerchant.SpecialPickUp = updatedMerchant.SpecialPickUp;
+
 
 
                     var existingUser = await user.FindByIdAsync(updatedMerchant.Id);
@@ -245,8 +243,10 @@ namespace Shipping_Project.Controllers
                     }
 
 
+
                     unit.Repository<Merchant>().Update(existingMerchant);
                     await unit.Save();
+
 
 
                     return Ok();

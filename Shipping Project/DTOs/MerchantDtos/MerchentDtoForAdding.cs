@@ -5,9 +5,6 @@ namespace Shipping_Project.DTOs.MerchantDtos
 {
     public class MerchantDtoForAdding
     {
-       
-       
-
         [Required]
         public string Address { get; set; }
 
