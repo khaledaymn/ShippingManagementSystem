@@ -9,7 +9,7 @@ namespace Shipping_Project.Specifications
     {
         public EmployeeSpecfication(EmployeeParams param):base
             (p=>
-            (string.IsNullOrEmpty(param.SearchByName)||p.User.Name.Contains(param.SearchByName)) 
+            (string.IsNullOrEmpty(param.SearchByName)||p.User.Name.ToLower().Contains(param.SearchByName)) 
             )
         {
             if(param.Sort is not null)
