@@ -1,8 +1,8 @@
 ﻿namespace Shipping_Project.DTOs.MerchantDtos
 {
-    public class MerchantReponseForPagniation<T> 
+    public class GovernoratePaginationForCount<T> 
     {
-        public MerchantReponseForPagniation(int pagesize, int pageindex, int count, IReadOnlyList<T> data)
+        public GovernoratePaginationForCount(int pagesize, int pageindex, int count, IReadOnlyList<T> data)
         {
             PageSize = pagesize;
             PageIndex = pageindex;
