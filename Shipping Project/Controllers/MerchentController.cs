@@ -29,7 +29,7 @@ namespace Shipping_Project.Controllers
             this.user = user;
         }
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<MerchantReponseForPagniation<MerchantDTO>>>> GetAll([FromQuery] MerchantParams Params)
+        public async Task<ActionResult<IReadOnlyList<GovernoratePaginationForCount<MerchantDTO>>>> GetAll([FromQuery] MerchantParams Params)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace Shipping_Project.Controllers
                 var countSpec = new MerchantPaginationForCount(Params);
                 var count = await unit.Repository<Merchant>().GetCountAsync(countSpec);
 
-                return Ok(new MerchantReponseForPagniation<MerchantDTO>(Params.PageSize, Params.PageIndex, count, merchantsDTO));
+                return Ok(new GovernoratePaginationForCount<MerchantDTO>(Params.PageSize, Params.PageIndex, count, merchantsDTO));
             }
             catch (Exception ex)
             {
