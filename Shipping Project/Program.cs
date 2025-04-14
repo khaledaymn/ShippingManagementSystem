@@ -20,6 +20,7 @@ using Shipping_Project.Repository;
 using Shipping_Project.UnitOfWork;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 
 #endregion
 
@@ -33,7 +34,11 @@ var builder = WebApplication.CreateBuilder(args);
 #region API Configration
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
 
 #endregion
 
@@ -106,7 +111,15 @@ builder.Services.AddSwaggerGen(option =>
 #region Dependancy Injection Configration
 builder.Services.AddScoped<UnitOfWork>();
 builder.Services.AddScoped(typeof(IGenaricRepo<>), typeof(GenaricRepo<>));
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 
 
@@ -229,6 +242,7 @@ if (app.Environment.IsDevelopment())
 
 #region Middlewares
 app.UseMiddleware<ConvensionExceptionMiddleWare>();
+app.UseCors("AllowAll");
 app.UseAuthorization();
 
 app.MapControllers();
