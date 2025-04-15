@@ -18,7 +18,7 @@ public class CitiesController : ControllerBase
     {
         var cities = await _unitOfWork.CityRepository.GetAll();
         var cityDTOs = CityDTO.FromCities(cities); // Manual Mapping
-        return Ok(cityDTOs);
+        return Ok(cityDTOs);            
     }
 
     [HttpGet("{id}")]

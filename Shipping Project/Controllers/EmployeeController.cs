@@ -61,6 +61,7 @@ namespace Shipping_Project.Controllers
             var Employee = new Employee()
             {
                 UserID = NewUser.Id,
+                GroupId =DTO.GroupId,
             };
 
            await unit.Repository<Employee>().ADD(Employee);
@@ -84,7 +85,7 @@ namespace Shipping_Project.Controllers
             }
             await unit.Save();
 
-            return Ok("Employee Created Done");
+            return Ok(new {message ="Created Done"});
         }
         //Get All Employee 
         [HttpGet]
@@ -97,6 +98,8 @@ namespace Shipping_Project.Controllers
             {
                 var employee = new GetAllEmployeeDTO()
                 {
+                    id=emp.UserID,
+                    GroupName=emp.group.Name,
                     Name=emp.User.Name,
                     BrachName=emp.User.UserBranches.Select(e=>e.Branches.Name).FirstOrDefault(),
                     Email=emp.User.Email,
@@ -108,22 +111,23 @@ namespace Shipping_Project.Controllers
             return Ok(ObjToReturn); 
         }
         //Get Employee By Id 
-        [HttpGet("{id}")]
+        [HttpGet("{id}")]   
         public async Task<ActionResult> GetById(string id )
         {
             var Spec = new EmployeeSpecfication(p=>p.UserID==id);
             var employee = await unit.Repository<Employee>().GetAsyncBySpec(Spec);
-            if (employee != null)
+            if (employee != null)    
             {
                 var emp =await _userManager.FindByIdAsync(id);
                 if (emp != null)
                 {
-                    var r = new GetAllEmployeeDTO()
+                    var r = new UpdateEmployeeDTO()
                     {
+                        GroupId=emp.Employee.GroupId,
+                        UserName = emp.UserName,
                         Name = emp.Name,
                         Email = emp.Email,
-                        IsDeleted = emp.IsDeleted,
-                        BrachName = emp.UserBranches.Select(s => s.Branches.Name).FirstOrDefault(),
+                        BranchIds = emp.UserBranches.Select(s => s.Branches.ID).ToList(), 
                         PhoneNumber = emp.PhoneNumber
                     };
                     return Ok(r);
@@ -132,27 +136,68 @@ namespace Shipping_Project.Controllers
             return BadRequest(new APIResponse(400));
         }
         // Update Employee
-        [HttpPut]
-        public async Task<ActionResult> Update([FromQuery] string id , UpdateEmployeeDTO DTO)
+
+
+
+        [HttpPut]           
+        public async Task<ActionResult> Update([FromQuery] string id, UpdateEmployeeDTO DTO)
         {
-            var Spec = new EmployeeSpecfication(p => p.UserID == id);
-            var employee = await unit.Repository<Employee>().GetAsyncBySpec(Spec);
-            if (employee != null)
+            var spec = new EmployeeSpecfication(p => p.UserID == id);
+            var employee = await unit.Repository<Employee>().GetAsyncBySpec(spec); 
+            if (employee == null)
+                return BadRequest();
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return BadRequest();
+            user.IsDeleted=DTO.IsDeleted;
+            user.Name = DTO.Name;
+            user.UserName = DTO.UserName;
+            user.Email = DTO.Email;
+            user.PhoneNumber = DTO.PhoneNumber;
+            var identityResult = await _userManager.UpdateAsync(user);
+            if (!identityResult.Succeeded)
+                return BadRequest();
+
+            employee.GroupId = DTO.GroupId;
+
+            employee.User.UserBranches.Clear(); 
+
+            if (DTO.BranchIds != null)
             {
-                var emp = await _userManager.FindByIdAsync(id);
-                if (emp != null)
-                {
-                    emp.Name = DTO.Name;
-                    emp.UserName=DTO.UserName;
-                    emp.Email = DTO.Email;
-                    emp.PhoneNumber = DTO.PhoneNumber;
-                    unit.Repository<Employee>().Update(employee);
-                    await unit.Save();
-                    return Ok(DTO);
+                foreach (var branchId in DTO.BranchIds)
+                { 
+                    employee.User.UserBranches.Add(new UserBranches(user.Id, branchId));
                 }
             }
-            return BadRequest();
+
+            unit.Repository<Employee>().Update(employee);
+            await unit.Save();
+            return Ok(DTO);
         }
+        //[HttpPut]              
+        //public async Task<ActionResult> Update([FromQuery] string id , UpdateEmployeeDTO DTO)
+        //{
+        //    var Spec = new EmployeeSpecfication(p => p.UserID == id);
+        //    var employee = await unit.Repository<Employee>().GetAsyncBySpec(Spec);
+        //    if (employee != null)
+        //    {
+        //        var emp = await _userManager.FindByIdAsync(id);
+        //        if (emp != null)
+        //        {
+        //            emp.Name = DTO.Name;
+        //            emp.UserName=DTO.UserName;
+        //            emp.Email = DTO.Email;
+        //            emp.PhoneNumber = DTO.PhoneNumber;
+        //            emp.Employee.GroupId=DTO.GroupId;
+        //            emp.UserBranches.Select(s => s.Branches.ID).ToList() = DTO.BranchIds; 
+        //            unit.Repository<Employee>().Update(employee);
+        //            await unit.Save();
+        //            return Ok(DTO);      
+        //        }
+        //    }
+        //    return BadRequest();
+        //}
         // Delete Employee
         [HttpDelete]
         public async Task<ActionResult> Delete(string id)
@@ -160,10 +205,10 @@ namespace Shipping_Project.Controllers
             var Emp = await unit.Repository<ApplicationUser>().GetAsyncBySpec( new BaseSpecifiction<ApplicationUser> (p=>p.Id==id));
             if (Emp != null)
             {
-                Emp.IsDeleted = true;
+                Emp.IsDeleted = !Emp.IsDeleted;
                 unit.Repository<ApplicationUser>().Update(Emp);
                 await unit.Save();
-                return Ok("Deleted Done");
+                return Ok(new { isDeleted = true }); 
             }
             return BadRequest(new APIResponse(400));
         }

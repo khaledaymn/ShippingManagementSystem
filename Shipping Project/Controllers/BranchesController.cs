@@ -5,6 +5,9 @@ using Shipping_Project.Models;
 using Shipping_Project.UnitOfWork;
 using Shipping_Project.Specifications.Params;
 using Shipping_Project.Specifications;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using APIsLayer.Errors;
+using Shipping_Project.DTOs.MerchantDtos;
 namespace Shipping_Project.Controllers
 {
     [Route("api/[controller]")]
@@ -17,7 +20,7 @@ namespace Shipping_Project.Controllers
         {
             this.unit = unit;
         }
-        [HttpPost("ADD Branche")]
+        [HttpPost]
         public async Task< ActionResult> ADD(BrancheDTO branchefromRequest)
         {
             if(ModelState.IsValid)
@@ -34,13 +37,38 @@ namespace Shipping_Project.Controllers
             }
             return BadRequest(); 
         }
+        // Get All Without Pagination
+        [HttpGet("withOutPagination")]
+        public async Task<ActionResult> GetAllWithOutPagination()
+        {
+            var branches= await unit.Repository<Branches>().GetAll();
+            if(branches is null)
+            {
+                return BadRequest();
+            }
+            List<BrancheDTO> brancheDTO = new List<BrancheDTO>();
+            foreach (var branche in branches) 
+            {
+                BrancheDTO b = new BrancheDTO();
+                b.BrancheID = branche.ID;
+                b.Name = branche.Name;
+                b.IsDeleted = branche.IsDeleted;
+                b.Location = branche.Location;
+                b.CreationDate = branche.CreationDate;
+                b.CityId = branche.CityId;
+                brancheDTO.Add(b);
+            }
+            return Ok(brancheDTO); 
+        }
         [HttpGet]
         public async Task< ActionResult> GetAll([FromQuery]BranchParams Params)
         {
             var Spec = new BranchSpecification(Params);
            var branches = await unit.Repository<Branches>().GetAllAsyncBySpec(Spec);
+            var countSpec = new BranchPaginationForCount(Params);
+            var count = await unit.Repository<Branches>().GetCountAsync(countSpec);
 
-           List <BrancheDTO> brancheDTO = new List<BrancheDTO>(); 
+            List <BrancheDTO> brancheDTO = new List<BrancheDTO>(); 
            if(branches is not null)
             {
                 foreach (var branche in branches)
@@ -55,11 +83,27 @@ namespace Shipping_Project.Controllers
                     brancheDTO.Add(b);
                 }
                 return Ok(brancheDTO);
-                
             }
             return BadRequest();
         }
-        [HttpPut("{id:int}Update")]
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetById(int id)
+        {
+            var branche = await unit.Repository<Branches>().GetById(id);
+            if(branche is null)
+            {
+                return BadRequest(new APIResponse(400));
+            }
+            Shipping_Project.DTOs.BrancheDTO b = new BrancheDTO();
+            b.BrancheID = branche.ID;
+            b.Name = branche.Name;
+            b.IsDeleted = branche.IsDeleted;
+            b.Location = branche.Location;
+            b.CreationDate = branche.CreationDate;
+            b.CityId = branche.CityId;
+            return Ok(b);
+        }
+        [HttpPut("{id:int}")]
         public async Task< ActionResult> Update( int id ,BrancheDTO fromRequest)
         { 
             Branches branches = await unit.Repository<Branches>().GetById(id);
@@ -76,7 +120,7 @@ namespace Shipping_Project.Controllers
             await unit.Save();
             return Ok(fromRequest);
         }
-        [HttpDelete("{id:int}Delete")]
+        [HttpDelete]
         public async Task< ActionResult> Delete(int id)
         {
             Branches branches = await unit.Repository<Branches>().GetById(id);
@@ -84,9 +128,10 @@ namespace Shipping_Project.Controllers
             {
                 return BadRequest();
             }
-            unit.Repository<Branches>().Delete(id);
+            branches.IsDeleted=true;
+            unit.Repository<Branches>().Update(branches);
             await unit.Save();
-            return Ok("Deleted Done");
+            return Ok(new { isDeleted = true });
         }
     }
 }

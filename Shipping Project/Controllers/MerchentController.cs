@@ -135,6 +135,7 @@ namespace Shipping_Project.Controllers
         //    }
         //}
         [HttpPost("add")]
+
         public async Task<ActionResult> Add(MerchantDtoForAdding AddingMerchant)
         {
            
@@ -182,7 +183,7 @@ namespace Shipping_Project.Controllers
                     await unit.Repository<MerchantCity>().AddRange(merchantCities);
                 }
 
-               
+                
                 var saveResult = await unit.Save();
                 await transaction.CommitAsync();
 

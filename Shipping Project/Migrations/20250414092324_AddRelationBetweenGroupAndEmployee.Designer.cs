@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shipping_Project.Models;
 
@@ -11,9 +12,11 @@ using Shipping_Project.Models;
 namespace Shipping_Project.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    partial class ShippingContextModelSnapshot : ModelSnapshot
+    [Migration("20250414092324_AddRelationBetweenGroupAndEmployee")]
+    partial class AddRelationBetweenGroupAndEmployee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -331,6 +334,9 @@ namespace Shipping_Project.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermassionId")
                         .HasColumnType("int");
 
                     b.HasKey("UserID");
