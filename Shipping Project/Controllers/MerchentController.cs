@@ -13,6 +13,7 @@ using Shipping_Project.Models;
 using Shipping_Project.Specifications;
 using Shipping_Project.Specifications.Params;
 using Shipping_Project.UnitOfWork;
+using Shipping_Project.DTOs.BranchesDtos;
 
 namespace Shipping_Project.Controllers
 {
@@ -29,7 +30,7 @@ namespace Shipping_Project.Controllers
             this.user = user;
         }
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<MerchantReponseForPagniation<MerchantDTO>>>> GetAll([FromQuery] MerchantParams Params)
+        public async Task<ActionResult<IReadOnlyList<GovernoratePaginationForCount<MerchantDTO>>>> GetAll([FromQuery] MerchantParams Params)
         {
             try
             {
@@ -38,7 +39,8 @@ namespace Shipping_Project.Controllers
                 var merchantsDTO = Merchants.Select(m => new MerchantDTO(m)).ToList();
                 var countSpec = new MerchantPaginationForCount(Params);
                 var count = await unit.Repository<Merchant>().GetCountAsync(countSpec);
-                return Ok(new MerchantReponseForPagniation<MerchantDTO>(Params.PageSize, Params.PageIndex, count, merchantsDTO));   
+
+                return Ok(new GovernoratePaginationForCount<MerchantDTO>(Params.PageSize, Params.PageIndex, count, merchantsDTO));
             }
             catch (Exception ex)
             {
@@ -46,6 +48,7 @@ namespace Shipping_Project.Controllers
 
             }
         }
+        
 
         [HttpGet("{id}")]
         public async Task<ActionResult<MerchecntForEditingAndGetting>> Get(string id) 
@@ -59,11 +62,17 @@ namespace Shipping_Project.Controllers
                 {
                     return NotFound(new APIResponse(404, "User not found."));
                 }
-                var userBranches = await unit.Repository<UserBranches>().GetAllAsyncBySpec(new BaseSpecifiction<UserBranches>(u => u.UserId == id));
-                var branchIds = userBranches.Select(ub => ub.BranchId).ToList();
+                var userBranchesids = await unit.Repository<UserBranches>().GetAllAsyncBySpec(new BaseSpecifiction<UserBranches>(u => u.UserId == id));
+               
+                var userbranches = userBranchesids.Select(b => b.Branches).ToList();
+                if (userbranches == null)
+                {
+                    return NotFound(new APIResponse(404, "Branches not found."));
+                }
+                List<branchDtoForMerchant> BranchForResp= userbranches.Select(b=>new branchDtoForMerchant(b)).ToList();
                 var MerchantCities = await unit.Repository<MerchantCity>().GetAllAsyncBySpec(new BaseSpecifiction<MerchantCity>(c => c.MerchantId == Merchant.User.Id));
                 
-                var specialDeliveryPrices = MerchantCities.Select(mc => new SpecialDeliveryPriceForMerchant { cityId = mc.CityId }).ToList();
+                var specialDeliveryPrices = MerchantCities.Select(mc => new SpecialDeliveryPriceForMerchant {CityName=mc.City.Name,SpecialPreice=mc.SpecialPreice, cityId = mc.CityId }).ToList();
 
                 var MerchantDto = new MerchecntForEditingAndGetting
                 {
@@ -75,7 +84,7 @@ namespace Shipping_Project.Controllers
                     StartWorkDDate = user.HiringDate,
                     PhoneNumber = user.PhoneNumber,
                     StoreName = Merchant.StoreName,
-                    BranchesIds = branchIds,
+                    Branches = BranchForResp,
                     Name = user.Name,
                     SpecialDeliveryPrices = specialDeliveryPrices ?? new List<SpecialDeliveryPriceForMerchant>()
                 };
@@ -229,7 +238,7 @@ namespace Shipping_Project.Controllers
 
                     var existingUserBranches = await unit.Repository<UserBranches>().GetAllAsyncBySpec(new BaseSpecifiction<UserBranches>(u => u.UserId == existingMerchant.UserID));
                     unit.Repository<UserBranches>().DeleteRange(existingUserBranches);
-                    var newUserBranches = updatedMerchant.BranchesIds.Select(b => new UserBranches(updatedMerchant.Id, b)).ToList();
+                    var newUserBranches = updatedMerchant.Branches.Select(b => new UserBranches(updatedMerchant.Id, b.BrancheID)).ToList();
                     await unit.Repository<UserBranches>().AddRange(newUserBranches);
 
 
@@ -265,7 +274,7 @@ namespace Shipping_Project.Controllers
         }
 
         [HttpDelete("delete/{id}")]
-        public async Task<ActionResult> Delete(string id)
+        public async Task<ActionResult> Delete([FromRoute]string id)
         {
             try
             {

@@ -1,4 +1,5 @@
-﻿using Shipping_Project.Models;
+﻿using Shipping_Project.DTOs.BranchesDtos;
+using Shipping_Project.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Shipping_Project.DTOs.MerchantDtos
@@ -27,7 +28,7 @@ namespace Shipping_Project.DTOs.MerchantDtos
         [Required]
         public float RejectedOrderPrecentage { get; set; }
         public int? SpecialPickUp { get; set; }
-        public List<int>? BranchesIds { get; set; } = new();
+        public List<branchDtoForMerchant> Branches { get; set; } = new();
 
         public List<SpecialDeliveryPriceForMerchant>? SpecialDeliveryPrices { get; set; } = new();
 
