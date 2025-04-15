@@ -10,6 +10,7 @@ namespace Shipping_Project.Specifications
             base(m => (!Params.ActiveStatus.HasValue || m.User.IsDeleted != Params.ActiveStatus) &&
             (string.IsNullOrEmpty(Params.SearchByName) || m.User.UserName.ToLower().Contains(Params.SearchByName)))
         {
+
         }
     }
    

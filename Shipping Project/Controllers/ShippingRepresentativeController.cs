@@ -116,7 +116,7 @@ namespace Shipping_Project.Controllers
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data.");
 
-            var shippingRepresentative = await _unitOfWork.Repository<ShippigRepresentative>().GetById(dto.ID);
+            var shippingRepresentative = await _unitOfWork.Repository<ShippigRepresentative>().GetById(dto.ID); 
             if (shippingRepresentative == null)
                 return NotFound("Shipping Representative not found.");
 

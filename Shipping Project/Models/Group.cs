@@ -5,5 +5,6 @@
         public string Name { get; set; }
         public DateTime CreationDAte { get; set; } = DateTime.Now;
         public virtual List<PermissionGroup>? PermissionGroup { get; set; }
+        public virtual List<Employee> Employees { get; set; }          
     }
 }

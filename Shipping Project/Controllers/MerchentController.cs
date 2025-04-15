@@ -38,8 +38,7 @@ namespace Shipping_Project.Controllers
                 var merchantsDTO = Merchants.Select(m => new MerchantDTO(m)).ToList();
                 var countSpec = new MerchantPaginationForCount(Params);
                 var count = await unit.Repository<Merchant>().GetCountAsync(countSpec);
-
-                return Ok(new MerchantReponseForPagniation<MerchantDTO>(Params.PageSize, Params.PageIndex, count, merchantsDTO));
+                return Ok(new MerchantReponseForPagniation<MerchantDTO>(Params.PageSize, Params.PageIndex, count, merchantsDTO));   
             }
             catch (Exception ex)
             {
@@ -127,6 +126,7 @@ namespace Shipping_Project.Controllers
         //    }
         //}
         [HttpPost("add")]
+
         public async Task<ActionResult> Add(MerchantDtoForAdding AddingMerchant)
         {
            
@@ -174,7 +174,7 @@ namespace Shipping_Project.Controllers
                     await unit.Repository<MerchantCity>().AddRange(merchantCities);
                 }
 
-               
+                
                 var saveResult = await unit.Save();
                 await transaction.CommitAsync();
 

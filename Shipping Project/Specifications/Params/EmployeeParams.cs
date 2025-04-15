@@ -15,7 +15,7 @@
 		public string? SearchByName
         {
 			get { return searchByName; }
-			set { searchByName = value.ToLower(); }
+			set { searchByName = value.ToLower(); } 
 		}
 	}
 }

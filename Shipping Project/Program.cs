@@ -34,6 +34,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+// Allow CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 #endregion
 
@@ -217,6 +228,7 @@ catch (Exception ex)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
+    app.UseCors("AllowAngularApp");
     app.UseSwaggerUI(options =>
     {
         var prefix = string.IsNullOrEmpty(options.RoutePrefix) ? "." : "..";

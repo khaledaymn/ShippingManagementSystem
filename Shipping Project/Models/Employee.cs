@@ -9,5 +9,8 @@ namespace Shipping_Project.Models
         [ForeignKey("User"),Key]
         public string UserID { get; set; }
         public virtual ApplicationUser User { get; set; }
+        [ForeignKey("group")]
+        public int GroupId { get; set; }
+        public virtual Group? group { get; set; }    
     }
 }

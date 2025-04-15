@@ -26,8 +26,9 @@ namespace Shipping_Project.Models
         public string UserID { get; set; }
         public string StoreName { get; set; }
         public double RejectedOrederPercentage { get; set; }
+        public int? SpecialPickUp { get; set; } 
 
-        public int? SpecialPickUp { get; set; }
+
         [ForeignKey("UserID")]
         public virtual ApplicationUser User { get; set; }
         public virtual List<MerchantCity>? MerchantCities { get; set; } = new List<MerchantCity>();
