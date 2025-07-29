@@ -1,0 +1,20 @@
+<div class="dashboard-card" [class]="getColorClass()">
+  <div class="card-header">
+    <div class="card-icon">
+      <i class="bi" [class]="metric.icon"></i>
+    </div>
+    <div class="card-change" [class]="getChangeColorClass()" *ngIf="metric.change">
+      <span>{{ metric.change }}</span>
+      <i class="bi"
+         [class.bi-arrow-up]="metric.changeType === 'increase'"
+         [class.bi-arrow-down]="metric.changeType === 'decrease'"
+         [class.bi-dash]="metric.changeType === 'neutral'"></i>
+    </div>
+  </div>
+
+  <div class="card-content">
+    <h3 class="card-value">{{ metric.value }}</h3>
+    <p class="card-title">{{ metric.title }}</p>
+    <p class="card-description" *ngIf="metric.description">{{ metric.description }}</p>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="notifications-container" role="region" aria-label="Notifications" aria-live="polite">
+  <div
+    *ngFor="let notification of notifications; trackBy: trackByNotificationId"
+    class="notification"
+    [class]="getNotificationClass(notification.type)"
+    [attr.role]="notification.type === 'error' ? 'alert' : 'status'"
+    [attr.aria-live]="notification.type === 'error' ? 'assertive' : 'polite'"
+    (click)="onNotificationClick(notification)"
+    (mouseenter)="onNotificationMouseEnter(notification)"
+    (mouseleave)="onNotificationMouseLeave(notification)">
+
+    <div class="notification-content">
+      <div class="notification-icon-wrapper">
+        <i
+          class="bi notification-icon"
+          [class]="getNotificationIcon(notification.type)"
+          [attr.aria-hidden]="true">
+        </i>
+      </div>
+
+      <div class="notification-body">
+        <span class="notification-message">{{ notification.message }}</span>
+        <div class="notification-meta" *ngIf="notification.persistent">
+          <small class="notification-persistent-label">Persistent</small>
+        </div>
+      </div>
+
+      <button
+        class="notification-close"
+        (click)="removeNotification(notification.id); $event.stopPropagation()"
+        [attr.aria-label]="'Close ' + notification.type + ' notification'"
+        [attr.title]="'Close ' + notification.type + ' notification'"
+        type="button">
+        <span class="visually-hidden">Close {{ notification.type }} notification</span>
+        <i class="bi bi-x" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div
+      class="notification-progress"
+      *ngIf="!notification.persistent && notification.duration"
+      [style.animation-duration]="notification.duration + 'ms'">
+    </div>
+  </div>
+</div>
+
+<div class="notifications-empty" *ngIf="notifications.length === 0" aria-hidden="true"></div>

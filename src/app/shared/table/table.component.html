@@ -1,0 +1,448 @@
+<div class="shared-table-container">
+  <!-- Compact Header Section -->
+  <div class="table-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h3 class="table-title">{{ title || "Data Table" }}</h3>
+        <p class="table-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+      </div>
+      <div class="header-right">
+        <!-- Search -->
+        <div class="search-container" *ngIf="config?.searchable">
+          <form [formGroup]="searchForm" class="search-form">
+            <div class="search-input-group">
+              <i class="bi bi-search search-icon"></i>
+              <input
+                #searchInput
+                type="text"
+                class="search-input"
+                placeholder="Search..."
+                autofocus
+                formControlName="search"
+                [disabled]="loading"
+              />
+            </div>
+          </form>
+        </div>
+
+        <!-- Filter Toggle -->
+        <button
+          type="button"
+          class="btn btn-filter"
+          *ngIf="config?.filters?.length"
+          (click)="toggleFilters()"
+          [disabled]="loading"
+          [class.active]="showFilters"
+        >
+          <i class="bi bi-funnel"></i>
+          <span class="d-none d-md-inline">Filters</span>
+          <span class="filter-count" *ngIf="filterForm?.dirty">
+            {{ activeFilterCount }}
+          </span>
+        </button>
+
+        <!-- Selected Items Info -->
+        <div
+          class="selected-info"
+          *ngIf="config?.selectable && (selectedItems?.length || 0) > 0"
+        >
+          <i class="bi bi-check-circle"></i>
+          <span>{{ selectedItems.length || 0 }} selected</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div
+    class="filters-section"
+    *ngIf="showFilters && config?.filters?.length"
+    >
+    <!-- [@slideDown] -->
+    <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
+      <div class="filters-grid">
+        <div class="filter-item" *ngFor="let filter of config?.filters">
+          <label class="filter-label">{{ filter?.label }}</label>
+
+          <!-- Text Filter -->
+          <input
+            *ngIf="filter?.type === 'text'"
+            type="text"
+            class="form-control form-control-sm"
+            [placeholder]="
+              filter.placeholder || 'Enter ' + filter.label.toLowerCase()
+            "
+            [formControlName]="filter.key"
+            [title]="filter.label || 'Text filter'"
+            [attr.aria-label]="filter.label || 'Text filter'"
+            title="{{ filter.label || 'Text filter' }}"
+          />
+
+          <!-- Number Filter -->
+          <input
+            *ngIf="filter?.type === 'number'"
+            type="number"
+            class="form-control form-control-sm"
+            [placeholder]="
+              filter.placeholder || 'Enter ' + filter.label.toLowerCase()
+            "
+            [min]="filter.min ?? null"
+            [max]="filter.max ?? null"
+            [formControlName]="filter.key"
+            [title]="filter.label || 'Number filter'"
+            placeholder="{{
+              filter.placeholder ||
+                'Enter ' + (filter.label.toLowerCase() || 'number')
+            }}"
+            title="{{ filter.label || 'Number filter' }}"
+          />
+
+          <!-- Select Filter -->
+          <select
+            *ngIf="filter?.type === 'select'"
+            class="form-select form-select-sm"
+            [formControlName]="filter.key"
+            [attr.aria-label]="filter.label || 'Select filter'"
+            [attr.title]="filter.label || 'Select filter'"
+            title="{{ filter.label || 'Select filter' }}"
+          >
+            <option value="">All {{ filter.label }}</option>
+            <option
+              *ngFor="let option of filter.options"
+              [value]="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+
+          <!-- Date Filter -->
+          <input
+            *ngIf="filter?.type === 'date'"
+            type="date"
+            class="form-control form-control-sm"
+            [formControlName]="filter.key"
+            [placeholder]="
+              filter.placeholder ||
+              'Select ' + (filter.label.toLowerCase() || 'date')
+            "
+            [title]="filter.label || 'Date filter'"
+            [attr.aria-label]="filter.label || 'Date filter'"
+            title="{{ filter.label || 'Date filter' }}"
+          />
+
+          <!-- Boolean Filter -->
+          <select
+            *ngIf="filter?.type === 'boolean'"
+            class="form-select form-select-sm"
+            [formControlName]="filter.key"
+            [attr.aria-label]="filter.label || 'Boolean filter'"
+            [attr.title]="filter.label || 'Boolean filter'"
+            title="{{ filter.label || 'Boolean filter' }}"
+          >
+            <option value="">All</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button
+          type="submit"
+          class="btn btn-primary btn-sm"
+          [disabled]="loading"
+        >
+          <i class="bi bi-check"></i>
+          Apply
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          (click)="onClearFilters()"
+          [disabled]="loading"
+        >
+          <i class="bi bi-x"></i>
+          Clear
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !loading">
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle"></i>
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper" *ngIf="!loading && !error">
+    <table class="table">
+      <thead>
+        <tr>
+          <!-- Select All Checkbox -->
+          <th class="select-column" *ngIf="config?.selectable">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [checked]="allSelected"
+                [indeterminate]="selectedItems.length > 0 && !allSelected"
+                (change)="onSelectAll($event)"
+                title="Select all rows"
+                placeholder="Select all rows"
+                [attr.aria-label]="'Select all rows'"
+              />
+            </div>
+          </th>
+
+          <!-- Column Headers -->
+          <th
+            *ngFor="let column of config?.columns"
+            [class]="'text-' + (column.align || 'left')"
+            [style.width]="column.width"
+            [class.sortable]="isSortable(column)"
+            [class.non-sortable]="!isSortable(column)"
+            (click)="isSortable(column) ? onSort(column) : null"
+          >
+            <div class="header-content">
+              <span class="column-label">{{ column.label }}</span>
+              <i
+                *ngIf="isSortable(column)"
+                class="sort-icon"
+                [class]="getSortIcon(column)"
+              ></i>
+            </div>
+          </th>
+
+          <!-- Actions Column -->
+          <th class="actions-column" *ngIf="config?.actions?.length">
+            <span class="actions-label">Actions</span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- No Data Row -->
+        <tr *ngIf="data?.items?.length === 0" class="no-data-row">
+          <td [attr.colspan]="getColumnCount()">
+            <div class="no-data-content">
+              <i class="bi bi-inbox"></i>
+              <h5>No data available</h5>
+              <p>No records match your current filters.</p>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Data Rows -->
+        <tr
+          *ngFor="let item of data?.items; trackBy: trackByFn"
+          class="data-row"
+          [class.selected]="isItemSelected(item)"
+        >
+          <!-- Select Checkbox -->
+          <td class="select-column" *ngIf="config?.selectable">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [checked]="isItemSelected(item)"
+                (change)="onSelectItem(item, $event)"
+                title="Select row"
+                placeholder="Select row"
+              />
+            </div>
+          </td>
+
+          <!-- Data Columns -->
+          <td
+            *ngFor="let column of config?.columns"
+            [class]="'text-' + (column.align || 'left')"
+            class="data-cell"
+          >
+            <span
+              *ngIf="
+                column.type !== 'boolean' &&
+                column.type !== 'badge' &&
+                column.type !== 'action'
+              "
+            >
+              {{ formatCellValue(item[column.key], column) }}
+            </span>
+            <span
+              *ngIf="column.type === 'boolean' || column.type === 'badge'"
+              [class]="getBadgeClass(item[column.key], column)"
+            >
+              {{ getBadgeText(item[column.key], column) }}
+            </span>
+            <!-- Action (Toggle Button) -->
+            <button
+              *ngIf="column.type === 'action'"
+              class="btn btn-sm btn-toggle"
+              [class.btn-success]="!item[column.key]"
+              [class.btn-outline-secondary]="item[column.key]"
+              (click)="onToggleAction(item,column.key)"
+              [disabled]="loading"
+              title="Toggle action"
+            >
+            </button>
+          </td>
+
+          <!-- Actions Column -->
+          <td class="actions-column" *ngIf="config?.actions?.length">
+            <div class="dropdown">
+              <button
+                class="btn btn-actions"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Show actions"
+              >
+                <i class="bi bi-three-dots"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li *ngFor="let action of config.actions">
+                  <button
+                    class="dropdown-item"
+                    [class]="'text-' + (action.color || 'dark')"
+                    [disabled]="isActionDisabled(action, item)"
+                    (click)="onAction(action.action, item)"
+                  >
+                    <i [class]="action.icon"></i>
+                    {{ action.label }}
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div
+    class="pagination-section"
+    *ngIf="
+      (config?.pagination && data?.totalCount) ||
+      (0 > 0 && config?.showFooter !== false)
+    "
+  >
+    <!-- Page Size Selector (Left) -->
+    <div class="page-size-container">
+      <label class="page-size-label">Show:</label>
+      <select
+        class="form-select form-select-sm page-size-select rounded-3"
+        [ngModel]="data.pageSize"
+        (change)="onPageSizeChange($event)"
+        aria-label="Select page size"
+        title="Select page size"
+      >
+        <option *ngFor="let size of pageSizeOptions" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Pagination Controls (Center) -->
+    <div class="pagination-controls">
+      <nav aria-label="Table pagination">
+        <ul class="pagination pagination-sm">
+          <!-- Previous Button -->
+          <li class="page-item" [attr.aria-disabled]="currentPage === 1">
+            <button
+              class="page-link"
+              (click)="onPageChange(currentPage - 1)"
+              [disabled]="currentPage === 1 || loading"
+              aria-label="Previous page"
+            >
+              <i class="bi bi-chevron-left"></i>
+            </button>
+          </li>
+
+          <!-- First Page -->
+          <li class="page-item" *ngIf="+pageNumbers[0] > 1">
+            <button
+              class="page-link"
+              (click)="onPageChange(1)"
+              [disabled]="loading"
+            >
+              1
+            </button>
+          </li>
+
+          <!-- Ellipsis -->
+          <li class="page-item disabled" *ngIf="+pageNumbers[0] > 2">
+            <span class="page-link">...</span>
+          </li>
+
+          <!-- Page Numbers -->
+          <li
+            class="page-item"
+            *ngFor="let page of pageNumbers"
+            [class.active]="page === currentPage"
+          >
+            <div
+              class="page-link"
+              (click)="!loading && onPageChange(+page)"
+              [class.disabled]="loading"
+            >
+              {{ page }}
+            </div>
+          </li>
+
+          <!-- Ellipsis -->
+          <li
+            class="page-item disabled"
+            *ngIf="+pageNumbers[pageNumbers.length - 1] < totalPages - 1"
+          >
+            <span class="page-link">...</span>
+          </li>
+
+          <!-- Last Page -->
+          <li
+            class="page-item"
+            *ngIf="+pageNumbers[pageNumbers.length - 1] < totalPages"
+          >
+            <button
+              class="page-link"
+              (click)="onPageChange(totalPages)"
+              [disabled]="loading"
+            >
+              {{ totalPages }}
+            </button>
+          </li>
+
+          <!-- Next Button -->
+          <li
+            class="page-item"
+            [attr.aria-disabled]="currentPage === totalPages"
+          >
+            <button
+              class="page-link"
+              (click)="onPageChange(currentPage + 1)"
+              [disabled]="currentPage === totalPages || loading"
+              aria-label="Next page"
+            >
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Results Info (Right) -->
+    <div class="results-info">
+      {{ getResultsText() }}
+    </div>
+  </div>
+</div>

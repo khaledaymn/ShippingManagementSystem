@@ -1,0 +1,46 @@
+<div class="cities-view-container">
+  <app-notification></app-notification>
+
+  <!-- Action Bar -->
+  <div class="action-bar" [class.no-action-left]="!canCreate">
+    <div class="action-left" *ngIf="canCreate">
+      <button class="btn btn-primary" (click)="addCity()" [disabled]="isLoading">
+        <i class="bi bi-plus-circle"></i>
+        Add New City
+      </button>
+    </div>
+
+    <div class="action-right" [class.no-action-left-right]="!canCreate">
+      <button class="btn btn-outline-secondary" (click)="exportCities()" [disabled]="isLoading">
+        <i class="bi bi-download"></i>
+        Export
+      </button>
+      <button class="btn btn-outline-secondary" (click)="refreshData()" [disabled]="isLoading">
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-card">
+    <app-table
+      [config]="tableConfig"
+      [data]="tableData"
+      [loading]="isLoading"
+      [error]="error"
+      title="Cities Management"
+      subtitle="Manage cities and their pricing information"
+      (tableEvent)="onTableEvent($event)"
+    ></app-table>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <app-confirmation-dialog
+    [show]="showDialog"
+    [data]="dialogData"
+    [loading]="isLoading"
+    (confirmed)="onConfirmDelete()"
+    (cancelled)="onCancelDelete()"
+  ></app-confirmation-dialog>
+</div>

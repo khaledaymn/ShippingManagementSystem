@@ -1,0 +1,54 @@
+<div class="modal fade" [class.show]="show" [style.display]="show ? 'block' : 'none'" tabindex="-1" role="dialog" aria-labelledby="modalTitle" [attr.aria-hidden]="!show">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content" [ngClass]="getDialogClass()">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <i [class]="getIconClass()" aria-hidden="true"></i>
+        </div>
+        <h5 class="modal-title" id="modalTitle">{{ mergedData.title }}</h5>
+        <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close" [disabled]="loading">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-message">{{ mergedData.message }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          *ngFor="let button of mergedData.extraButtons"
+          type="button"
+          [class]="button.class"
+          (click)="button.action()"
+          [disabled]="loading"
+          [attr.aria-label]="button.text"
+        >
+          {{ button.text }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="onCancel()"
+          [disabled]="loading"
+          [attr.aria-label]="mergedData.cancelText || 'Cancel'"
+        >
+          {{ mergedData.cancelText || 'Cancel' }}
+        </button>
+        <button
+          #confirmButton
+          type="button"
+          [class]="'btn ' + getButtonClass()"
+          (click)="onConfirm()"
+          [disabled]="loading"
+          [attr.aria-label]="mergedData.confirmText || 'Confirm'"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ mergedData.confirmText || 'Confirm' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade" [class.show]="show" *ngIf="show" (click)="onBackdropClick()" [attr.aria-hidden]="true"></div>

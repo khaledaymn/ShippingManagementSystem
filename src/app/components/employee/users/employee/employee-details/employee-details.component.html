@@ -1,0 +1,61 @@
+<div class="employee-details-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <button *ngIf="canEdit" (click)="onEdit()" class="btn btn-primary edit-button">
+      <i class="bi bi-pencil-square"></i> Edit Employee
+    </button>
+    <h2 class="page-title">Employee Details</h2>
+    <button (click)="onBack()" class="btn btn-primary edit-button">
+      <i class="bi bi-arrow-left"></i> Back to Employees
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner-border"></div>
+      <p>Loading employee details...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Employee Details Card -->
+  <div *ngIf="employee && !isLoading" class="details-card">
+    <div class="card-header">
+      <h3>{{ employee.name }}</h3>
+      <span [class]="employee.isDeleted ? 'status-active' : 'status-inactive'">
+        {{ employee.isDeleted ? 'Active' : 'Inactive' }}
+      </span>
+    </div>
+    <div class="card-body">
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-envelope-fill"></i> Email</div>
+        <div class="value">{{ employee.email }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-telephone-fill"></i> Phone Number</div>
+        <div class="value">{{ employee.phoneNumber }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-building"></i> Branches</div>
+        <div class="value">{{ getBranchNames() }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-shield-lock-fill"></i> Permission</div>
+        <div class="value">{{ employee.permission }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Data State -->
+  <div *ngIf="!employee && !isLoading && !errorMessage" class="no-data-container">
+    <div class="no-data-message">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <p>No employee details found.</p>
+    </div>
+  </div>
+</div>

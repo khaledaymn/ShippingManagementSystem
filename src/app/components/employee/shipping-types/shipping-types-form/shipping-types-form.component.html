@@ -1,0 +1,223 @@
+<div class="shipping-types-form-container">
+  <!-- Action Bar -->
+  <!-- <div class="action-bar">
+    <div class="action-left">
+      <h2 class="action-title">
+        <i class="bi bi-truck me-2"></i>
+        {{ isEditMode ? 'Edit Shipping Type' : 'Create Shipping Type' }}
+      </h2>
+      <p class="action-subtitle">
+        {{ isEditMode ? 'Update shipping type information' : 'Add a new shipping type to your store' }}
+      </p>
+    </div>
+
+  </div> -->
+
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">
+          <i class="bi bi-pencil-square"></i>
+          {{ isEditMode ? "Edit Shipping Type" : "Create Shipping Type" }}
+        </h1>
+        <p class="page-subtitle">
+          {{
+            isEditMode
+              ? "Update shipping type information"
+              : "Add a new shipping type to your store"
+          }}
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          class="back-button"
+          (click)="onCancel()"
+          [disabled]="submitting"
+        >
+          <i class="bi bi-arrow-left"></i>
+          <span>Back to List</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading shipping type...</p>
+  </div>
+
+  <!-- Form Content -->
+  <div class="form-container" *ngIf="!loading">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-6">
+        <div class="form-card">
+          <div class="form-header">
+            <div class="form-icon">
+              <i class="bi bi-truck"></i>
+            </div>
+            <h2 class="form-title">Shipping Type Details</h2>
+            <p class="form-subtitle">
+              Fill in the information below to
+              {{ isEditMode ? "update" : "create" }} the shipping type
+            </p>
+          </div>
+
+          <form
+            [formGroup]="shippingTypeForm"
+            (ngSubmit)="onSubmit()"
+            novalidate
+          >
+            <div class="form-body">
+              <!-- Name Field -->
+              <div class="form-group">
+                <label for="name" class="form-label required">
+                  <i class="bi bi-tag me-2"></i>
+                  Shipping Type Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('name')"
+                  formControlName="name"
+                  placeholder="Enter shipping type name (e.g., Express, Standard)"
+                  maxlength="100"
+                />
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
+                  {{ getFieldError("name") }}
+                </div>
+                <div class="form-text">
+                  Choose a clear, descriptive name for this shipping option
+                </div>
+              </div>
+
+              <!-- Extra Price Field -->
+              <div class="form-group">
+                <label for="extraPrice" class="form-label required">
+                  <i class="bi bi-currency-dollar me-2"></i>
+                  Extra Price
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="number"
+                    id="extraPrice"
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('extraPrice')"
+                    formControlName="extraPrice"
+                    placeholder="0.00"
+                    min="0"
+                    max="9999.99"
+                    step="0.01"
+                  />
+                </div>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="isFieldInvalid('extraPrice')"
+                >
+                  {{ getFieldError("extraPrice") }}
+                </div>
+                <div class="form-text">
+                  Additional cost for this shipping method (0.00 for free
+                  shipping)
+                </div>
+              </div>
+
+              <!-- Number of Days Field -->
+              <div class="form-group">
+                <label for="numOfDay" class="form-label required">
+                  <i class="bi bi-calendar-event me-2"></i>
+                  Delivery Days
+                </label>
+                <div class="input-group">
+                  <input
+                    type="number"
+                    id="numOfDay"
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('numOfDay')"
+                    formControlName="numOfDay"
+                    placeholder="1"
+                    min="1"
+                    max="365"
+                  />
+                  <span class="input-group-text">days</span>
+                </div>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="isFieldInvalid('numOfDay')"
+                >
+                  {{ getFieldError("numOfDay") }}
+                </div>
+                <div class="form-text">
+                  Expected delivery time in days (1-365 days)
+                </div>
+              </div>
+
+              <!-- Form Preview -->
+              <!-- <div class="form-preview" *ngIf="shippingTypeForm.valid">
+                <h6 class="preview-title">
+                  <i class="bi bi-eye me-2"></i>
+                  Preview
+                </h6>
+                <div class="preview-grid">
+                  <div class="preview-item">
+                    <span class="preview-label">Shipping Type:</span>
+                    <span class="preview-value">{{ shippingTypeForm.get('name')?.value }}</span>
+                  </div>
+                  <div class="preview-item">
+                    <span class="preview-label">Extra Price:</span>
+                    <span class="preview-value">
+                      ${{ (shippingTypeForm.get('extraPrice')?.value || 0).toFixed(2) }}
+                    </span>
+                  </div>
+                  <div class="preview-item">
+                    <span class="preview-label">Delivery Days:</span>
+                    <span class="preview-value">
+                      {{ shippingTypeForm.get('numOfDay')?.value }}
+                      {{ (shippingTypeForm.get('numOfDay')?.value || 0) === 1 ? 'day' : 'days' }}
+                    </span>
+                  </div>
+                </div>
+              </div> -->
+              <div class="action-right">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="onCancel()"
+                  [disabled]="submitting"
+                >
+                  <i class="bi bi-x-circle me-2"></i>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="shippingTypeForm.invalid || submitting"
+                  (click)="onSubmit()"
+                >
+                  <span
+                    *ngIf="submitting"
+                    class="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  <i
+                    *ngIf="!submitting"
+                    [class]="
+                      isEditMode
+                        ? 'bi bi-check-circle me-2'
+                        : 'bi bi-plus-circle me-2'
+                    "
+                  ></i>
+                  {{ submitButtonText }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

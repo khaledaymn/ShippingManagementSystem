@@ -1,0 +1,264 @@
+<div class="employee-edit-container">
+  <app-notification></app-notification>
+  <!-- Form Header -->
+  <div class="form-header">
+    <h2>{{ isEditMode ? "Edit Employee" : "Add New Employee" }}</h2>
+    <button (click)="onCancel()" class="back-button" [disabled]="isLoading">
+      <i class="bi bi-x-circle"></i> Cancel
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="isLoading" class="alert alert-info">
+    <i class="bi bi-hourglass-split"></i> Loading employee data...
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success">
+    <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+  </div>
+
+  <!-- Employee Form -->
+  <form
+    [formGroup]="employeeForm"
+    (ngSubmit)="onSubmit()"
+    class="employee-form"
+  >
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label for="name">
+          <i class="bi bi-person-fill"></i> Name
+          <span class="required">*</span>
+        </label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          class="form-control"
+          placeholder="Enter full name"
+          maxlength="100"
+        />
+        <div
+          *ngIf="isFieldInvalid('name')"
+          class="validation-error"
+        >
+          {{ getFieldError("name") }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="email">
+          <i class="bi bi-envelope-fill"></i> Email
+          <span class="required">*</span>
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="Enter email"
+        />
+        <div
+          *ngIf="isFieldInvalid('email')"
+          class="validation-error"
+        >
+          {{ getFieldError("email") }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="phoneNumber">
+          <i class="bi bi-telephone-fill"></i> Phone Number
+          <span class="required">*</span>
+        </label>
+        <input
+          id="phoneNumber"
+          type="text"
+          formControlName="phoneNumber"
+          class="form-control"
+          placeholder="Enter phone number"
+        />
+        <div
+          *ngIf="isFieldInvalid('phoneNumber')"
+          class="validation-error"
+        >
+          {{ getFieldError("phoneNumber") }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label for="address">
+          <i class="bi bi-geo-alt-fill"></i> Address
+          <span class="required">*</span>
+        </label>
+        <input
+          id="address"
+          type="text"
+          formControlName="address"
+          class="form-control"
+          placeholder="Enter address"
+        />
+        <div
+          *ngIf="isFieldInvalid('address')"
+          class="validation-error"
+        >
+          {{ getFieldError("address") }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="branchIds">
+          <i class="bi bi-building"></i> Branches
+          <span class="required">*</span>
+        </label>
+        <select
+          id="branchIds"
+          formControlName="branchIds"
+          multiple
+          class="form-control select-multiple"
+          [disabled]="branches.length === 0"
+        >
+          <option value="" disabled>
+            {{ branches.length === 0 ? "Loading branches..." : "Select branches" }}
+          </option>
+          <option
+            *ngFor="let branch of branches"
+            [value]="branch.id"
+          >
+            {{ branch.name }}
+          </option>
+        </select>
+        <div
+          *ngIf="isFieldInvalid('branchIds')"
+          class="validation-error"
+        >
+          {{ getFieldError("branchIds") }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="groupId">
+          <i class="bi bi-people-fill"></i> Group
+          <span class="required">*</span>
+        </label>
+        <select
+          id="groupId"
+          formControlName="groupId"
+          class="form-control"
+          [disabled]="groups.length === 0"
+        >
+          <option value="" disabled>
+            {{ groups.length === 0 ? "Loading groups..." : "Select group" }}
+          </option>
+          <option
+            *ngFor="let group of groups"
+            [value]="group.id"
+          >
+            {{ group.name }}
+          </option>
+        </select>
+        <div
+          *ngIf="isFieldInvalid('groupId')"
+          class="validation-error"
+        >
+          {{ getFieldError("groupId") }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Commented-out fields (kept as-is) -->
+    <!-- <div class="form-row">
+      <div class="form-group">
+        <label for="permission">
+          <i class="bi bi-shield-lock-fill"></i> Permission
+          <span class="required">*</span>
+        </label>
+        <input
+          id="permission"
+          type="text"
+          formControlName="permission"
+          class="form-control"
+          placeholder="Enter permission"
+        />
+        <div
+          *ngIf="isFieldInvalid('permission')"
+          class="validation-error"
+        >
+          {{ getFieldError("permission") }}
+        </div>
+      </div>
+      <div class="form-group checkbox-group">
+        <input
+          id="isActive"
+          type="checkbox"
+          formControlName="isActive"
+          class="form-check-input"
+        />
+        <label for="isActive" class="form-check-label">Is Active</label>
+      </div>
+    </div> -->
+
+    <ng-container *ngIf="!isEditMode">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">
+            <i class="bi bi-lock-fill"></i> Password
+            <span class="required">*</span>
+          </label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="form-control"
+            placeholder="Enter password"
+          />
+          <div
+            *ngIf="isFieldInvalid('password')"
+            class="validation-error"
+          >
+            {{ getFieldError("password") }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">
+            <i class="bi bi-lock-fill"></i> Confirm Password
+            <span class="required">*</span>
+          </label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            class="form-control"
+            placeholder="Confirm password"
+          />
+          <div
+            *ngIf="isFieldInvalid('confirmPassword')"
+            class="validation-error"
+          >
+            {{ getFieldError("confirmPassword") }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        [disabled]="employeeForm.invalid || isLoading"
+        class="btn btn-primary"
+      >
+        <i class="bi bi-save"></i>
+        <span
+          *ngIf="isLoading"
+          class="spinner-border spinner-border-sm me-2"
+        ></span>
+        {{ isEditMode ? "Update Employee" : "Add Employee" }}
+      </button>
+    </div>
+  </form>
+</div>

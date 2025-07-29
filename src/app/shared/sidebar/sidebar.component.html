@@ -1,0 +1,75 @@
+<div class="sidebar"
+     [class.collapsed]="isCollapsed && !isMobile"
+     [class.mobile-open]="isMobileOpen && isMobile">
+
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <a href="/dashboard" class="sidebar-brand">
+      <div class="brand-icon">
+        <!-- <i class="bi" [class]="config.brandIcon"></i> -->
+        <img [src]="config.brandIcon" alt="Brand Logo" class="logo">
+      </div>
+      <div class="brand-text">
+        <h2 class="brand-title">{{ config.brandTitle }}</h2>
+        <p class="brand-subtitle">{{ config.brandSubtitle }}</p>
+      </div>
+    </a>
+  </div>
+
+  <!-- Sidebar Content -->
+  <div class="sidebar-content">
+    <div class="sidebar-section">
+      <ul class="sidebar-menu">
+        <ng-container *ngFor="let item of config.menuItems; trackBy: trackByMenuItem">
+
+          <!-- Menu item with children (collapsible) -->
+          <li class="collapsible-item"
+              [class.expanded]="isExpanded(item.id)"
+              *ngIf="item.children && item.children.length > 0">
+
+            <button class="collapsible-trigger"
+                    (click)="onItemClick(item)"
+                    [attr.aria-expanded]="isExpanded(item.id)"
+                    [attr.aria-controls]="'submenu-' + item.id">
+              <div class="trigger-content">
+                <i class="bi menu-icon" [class]="item.icon"></i>
+                <span class="menu-text">{{ item.title }}</span>
+              </div>
+              <i class="bi bi-chevron-down chevron-icon"></i>
+            </button>
+
+            <ul class="submenu" [id]="'submenu-' + item.id">
+              <li class="submenu-item" *ngFor="let child of item.children; trackBy: trackByMenuItem">
+                <a class="submenu-link"
+                   [href]="child.url || '#'"
+                   [class.active]="isActive(child)"
+                   (click)="onItemClick(child, $event)">
+                  <i class="bi submenu-icon" [class]="child.icon"></i>
+                  <span>{{ child.title }}</span>
+                  <span class="role-badge" *ngIf="child.badge">{{ child.badge }}</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Simple menu item (no children) -->
+          <li class="menu-item" *ngIf="!item.children || item.children.length === 0">
+            <a class="menu-link"
+               [href]="item.url || '#'"
+               [class.active]="isActive(item)"
+               (click)="onItemClick(item, $event)">
+              <i class="bi menu-icon" [class]="item.icon"></i>
+              <span class="menu-text">{{ item.title }}</span>
+              <span class="role-badge" *ngIf="item.badge">{{ item.badge }}</span>
+            </a>
+          </li>
+        </ng-container>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Overlay -->
+<div class="sidebar-overlay"
+     [class.active]="isMobileOpen && isMobile"
+     (click)="onOverlayClick()"></div>

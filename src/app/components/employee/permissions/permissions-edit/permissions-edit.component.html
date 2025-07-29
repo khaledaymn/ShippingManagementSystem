@@ -1,0 +1,231 @@
+<div class="permissions-edit-container">
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-left">
+      <h3 class="action-title">
+        <i class="bi bi-shield-lock"></i>
+        {{ isEditMode ? "Edit Permission Group" : "Create Permission Group" }}
+      </h3>
+      <p class="action-subtitle">
+        {{ isEditMode ? "Modify permissions for the selected group" : "Set up permissions for a new group" }}
+      </p>
+    </div>
+    <div class="action-right">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="cancel()"
+        [disabled]="saving"
+      >
+        <i class="bi bi-arrow-left"></i>
+        Back to Groups
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading group data...</p>
+  </div>
+
+  <!-- Main Form -->
+  <div class="form-container" *ngIf="!loading">
+    <form [formGroup]="permissionForm" (ngSubmit)="onSubmit()">
+      <!-- Group Name Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="bi bi-tag"></i>
+            Group Information
+          </h3>
+        </div>
+        <div class="section-content">
+          <div class="form-group">
+            <label for="name" class="form-label">
+              Group Name <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('name')"
+              formControlName="name"
+              placeholder="Enter group name"
+              [disabled]="saving"
+            />
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
+              {{ getFieldError("name") }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permissions Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="bi bi-key"></i>
+            Permissions
+          </h3>
+          <p class="section-subtitle">
+            Select the permissions for each module. View permission is automatically selected when other permissions are chosen.
+          </p>
+        </div>
+        <div class="section-content">
+          <div class="permissions-grid">
+            <div
+              class="permission-module"
+              *ngFor="let module of modules"
+              [class.has-permissions]="hasAnyPermission(module.id)"
+            >
+              <div class="module-header">
+                <h4 class="module-name">
+                  <i class="bi bi-folder"></i>
+                  {{ module.name }}
+                </h4>
+                <div class="module-actions">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    (click)="selectAllPermissions(module.id)"
+                    [disabled]="saving"
+                  >
+                    Select All
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    (click)="clearAllPermissions(module.id)"
+                    [disabled]="saving"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+
+              <div class="permissions-list">
+                <!-- View Permission -->
+                <label class="permission-item" [for]="'view_' + module.id">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [id]="'view_' + module.id"
+                      [checked]="isPermissionChecked(module.id, 'view')"
+                      [disabled]="isPermissionDisabled(module.id, 'view') || saving"
+                      (change)="onPermissionChange(module.id, 'view', $event)"
+                    />
+                    <div class="permission-content">
+                      <div class="permission-header">
+                        <i class="bi bi-eye permission-icon view"></i>
+                        <span class="permission-name">View</span>
+                      </div>
+                      <span class="permission-desc">Can view {{ module.name.toLowerCase() }}</span>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- Create Permission -->
+                <label class="permission-item" [for]="'create_' + module.id">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [id]="'create_' + module.id"
+                      [checked]="isPermissionChecked(module.id, 'create')"
+                      [disabled]="saving"
+                      (change)="onPermissionChange(module.id, 'create', $event)"
+                    />
+                    <div class="permission-content">
+                      <div class="permission-header">
+                        <i class="bi bi-plus-circle permission-icon create"></i>
+                        <span class="permission-name">Create</span>
+                      </div>
+                      <span class="permission-desc">Can create new {{ module.name.toLowerCase() }}</span>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- Update Permission -->
+                <label class="permission-item" [for]="'update_' + module.id">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [id]="'update_' + module.id"
+                      [checked]="isPermissionChecked(module.id, 'update')"
+                      [disabled]="saving"
+                      (change)="onPermissionChange(module.id, 'update', $event)"
+                    />
+                    <div class="permission-content">
+                      <div class="permission-header">
+                        <i class="bi bi-pencil permission-icon update"></i>
+                        <span class="permission-name">Update</span>
+                      </div>
+                      <span class="permission-desc">Can modify {{ module.name.toLowerCase() }}</span>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- Delete Permission -->
+                <label class="permission-item" [for]="'delete_' + module.id">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [id]="'delete_' + module.id"
+                      [checked]="isPermissionChecked(module.id, 'delete')"
+                      [disabled]="saving"
+                      (change)="onPermissionChange(module.id, 'delete', $event)"
+                    />
+                    <div class="permission-content">
+                      <div class="permission-header">
+                        <i class="bi bi-trash permission-icon delete"></i>
+                        <span class="permission-name">Delete</span>
+                      </div>
+                      <span class="permission-desc">Can delete {{ module.name.toLowerCase() }}</span>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="cancel()"
+          [disabled]="saving"
+        >
+          <i class="bi bi-x-circle"></i>
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="permissionForm.invalid || saving"
+        >
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="saving"></span>
+          <i class="bi bi-check-circle" *ngIf="!saving"></i>
+          {{ isEditMode ? "Update Group" : "Create Group" }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <app-confirmation-dialog
+    [show]="showConfirmDialog"
+    [data]="confirmDialogData"
+    [loading]="saving"
+    (confirmed)="onConfirmCancel()"
+    (cancelled)="onCancelDialog()"
+  ></app-confirmation-dialog>
+</div>

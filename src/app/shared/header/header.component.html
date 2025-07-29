@@ -1,0 +1,289 @@
+<header class="header">
+  <div class="header-left">
+    <button
+      class="mobile-menu-toggle"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="isMobileMenuOpen"
+      aria-label="Toggle mobile menu"
+    >
+      <i
+        class="bi"
+        [class.bi-list]="!isMobileMenuOpen"
+        [class.bi-x]="isMobileMenuOpen"
+      ></i>
+    </button>
+    <h1 class="page-title">ShipSmart</h1>
+  </div>
+
+  <div class="header-center" *ngIf="!isMobile">
+    <div class="search-container">
+      <i class="bi bi-search search-icon"></i>
+      <input
+        #searchInput
+        type="text"
+        class="search-input"
+        placeholder="Search for Order..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput($event)"
+        (keypress)="onSearchKeyPress($event)"
+        [class.loading]="isSearching"
+        autocomplete="off"
+        role="searchbox"
+        aria-label="Search"
+      />
+
+      <!-- Search Results Dropdown -->
+      <div
+        class="search-results"
+        *ngIf="(searchResults$ | async)?.length && searchQuery"
+      >
+        <div class="search-results-header">
+          <span>Search Results</span>
+          <button
+            class="clear-search"
+            (click)="clearSearchResults()"
+            aria-label="Clear search"
+          >
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+        <div class="search-results-list">
+          <button
+            *ngFor="
+              let result of searchResults$ | async;
+              trackBy: trackBySearchResultId
+            "
+            class="search-result-item"
+            (click)="onSearchResultClick(result)"
+          >
+            <i class="bi" [class]="getSearchResultIcon(result.type)"></i>
+            <div class="search-result-content">
+              <div class="search-result-title">{{ result.title }}</div>
+              <div class="search-result-description">
+                {{ result.description }}
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="header-actions">
+      <div class="user-dropdown" [class.active]="isDropdownOpen">
+        <button
+          class="user-profile-btn"
+          (click)="toggleDropdown($event)"
+          [attr.aria-expanded]="isDropdownOpen"
+          aria-label="User menu"
+        >
+          <div class="user-avatar">
+            <div class="user-avatar-fallback">
+              <i class="bi bi-person-circle"></i>
+            </div>
+          </div>
+          <div class="user-info" *ngIf="!isMobile">
+            <span class="user-name">{{ userName }}</span>
+            <span class="user-role">{{ userRole }}</span>
+          </div>
+          <i class="bi bi-chevron-down dropdown-arrow"></i>
+        </button>
+
+        <div
+          #dropdownMenu
+          class="dropdown-menu"
+          role="menu"
+          (keydown)="onDropdownKeyDown($event)"
+          [style.display]="isDropdownOpen ? 'block' : 'none'"
+        >
+          <div class="dropdown-header">
+            <div class="dropdown-user-info">
+              <div class="user-avatar">
+                <div class="user-avatar-fallback">
+                  <i class="bi bi-person-circle"></i>
+                </div>
+              </div>
+              <div class="dropdown-user-details">
+                <p class="dropdown-user-name">{{ userName }}</p>
+                <p class="dropdown-user-email">{{ userEmail }}</p>
+                <p class="dropdown-user-role">{{ userRole }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <button
+            class="dropdown-item"
+            (click)="profile(); closeDropdown()"
+            role="menuitem"
+          >
+            <i class="bi bi-person"></i> Profile
+          </button>
+          <button
+            class="dropdown-item"
+            (click)="settings(); closeDropdown()"
+            role="menuitem"
+          >
+            <i class="bi bi-gear"></i> Settings
+          </button>
+          <div class="dropdown-divider"></div>
+          <button
+            class="dropdown-item text-danger"
+            (click)="confirmLogout(); closeDropdown()"
+            role="menuitem"
+          >
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" [class.active]="isMobileMenuOpen">
+  <div class="mobile-menu-content">
+    <div class="mobile-search">
+      <div class="search-container">
+        <i class="bi bi-search search-icon"></i>
+        <input
+          #mobileSearchInput
+          type="text"
+          class="search-input"
+          placeholder="Search for Order..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput($event)"
+          (keypress)="onSearchKeyPress($event)"
+          [class.loading]="isSearching"
+          autocomplete="off"
+          role="searchbox"
+          aria-label="Search"
+        />
+        <div
+          class="search-results"
+          *ngIf="(searchResults$ | async)?.length && searchQuery"
+        >
+          <div class="search-results-header">
+            <span>Search Results</span>
+            <button
+              class="clear-search"
+              (click)="clearSearchResults()"
+              aria-label="Clear search"
+            >
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+          <div class="search-results-list">
+            <button
+              *ngFor="
+                let result of searchResults$ | async;
+                trackBy: trackBySearchResultId
+              "
+              class="search-result-item"
+              (click)="onSearchResultClick(result)"
+            >
+              <i class="bi" [class]="getSearchResultIcon(result.type)"></i>
+              <div class="search-result-content">
+                <div class="search-result-title">{{ result.title }}</div>
+                <div class="search-result-description">
+                  {{ result.description }}
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mobile-menu-items">
+      <button class="mobile-menu-item" (click)="profile(); closeMobileMenu()">
+        <i class="bi bi-person"></i> Profile
+      </button>
+      <button class="mobile-menu-item" (click)="settings(); closeMobileMenu()">
+        <i class="bi bi-gear"></i> Settings
+      </button>
+      <button
+        class="mobile-menu-item text-danger"
+        (click)="confirmLogout(); closeMobileMenu()"
+      >
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Logout Confirmation Dialog -->
+<div
+  class="logout-dialog"
+  [class.active]="showLogoutConfirm"
+  *ngIf="showLogoutConfirm"
+>
+  <div
+    class="logout-dialog-content"
+    role="dialog"
+    aria-labelledby="logout-title"
+    aria-modal="true"
+  >
+    <div class="logout-dialog-header">
+      <h3 id="logout-title">Confirm Logout</h3>
+      <button
+        class="close-btn"
+        (click)="cancelLogout()"
+        aria-label="Close dialog"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <p>
+      Are you sure you want to logout? You'll need to sign in again to access
+      your account.
+    </p>
+    <div class="logout-dialog-actions">
+      <button class="btn-cancel" (click)="cancelLogout()">Cancel</button>
+      <button class="btn-confirm" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div
+  class="overlay"
+  [class.active]="showLogoutConfirm || isMobileMenuOpen"
+  (click)="closeAllModals()"
+></div>
+
+<!-- Notifications -->
+<div class="notifications-container">
+  <div
+    *ngFor="
+      let notification of notifications$ | async;
+      trackBy: trackByNotificationId
+    "
+    class="notification"
+    [class]="'notification-' + notification.type"
+  >
+    <div class="notification-content">
+      <i
+        class="bi notification-icon"
+        [class]="getNotificationIcon(notification.type)"
+      ></i>
+      <span class="notification-message">{{ notification.message }}</span>
+      <button
+        class="notification-close"
+        (click)="removeNotification(notification.id)"
+        aria-label="Close notification"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Back to Top Button -->
+<button
+  class="back-to-top"
+  title="Back to Top"
+  *ngIf="showBackToTop"
+  (click)="scrollToTop()"
+>
+  <i class="bi bi-arrow-up"></i>
+</button>

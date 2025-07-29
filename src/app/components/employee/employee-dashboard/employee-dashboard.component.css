@@ -1,0 +1,18 @@
+/* Employee-specific dashboard customizations */
+:host {
+  display: block;
+}
+
+/* Employee dashboard header customization */
+::ng-deep .dashboard-header {
+  background: linear-gradient(135deg, #059669, #10b981);
+}
+
+/* Employee metric cards accent color */
+::ng-deep .card-green::before {
+  background: linear-gradient(90deg, #059669, #10b981);
+}
+
+::ng-deep .card-green .card-icon {
+  background: linear-gradient(135deg, #059669, #10b981);
+}

@@ -1,0 +1,49 @@
+<div class="branches-view-container">
+  <app-notification></app-notification>
+  <!-- Action Bar -->
+  <div class="action-bar" [class.no-action-left]="!canCreate">
+    <div class="action-left" *ngIf="canCreate">
+      <button class="btn btn-primary" (click)="createBranch()">
+        <i class="bi bi-plus-circle"></i>
+        Add New Branch
+      </button>
+    </div>
+
+    <div class="action-right" [class.no-action-left-right]="!canCreate">
+      <button
+        class="btn btn-outline-secondary"
+        (click)="exportBranches()"
+        [disabled]="loading">
+        <i class="bi bi-download"></i>
+        Export
+      </button>
+      <button
+        class="btn btn-outline-secondary"
+        (click)="refreshData()"
+        [disabled]="loading">
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Shared Table Component -->
+  <app-table
+    [config]="tableConfig"
+    [data]="tableData"
+    [loading]="loading"
+    [error]="error"
+    [title]="'Branches'"
+    [subtitle]="'Manage your store locations and branch information'"
+    (tableEvent)="onTableEvent($event)">
+  </app-table>
+
+  <!-- Confirmation Dialog -->
+  <app-confirmation-dialog
+    [show]="showConfirmDialog"
+    [data]="confirmDialogData"
+    [loading]="confirmDialogLoading"
+    (confirmed)="onConfirmDelete()"
+    (cancelled)="onCancelDelete()">
+  </app-confirmation-dialog>
+</div>

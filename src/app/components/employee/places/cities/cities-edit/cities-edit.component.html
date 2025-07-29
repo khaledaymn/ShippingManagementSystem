@@ -1,0 +1,218 @@
+<div class="cities-edit-container">
+  <app-notification></app-notification>
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">
+          <i class="bi bi-building"></i>
+          {{ isEditMode ? "Edit City" : "Create New City" }}
+        </h1>
+        <p class="page-subtitle">
+          {{
+            isEditMode
+              ? "Update city information"
+              : "Add a new city to your system"
+          }}
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="back-button"
+          (click)="onCancel()"
+          [disabled]="isLoading"
+        >
+          <i class="bi bi-arrow-left"></i>
+          <span>Back to List</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="loading-text">Loading city data...</p>
+  </div>
+
+  <!-- Form Content -->
+  <div class="form-container" *ngIf="!isLoading">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-6">
+        <div class="form-card">
+          <div class="form-header">
+            <div class="form-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <h2 class="form-title">City Information</h2>
+            <p class="form-subtitle">
+              Fill in the details below to
+              {{ isEditMode ? "update" : "create" }} the city
+            </p>
+          </div>
+          <form [formGroup]="cityForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="form-body">
+              <!-- City Name -->
+              <div class="form-group">
+                <label for="name" class="form-label required">
+                  <i class="bi bi-geo-alt-fill me-2"></i>
+                  City Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('name')"
+                  formControlName="name"
+                  placeholder="Enter city name"
+                  maxlength="100"
+                />
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
+                  {{ getFieldError("name") }}
+                </div>
+                <div class="form-text">
+                  Enter a descriptive name for the city (2-100 characters)
+                </div>
+              </div>
+
+              <!-- Governorate Selection -->
+              <div class="form-group">
+                <label for="governorateId" class="form-label required">
+                  <i class="bi bi-map-fill me-2"></i>
+                  Governorate
+                </label>
+                <select
+                  id="governorateId"
+                  class="form-select"
+                  [class.is-invalid]="isFieldInvalid('governorateId')"
+                  formControlName="governorateId"
+                  [disabled]="loadingGovernorates"
+                >
+                  <option value="">
+                    {{
+                      loadingGovernorates
+                        ? "Loading governorates..."
+                        : "Select Governorate"
+                    }}
+                  </option>
+                  <option
+                    *ngFor="let governorate of governorates"
+                    [value]="governorate.id"
+                  >
+                    {{ governorate.name }}
+                  </option>
+                </select>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="isFieldInvalid('governorateId')"
+                >
+                  {{ getFieldError("governorateId") }}
+                </div>
+                <div class="form-text">
+                  Select the governorate where this city is located
+                </div>
+              </div>
+
+              <!-- Charge Price -->
+              <div class="form-group">
+                <label for="chargePrice" class="form-label required">
+                  <i class="bi bi-currency-dollar me-2"></i>
+                  Charge Price
+                </label>
+                <input
+                  type="number"
+                  id="chargePrice"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('chargePrice')"
+                  formControlName="chargePrice"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="isFieldInvalid('chargePrice')"
+                >
+                  {{ getFieldError("chargePrice") }}
+                </div>
+                <div class="form-text">
+                  Enter the charge price for the city
+                </div>
+              </div>
+
+              <!-- Pickup Price -->
+              <div class="form-group">
+                <label for="pickUpPrice" class="form-label required">
+                  <i class="bi bi-currency-dollar me-2"></i>
+                  Pickup Price
+                </label>
+                <input
+                  type="number"
+                  id="pickUpPrice"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('pickUpPrice')"
+                  formControlName="pickUpPrice"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                />
+                <div
+                  class="invalid-feedback"
+                  *ngIf="isFieldInvalid('pickUpPrice')"
+                >
+                  {{ getFieldError("pickUpPrice") }}
+                </div>
+                <div class="form-text">
+                  Enter the pickup price for the city
+                </div>
+              </div>
+
+              <div class="action-right">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="onCancel()"
+                  [disabled]="isLoading"
+                >
+                  <i class="bi bi-x-circle me-2"></i>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="
+                    cityForm.invalid || isLoading || loadingGovernorates
+                  "
+                >
+                  <span
+                    *ngIf="isLoading"
+                    class="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  <i
+                    *ngIf="!isLoading"
+                    [class]="
+                      isEditMode
+                        ? 'bi bi-check-circle me-2'
+                        : 'bi bi-plus-circle me-2'
+                    "
+                  ></i>
+                  {{
+                    isLoading
+                      ? "Saving..."
+                      : isEditMode
+                      ? "Update City"
+                      : "Create City"
+                  }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

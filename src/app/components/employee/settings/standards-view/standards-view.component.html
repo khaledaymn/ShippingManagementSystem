@@ -1,0 +1,134 @@
+<div class="standards-view-container">
+  <!-- Notification Component -->
+  <app-notification></app-notification>
+
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">
+          <i class="bi bi-gear-fill"></i>
+          General Settings
+        </h1>
+        <p class="page-subtitle">View and manage standard weight and pricing configurations</p>
+      </div>
+      <div class="header-actions">
+        <button
+          class="btn btn-secondary"
+          (click)="onRefresh()"
+          [disabled]="loading"
+          title="Refresh data">
+          <i class="bi" [class.bi-arrow-clockwise]="!loading" [class.bi-hourglass-split]="loading"></i>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading standards...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !loading">
+    <div class="error-card">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <h3>Error Loading Standards</h3>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="onRefresh()">
+        <i class="bi bi-arrow-clockwise"></i>
+        Try Again
+      </button>
+    </div>
+  </div>
+
+  <!-- Single Standard Display -->
+  <div class="standard-display" *ngIf="!loading && !error">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!singleStandard">
+      <div class="empty-card">
+        <i class="bi bi-inbox"></i>
+        <h3>No General Settings Found</h3>
+        <p>The standard configuration with ID 1 was not found.</p>
+        <button class="btn btn-primary" (click)="onRefresh()">
+          <i class="bi bi-arrow-clockwise"></i>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Standard Card -->
+    <div class="standard-card-single" *ngIf="singleStandard">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="card-title">
+          <i class="bi bi-speedometer2"></i>
+          <span>Standard Configuration</span>
+        </div>
+        <div class="card-actions" *ngIf="canEdit">
+          <button
+            class="btn-icon btn-edit"
+            (click)="onEditStandard(singleStandard)"
+            title="Edit standard configuration"
+            aria-label="Edit standard configuration">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Card Content -->
+      <div class="card-content">
+        <!-- Standard Weight -->
+        <div class="info-item">
+          <div class="info-label">
+            <i class="bi bi-weight"></i>
+            <span>Standard Weight</span>
+          </div>
+          <div class="info-value weight-value">
+            {{ formatWeight(singleStandard.standardWeight) }}
+          </div>
+        </div>
+
+        <!-- Village Price -->
+        <div class="info-item">
+          <div class="info-label">
+            <i class="bi bi-house-door"></i>
+            <span>Village Price</span>
+          </div>
+          <div class="info-value price-value">
+            {{ formatCurrency(singleStandard.villagePrice) }}
+          </div>
+        </div>
+
+        <!-- KG Price -->
+        <div class="info-item">
+          <div class="info-label">
+            <i class="bi bi-currency-dollar"></i>
+            <span>Per KG Price over {{ formatWeight(singleStandard.standardWeight) }}</span>
+          </div>
+          <div class="info-value price-value">
+            {{ formatCurrency(singleStandard.kGprice) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <div class="card-footer" *ngIf="canEdit">
+        <div class="status-indicator">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Active Configuration</span>
+        </div>
+        <button
+          class="btn btn-primary"
+          (click)="onEditStandard(singleStandard)">
+          <i class="bi bi-pencil"></i>
+          Edit Configuration
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

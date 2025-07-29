@@ -1,0 +1,226 @@
+<div class="branches-edit-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">
+          <i class="bi bi-building"></i>
+          {{ isEditMode ? "Edit Branch" : "Create New Branch" }}
+        </h1>
+        <p class="page-subtitle">
+          {{
+            isEditMode
+              ? "Update branch information"
+              : "Add a new branch to your system"
+          }}
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="back-button"
+          (click)="onCancel()"
+          [disabled]="saving"
+        >
+          <i class="bi bi-arrow-left"></i>
+          <span>Back to List</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="loading-text">Loading branch data...</p>
+  </div>
+
+  <!-- Form Content -->
+  <div class="form-container" *ngIf="!loading">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-6">
+        <div class="form-card">
+          <div class="form-header">
+            <div class="form-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <h2 class="form-title">Branch Information</h2>
+            <p class="form-subtitle">
+              Fill in the details below to
+              {{ isEditMode ? "update" : "create" }} the branch
+            </p>
+          </div>
+
+          <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="form-body">
+              <!-- Branch Name -->
+              <div class="form-group">
+                <label for="name" class="form-label required">
+                  <i class="bi bi-tag me-2"></i>
+                  Branch Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('name')"
+                  formControlName="name"
+                  placeholder="Enter branch name"
+                  maxlength="100"
+                />
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
+                  {{ getFieldError("name") }}
+                </div>
+                <div class="form-text">
+                  Enter a descriptive name for the branch (2-100 characters)
+                </div>
+              </div>
+
+              <!-- Location -->
+              <div class="form-group">
+                <label for="location" class="form-label required">
+                  <i class="bi bi-geo-alt me-2"></i>
+                  Location
+                </label>
+                <textarea
+                  id="location"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('location')"
+                  formControlName="location"
+                  placeholder="Enter full address"
+                  rows="3"
+                  maxlength="255"
+                ></textarea>
+                <div
+                  class="invalid-feedback"
+                  *ngIf="isFieldInvalid('location')"
+                >
+                  {{ getFieldError("location") }}
+                </div>
+                <div class="form-text">
+                  Enter the complete address of the branch (5-255 characters)
+                </div>
+              </div>
+
+              <!-- City Selection -->
+              <div class="form-group">
+                <label for="cityId" class="form-label required">
+                  <i class="bi bi-building me-2"></i>
+                  City
+                </label>
+                <select
+                  id="cityId"
+                  class="form-select"
+                  [class.is-invalid]="isFieldInvalid('cityId')"
+                  formControlName="cityId"
+                >
+                  <option value="">Select a city</option>
+                  <option *ngFor="let city of cities" [value]="city.id">
+                    {{ city.name }}
+                    <span *ngIf="city.governorateName">
+                      - {{ city.governorateName }}</span
+                    >
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('cityId')">
+                  {{ getFieldError("cityId") }}
+                </div>
+                <div class="form-text">
+                  Select the city where this branch is located
+                </div>
+              </div>
+              <div class="action-right">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="onCancel()"
+                  [disabled]="saving"
+                >
+                  <i class="bi bi-x-circle me-2"></i>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="branchForm.invalid || saving"
+                  (click)="onSubmit()"
+                >
+                  <span
+                    *ngIf="saving"
+                    class="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  <i
+                    *ngIf="!saving"
+                    [class]="
+                      isEditMode
+                        ? 'bi bi-check-circle me-2'
+                        : 'bi bi-plus-circle me-2'
+                    "
+                  ></i>
+                  {{
+                    saving
+                      ? "Saving..."
+                      : isEditMode
+                      ? "Update Branch"
+                      : "Create Branch"
+                  }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Current Branch Info (Edit Mode) -->
+      <!-- <div class="col-lg-8 col-xl-6" *ngIf="isEditMode && currentBranch">
+        <div class="form-preview">
+          <h6 class="preview-title">
+            <i class="bi bi-eye me-2"></i>
+            Current Branch Information
+          </h6>
+          <div class="preview-grid">
+            <div class="preview-item">
+              <span class="preview-label">ID</span>
+              <span class="preview-value">{{ currentBranch.id }}</span>
+            </div>
+            <div class="preview-item">
+              <span class="preview-label">Created</span>
+              <span class="preview-value">{{
+                currentBranch.creationDate | date : "medium"
+              }}</span>
+            </div>
+            <div class="preview-item">
+              <span class="preview-label">Status</span>
+              <span class="preview-value">
+                <span
+                  class="badge"
+                  [class.badge-success]="!currentBranch.isDeleted"
+                  [class.badge-danger]="currentBranch.isDeleted"
+                >
+                  {{ currentBranch.isDeleted ? "Deleted" : "Active" }}
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <!-- <div class="action-bar" *ngIf="!loading">
+    <div class="action-left">
+      <h2 class="action-title">
+        <i class="bi bi-building me-2"></i>
+        {{ isEditMode ? 'Edit Branch' : 'Create New Branch' }}
+      </h2>
+      <p class="action-subtitle">
+        {{ isEditMode ? 'Update branch information' : 'Add a new branch to your system' }}
+      </p>
+    </div>
+
+  </div> -->
+</div>

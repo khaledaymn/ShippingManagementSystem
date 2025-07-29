@@ -1,0 +1,46 @@
+<div class="governorates-view-container">
+  <app-notification></app-notification>
+
+  <!-- Action Bar -->
+  <div class="action-bar" [class.no-action-left]="!canCreate">
+    <div class="action-left" *ngIf="canCreate">
+      <button class="btn btn-primary" (click)="addGovernorate()" [disabled]="isLoading">
+        <i class="bi bi-plus-circle"></i>
+        Add New Governorate
+      </button>
+    </div>
+
+    <div class="action-right" [class.no-action-left-right]="!canCreate">
+      <button class="btn btn-outline-secondary" (click)="exportGovernorates()" [disabled]="isLoading">
+        <i class="bi bi-download"></i>
+        Export
+      </button>
+      <button class="btn btn-outline-secondary" (click)="refreshData()" [disabled]="isLoading">
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-card">
+    <app-table
+      [config]="tableConfig"
+      [data]="tableData"
+      [loading]="isLoading"
+      [error]="error"
+      title="Governorates Management"
+      subtitle="Manage governorates and their settings"
+      (tableEvent)="onTableEvent($event)"
+    ></app-table>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <app-confirmation-dialog
+    [show]="showDialog"
+    [data]="dialogData"
+    [loading]="isLoading"
+    (confirmed)="onConfirmDelete()"
+    (cancelled)="onCancelDelete()"
+  ></app-confirmation-dialog>
+</div>

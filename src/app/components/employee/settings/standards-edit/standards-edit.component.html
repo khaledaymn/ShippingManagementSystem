@@ -1,0 +1,213 @@
+<div class="standards-edit-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">
+          <i class="bi bi-pencil-square"></i>
+          Edit General Settings
+        </h1>
+        <p class="page-subtitle">
+          Modify the primary standard weight and pricing configuration
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          class="btn btn-secondary"
+          (click)="onCancel()"
+          [disabled]="saving">
+          <i class="bi bi-arrow-left"></i>
+          <span>Back to List</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Loading configuration data...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !loading">
+    <div class="error-card">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <h3>Error Loading Configuration</h3>
+      <p>{{ error }}</p>
+      <div class="error-actions">
+        <button class="btn btn-primary" (click)="loadStandard()">
+          <i class="bi bi-arrow-clockwise"></i>
+          Try Again
+        </button>
+        <button class="btn btn-secondary" (click)="onCancel()">
+          <i class="bi bi-arrow-left"></i>
+          Go Back
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Form -->
+  <div class="form-container" *ngIf="!loading && !error">
+    <form [formGroup]="standardForm" (ngSubmit)="onSubmit()" class="standard-form">
+
+      <!-- Success Message -->
+      <div class="alert alert-success" *ngIf="successMessage">
+        <i class="bi bi-check-circle-fill"></i>
+        <div class="alert-content">
+          <strong>Success!</strong>
+          <p>{{ successMessage }}</p>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div class="alert alert-error" *ngIf="error">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="alert-content">
+          <strong>Error!</strong>
+          <p>{{ error }}</p>
+        </div>
+      </div>
+
+      <!-- Form Fields -->
+      <div class="form-grid">
+
+        <!-- Standard Weight Field -->
+        <div class="form-group">
+          <label for="standardWeight" class="form-label">
+            <i class="bi bi-weight"></i>
+            Standard Weight (kg)
+            <span class="required">*</span>
+          </label>
+          <div class="input-group">
+            <input
+              type="number"
+              id="standardWeight"
+              formControlName="standardWeight"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('standardWeight')"
+              placeholder="Enter standard weight"
+              step="0.01"
+              min="0.01"
+              max="1000">
+            <span class="input-group-text">kg</span>
+          </div>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('standardWeight')">
+            {{ getFieldError('standardWeight') }}
+          </div>
+          <small class="form-text">Enter the standard weight in kilograms (0.01 - 1000 kg)</small>
+        </div>
+
+        <!-- Village Price Field -->
+        <div class="form-group">
+          <label for="villagePrice" class="form-label">
+            <i class="bi bi-house-door"></i>
+            Village Price
+            <span class="required">*</span>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input
+              type="number"
+              id="villagePrice"
+              formControlName="villagePrice"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('villagePrice')"
+              placeholder="Enter village price"
+              step="0.01"
+              min="0.01"
+              max="999999.99">
+          </div>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('villagePrice')">
+            {{ getFieldError('villagePrice') }}
+          </div>
+          <small class="form-text">Enter the village price in USD ($0.01 - $999,999.99)</small>
+        </div>
+
+        <!-- KG Price Field -->
+        <div class="form-group">
+          <label for="kgPrice" class="form-label">
+            <i class="bi bi-currency-dollar"></i>
+            Price per KG
+            <span class="required">*</span>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input
+              type="number"
+              id="kgPrice"
+              formControlName="kgPrice"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('kgPrice')"
+              placeholder="Enter price per kilogram"
+              step="0.01"
+              min="0.01"
+              max="999999.99">
+            <span class="input-group-text">/ kg</span>
+          </div>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('kgPrice')">
+            {{ getFieldError('kgPrice') }}
+          </div>
+          <small class="form-text">Enter the price per kilogram in USD ($0.01 - $999,999.99)</small>
+        </div>
+
+      </div>
+
+      <!-- Calculated Values Preview -->
+      <!-- <div class="calculated-preview" *ngIf="standardForm.valid">
+        <h3 class="preview-title">
+          <i class="bi bi-calculator"></i>
+          Calculated Values Preview
+        </h3>
+        <div class="preview-grid">
+          <div class="preview-item">
+            <span class="preview-label">Price per gram</span>
+            <span class="preview-value">{{ formatCurrency(calculatedPricePerGram) }}</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-label">Total for standard weight</span>
+            <span class="preview-value">{{ formatCurrency(calculatedTotalForStandardWeight) }}</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-label">Standard weight</span>
+            <span class="preview-value">{{ formatWeight(standardForm.get('standardWeight')?.value || 0) }}</span>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <div class="action-group">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="onReset()"
+            [disabled]="saving">
+            <i class="bi bi-arrow-clockwise"></i>
+            Reset
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="onCancel()"
+            [disabled]="saving">
+            <i class="bi bi-x-lg"></i>
+            Cancel
+          </button>
+        </div>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="standardForm.invalid || saving">
+          <i class="bi" [class.bi-check-lg]="!saving" [class.bi-hourglass-split]="saving"></i>
+          <span *ngIf="!saving">Save Changes</span>
+          <span *ngIf="saving">Saving...</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

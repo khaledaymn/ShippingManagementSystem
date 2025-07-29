@@ -1,0 +1,124 @@
+<div class="governorates-edit-container">
+  <app-notification></app-notification>
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">
+          <i class="bi bi-building"></i>
+          {{ isEditMode ? "Edit Governorate" : "Create New Governorate" }}
+        </h1>
+        <p class="page-subtitle">
+          {{
+            isEditMode
+              ? "Update governorate information"
+              : "Add a new governorate to your system"
+          }}
+        </p>
+      </div>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="back-button"
+          (click)="onCancel()"
+          [disabled]="isLoading"
+        >
+          <i class="bi bi-arrow-left"></i>
+          <span>Back to List</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="loading-text">Loading governorate data...</p>
+  </div>
+
+  <!-- Form Content -->
+  <div class="form-container" *ngIf="!isLoading">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-6">
+        <div class="form-card">
+          <div class="form-header">
+            <div class="form-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <h2 class="form-title">Governorate Information</h2>
+            <p class="form-subtitle">
+              Fill in the details below to
+              {{ isEditMode ? "update" : "create" }} the governorate
+            </p>
+          </div>
+          <form [formGroup]="governorateForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="form-body">
+              <!-- Governorate Name -->
+              <div class="form-group">
+                <label for="name" class="form-label required">
+                  <i class="bi bi-geo-alt-fill me-2"></i>
+                  Governorate Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('name')"
+                  formControlName="name"
+                  placeholder="Enter governorate name"
+                  maxlength="100"
+                />
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">
+                  {{ getFieldError("name") }}
+                </div>
+                <div class="form-text">
+                  Enter a descriptive name for the governorate (2-100 characters)
+                </div>
+              </div>
+
+              <div class="action-right">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="onCancel()"
+                  [disabled]="isLoading"
+                >
+                  <i class="bi bi-x-circle me-2"></i>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="governorateForm.invalid || isLoading"
+                >
+                  <span
+                    *ngIf="isLoading"
+                    class="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  <i
+                    *ngIf="!isLoading"
+                    [class]="
+                      isEditMode
+                        ? 'bi bi-check-circle me-2'
+                        : 'bi bi-plus-circle me-2'
+                    "
+                  ></i>
+                  {{
+                    isLoading
+                      ? "Saving..."
+                      : isEditMode
+                      ? "Update Governorate"
+                      : "Create Governorate"
+                  }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

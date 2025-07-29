@@ -1,0 +1,45 @@
+<div class="employees-view-container">
+  <app-notification></app-notification>
+
+  <!-- Action Bar -->
+  <div class="action-bar" [class.no-action-left]="!canCreate">
+    <div class="action-left" *ngIf="canCreate">
+      <button class="btn btn-primary" (click)="onAdd()" [disabled]="loading">
+        <i class="bi bi-plus-circle"></i>
+        Add New Employee
+      </button>
+    </div>
+    <div class="action-right" [class.no-action-left-right]="!canCreate">
+      <button class="btn btn-outline-secondary" (click)="onExport()" [disabled]="loading">
+        <i class="bi bi-download"></i>
+        Export
+      </button>
+      <button class="btn btn-outline-secondary" (click)="refreshData()" [disabled]="loading">
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-card">
+    <app-table
+      [config]="tableConfig"
+      [data]="tableData"
+      [loading]="loading"
+      [error]="error"
+      title="Employees Management"
+      subtitle="Manage employees and their information"
+      (tableEvent)="onTableEvent($event)"
+    ></app-table>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <app-confirmation-dialog
+    [show]="showConfirmDialog"
+    [data]="dialogData"
+    [loading]="loading"
+    (confirmed)="onConfirmDelete()"
+    (cancelled)="onCancelDelete()"
+  ></app-confirmation-dialog>
+</div>

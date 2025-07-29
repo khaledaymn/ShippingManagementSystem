@@ -1,0 +1,33 @@
+<div class="shipping-types-view">
+  <app-notification></app-notification>
+  <!-- Action Bar -->
+  <div class="action-bar" [class.no-action-left]="!canCreate">
+    <div class="action-left" *ngIf="canCreate">
+      <button class="btn btn-primary" (click)="onAddNew()">
+        <i class="bi bi-plus-circle"></i>
+        Add New Shipping Type
+      </button>
+    </div>
+    <div class="action-right" [class.no-action-left-right]="!canCreate">
+      <button class="btn btn-outline-secondary" (click)="onExport(tableData)">
+        <i class="bi bi-download"></i>
+        Export
+      </button>
+      <button class="btn btn-outline-secondary" (click)="onRefresh()">
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Shared Table Component -->
+  <app-table
+    [config]="tableConfig"
+    [data]="tableData"
+    [loading]="loading"
+    [error]="error"
+    [title]="tableTitle"
+    [subtitle]="tableSubtitle"
+    (tableEvent)="onTableEvent($event)"
+  ></app-table>
+</div>
