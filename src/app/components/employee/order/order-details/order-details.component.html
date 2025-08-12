@@ -1,0 +1,151 @@
+<div class="order-details-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h2 class="page-title">Order Details</h2>
+    <button (click)="goBack()" class="btn btn-primary back-button">
+      <i class="bi bi-arrow-left"></i> Back to Orders
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner-border"></div>
+      <p>Loading order details...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Order Details Card -->
+  <div *ngIf="order && !loading" class="details-card">
+    <div class="card-header">
+      <h3>Order #{{ order.id }}</h3>
+      <span [class]="order.isDeleted ? 'status-inactive' : 'status-active'">
+        {{ order.isDeleted ? 'Deleted' : 'Active' }}
+      </span>
+    </div>
+    <div class="card-body">
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-person-fill"></i> Customer Name</div>
+        <div class="value">{{ order.customerName }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-telephone-fill"></i> Primary Phone</div>
+        <div class="value">{{ order.customerPhone1 }}</div>
+      </div>
+      <div class="detail-item" *ngIf="order.customerPhone2">
+        <div class="label"><i class="bi bi-telephone-fill"></i> Secondary Phone</div>
+        <div class="value">{{ order.customerPhone2 }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-geo-alt-fill"></i> Address</div>
+        <div class="value">{{ order.villageAndStreet }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-building"></i> City</div>
+        <div class="value">{{ order.cityName || 'N/A' }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-tag-fill"></i> Order Status</div>
+        <div class="value">{{ formatOrderStatus(order.orderState) }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-cart-fill"></i> Order Type</div>
+        <div class="value">{{ formatOrderType(order.orderType) }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-credit-card-fill"></i> Payment Type</div>
+        <div class="value">{{ formatPaymentType(order.paymentType) }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-shop"></i> Merchant</div>
+        <div class="value">{{ order.merchantName || 'N/A' }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-building"></i> Branch</div>
+        <div class="value">{{ order.branchName || 'N/A' }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-truck"></i> Shipping Representative</div>
+        <div class="value">{{ order.shippingRepresentativeName || 'N/A' }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-geo-fill"></i> Shipping to Village</div>
+        <div class="value">{{ order.isShippingToVillage ? 'Yes' : 'No' }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-currency-dollar"></i> Order Price</div>
+        <div class="value">${{ order.orderPrice.toFixed(2) }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-currency-dollar"></i> Charge Price</div>
+        <div class="value">${{ order.chargePrice.toFixed(2) }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-currency-dollar"></i> Amount Received</div>
+        <div class="value">${{ order.amountReceived.toFixed(2) }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-box"></i> Total Weight</div>
+        <div class="value">{{ order.totalWeight }} kg</div>
+      </div>
+       <div class="detail-item">
+        <div class="label"><i class="bi bi-currency-dollar"></i> Total Price</div>
+        <div class="value">${{ (order.orderPrice + order.chargePrice).toFixed(2) }}</div>
+      </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="card-body" *ngIf="order.products && order.products.length > 0">
+      <h3 class="products-title">Products</h3>
+      <div class="table-container">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Quantity</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of order.products">
+              <td>{{ product.name }}</td>
+              <td>{{ product.quantity }}</td>
+              <td>{{ product.weight }} kg</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div class="card-body" *ngIf="order.notes">
+      <h3 class="notes-title">Notes</h3>
+      <div class="detail-item notes">
+        <div class="value">{{ order.notes }}</div>
+      </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="card-footer">
+      <button class="btn btn-primary" (click)="printOrder()" [disabled]="loading">
+        <i class="bi bi-printer me-2"></i> Print Order
+      </button>
+    </div>
+  </div>
+
+  <!-- No Data State -->
+  <div *ngIf="!order && !loading && !error" class="no-data-container">
+    <div class="no-data-message">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <p>No order details found.</p>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <app-notification></app-notification>
+</div>

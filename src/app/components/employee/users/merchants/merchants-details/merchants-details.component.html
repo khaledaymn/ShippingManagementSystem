@@ -1,0 +1,113 @@
+<div class="merchant-details-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <button *ngIf="canEdit && merchant" (click)="onEdit()" class="btn btn-primary edit-button">
+      <i class="bi bi-pencil-square"></i> Edit Merchant
+    </button>
+    <h2 class="page-title">{{ merchant ? merchant.name : 'Merchant Details' }}</h2>
+    <button (click)="onBack()" class="btn btn-primary back-button">
+      <i class="bi bi-arrow-left"></i> Back to Merchants
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner-border"></div>
+      <p>Loading merchant details...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Merchant Details Card -->
+  <div *ngIf="merchant && !isLoading" class="details-card">
+    <div class="card-header">
+      <h3>{{ merchant.name }}</h3>
+      <span [class]="getStatusClass(merchant.isDeleted)">
+        {{ getStatusText(merchant.isDeleted) }}
+      </span>
+    </div>
+    <div class="card-body">
+      <!-- Basic Information -->
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-envelope-fill"></i> Email</div>
+        <div class="value">{{ merchant.email }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-telephone-fill"></i> Phone Number</div>
+        <div class="value">{{ merchant.phoneNumber }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-geo-alt-fill"></i> Address</div>
+        <div class="value">{{ merchant.address || 'N/A' }}</div>
+      </div>
+      <div class="detail-item" *ngIf="merchant.startWorkDate">
+        <div class="label"><i class="bi bi-calendar"></i> Start Work Date</div>
+        <div class="value">{{ formatDate(merchant.startWorkDate) }}</div>
+      </div>
+      <!-- Store Information -->
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-shop"></i> Store Name</div>
+        <div class="value">{{ merchant.storeName || 'N/A' }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-percent"></i> Rejected Order Percentage</div>
+        <div class="value percentage">{{ merchant.rejectedOrderPercent || 0 }}%</div>
+      </div>
+      <div class="detail-item" *ngIf="merchant.specialPickup">
+        <div class="label"><i class="bi bi-currency-dollar"></i> Special Pickup Price</div>
+        <div class="value price">${{ merchant.specialPickup }}</div>
+      </div>
+      <!-- Assigned Branches -->
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-building"></i> Assigned Branches</div>
+        <div class="value">
+          <div *ngIf="merchant.branches && merchant.branches.length > 0; else noBranches">
+            <div *ngFor="let branch of merchant.branches" class="branch-item">
+              <div class="branch-info">
+                <strong>{{ branch.name }}</strong>
+                <small class="text-muted d-block">{{ branch.location || 'N/A' }}</small>
+                <small class="text-muted">City: {{ branch.cityName || 'N/A' }}</small>
+              </div>
+              <span [class]="branch.isDeleted ? 'status-inactive' : 'status-active'">
+                {{ branch.isDeleted ? 'Inactive' : 'Active' }}
+              </span>
+            </div>
+          </div>
+          <ng-template #noBranches>
+            <span class="text-muted">No branches assigned</span>
+          </ng-template>
+        </div>
+      </div>
+      <!-- Special Delivery Prices -->
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-currency-dollar"></i> Special Delivery Prices</div>
+        <div class="value">
+          <div *ngIf="merchant.specialDeliveryPrices && merchant.specialDeliveryPrices.length > 0; else noSpecialPrices">
+            <div *ngFor="let price of merchant.specialDeliveryPrices" class="price-item">
+              <div class="price-info">
+                <strong>{{ price.cityName }}</strong>
+                <span class="price">${{ price.specialPrice }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noSpecialPrices>
+            <span class="text-muted">No special delivery prices configured</span>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Data State -->
+  <div *ngIf="!merchant && !isLoading && !errorMessage" class="no-data-container">
+    <div class="no-data-message">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <p>No merchant details found.</p>
+    </div>
+  </div>
+</div>

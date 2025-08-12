@@ -23,13 +23,9 @@ import { AuthService } from "../../../../core/services/auth.service";
 })
 export class BranchesViewComponent implements OnInit, OnDestroy {
   tableConfig: TableConfig = {
-    title: "Branches",
     searchable: true,
     sortable: true,
-    selectable: false,
     pagination: true,
-    showHeader: true,
-    showFooter: true,
     pageSizeOptions: [5, 10, 25, 50],
     columns: [
       {
@@ -185,6 +181,7 @@ export class BranchesViewComponent implements OnInit, OnDestroy {
     if (!this.canEdit) {
       this.tableConfig.actions = [];
     }
+
   }
 
   private loadCities(): void {
@@ -254,9 +251,6 @@ export class BranchesViewComponent implements OnInit, OnDestroy {
           break;
         case "page":
           this.handlePageChange(event.data as { pageIndex: number; pageSize: number });
-          break;
-        case "select":
-          this.handleSelection(event.data as { selectedItems: Branch[] });
           break;
         case "action":
           this.handleAction(event.data as { action: string; item: Branch });
@@ -360,15 +354,6 @@ export class BranchesViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  private handleSelection(data: { selectedItems: Branch[] }): void {
-    if (!data?.selectedItems || !Array.isArray(data.selectedItems)) {
-      console.warn("Invalid selection data:", data);
-      this.selectedBranches = [];
-      this.notificationService.showWarning("Invalid selection data", 6000);
-      return;
-    }
-    this.selectedBranches = data.selectedItems;
-  }
 
   private handleAction(data: { action: string; item: Branch }): void {
     if (!data?.action || !data?.item) {
@@ -559,12 +544,4 @@ export class BranchesViewComponent implements OnInit, OnDestroy {
     this.notificationService.showSuccess("Data exported successfully as CSV!", 5000);
   }
 
-  toggleSelection(): void {
-    this.tableConfig.selectable = !this.tableConfig.selectable;
-    this.selectedBranches = [];
-    this.notificationService.showInfo(
-      `Row selection ${this.tableConfig.selectable ? "enabled" : "disabled"}`,
-      5000
-    );
-  }
 }

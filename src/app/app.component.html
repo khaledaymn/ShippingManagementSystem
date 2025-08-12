@@ -1,14 +1,15 @@
 <div class="app-container" *ngIf="isAuthenticated && isHasRole">
   <!-- Employee Sidebar -->
-  <app-employee-sidebar
-    *ngIf="currentUserRole === 'employee'"
-    [isCollapsed]="isSidebarCollapsed"
-    [isMobileOpen]="isMobileSidebarOpen"
-    (itemClick)="onSidebarItemClick($event)"
-    (mobileToggle)="onMobileSidebarToggle($event)"
-    [style.zIndex]="isSidebarCollapsed ? '0' : '1001'"
-  >
-  </app-employee-sidebar>
+
+    <app-employee-sidebar
+      *ngIf="currentUserRole === 'employee'"
+      [isCollapsed]="isSidebarCollapsed"
+      [isMobileOpen]="isMobileSidebarOpen"
+      (itemClick)="onSidebarItemClick($event)"
+      (mobileToggle)="onMobileSidebarToggle($event)"
+      [style.zIndex]="isSidebarCollapsed ? '0' : '1001'"
+    >
+    </app-employee-sidebar>
 
   <!-- Main Content Area -->
   <div class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">

@@ -1,28 +1,20 @@
-<div class="permissions-container">
+<div class="shipping-representatives-view-container">
   <app-notification></app-notification>
+
   <!-- Action Bar -->
   <div class="action-bar" [class.no-action-left]="!canCreate">
     <div class="action-left" *ngIf="canCreate">
-      <button class="btn btn-primary" (click)="addGroup()" [disabled]="loading">
+      <button class="btn btn-primary" (click)="onAdd()" [disabled]="loading">
         <i class="bi bi-plus-circle"></i>
-        Add New Group
+        Add New Shipping Representative
       </button>
     </div>
-
     <div class="action-right" [class.no-action-left-right]="!canCreate">
-      <button
-        class="btn btn-outline-secondary"
-        (click)="exportGroups()"
-        [disabled]="loading"
-      >
+      <button class="btn btn-outline-secondary" (click)="onExport()" [disabled]="loading">
         <i class="bi bi-download"></i>
         Export
       </button>
-      <button
-        class="btn btn-outline-secondary"
-        (click)="refreshData()"
-        [disabled]="loading"
-      >
+      <button class="btn btn-outline-secondary" (click)="refreshData()" [disabled]="loading">
         <i class="bi bi-arrow-clockwise"></i>
         Refresh
       </button>
@@ -36,15 +28,15 @@
       [data]="tableData"
       [loading]="loading"
       [error]="error"
-      title="Permission Groups"
-      subtitle="Manage and configure user permission groups"
+      title="Shipping Representatives Management"
+      subtitle="Manage shipping representatives and their information"
       (tableEvent)="onTableEvent($event)"
     ></app-table>
   </div>
 
   <!-- Confirmation Dialog -->
   <app-confirmation-dialog
-    [show]="showDialog"
+    [show]="showConfirmDialog"
     [data]="dialogData"
     [loading]="loading"
     (confirmed)="onConfirmDelete()"

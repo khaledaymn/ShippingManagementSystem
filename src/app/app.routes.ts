@@ -27,6 +27,16 @@ import { CitiesViewComponent } from './components/employee/places/cities/cities-
 import { CitiesEditComponent } from './components/employee/places/cities/cities-edit/cities-edit.component';
 import { GovernoratesEditComponent } from './components/employee/places/governorate/governorate-edit/governorate-edit.component';
 import { GovernoratesViewComponent } from './components/employee/places/governorate/governorate-view/governorate-view.component';
+import { MerchantsViewComponent } from './components/employee/users/merchants/merchant-view/merchants-view.component';
+import { MerchantsDetailsComponent } from './components/employee/users/merchants/merchants-details/merchants-details.component';
+import { MerchantsEditComponent } from './components/employee/users/merchants/merchant-edit/merchants-edit.component';
+import { ShippingRepresentativesViewComponent } from './components/employee/users/shipping-representatives/shipping-representatives-view/shipping-representatives-view.component';
+import { ShippingRepresentativeDetailsComponent } from './components/employee/users/shipping-representatives/shipping-representative-details/shipping-representative-details.component';
+import { ShippingRepresentativesEditComponent } from './components/employee/users/shipping-representatives/shipping-representatives-edit/shipping-representatives-edit.component';
+import { OrdersViewComponent } from './components/employee/order/order-view/order-view.component';
+import { OrderDetailsComponent } from './components/employee/order/order-details/order-details.component';
+import { OrdersAddComponent } from './components/employee/order/order-add/order-add.component';
+import { ProfileComponent } from './shared/profile/profile.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -158,7 +168,7 @@ export const routes: Routes = [
       },
       {
         path: 'users',
-          canActivate: [authGuard, roleGuard([Role.ADMIN,Role.EMPLOYEE])],
+        canActivate: [authGuard, roleGuard([Role.ADMIN,Role.EMPLOYEE])],
         children: [
           {
             path: 'employees',
@@ -179,75 +189,60 @@ export const routes: Routes = [
             component: EmployeesEditComponent,
             canActivate: [permissionOrRoleGuard('Employees', 'Create', [Role.ADMIN])],
           },
-          // {
-          //   path: 'merchants',
-          //   component: MerchantsComponent,
-          // },
-          // {
-          //   path: 'addMerchant',
-          //   component: AddMerchantComponent,
-          //   canActivate: [permissionGuard('users', 'create')],
-          // },
-          // {
-          //   path: 'editMerchant/:id',
-          //   component: EditMerchantComponent,
-          //   canActivate: [permissionGuard('users', 'edit')],
-          // },
-          // {
-          //   path: 'shipping-representatives',
-          //   component: ShippingRepresentativeListComponent,
-          //   canActivate: [permissionGuard('users', 'view')],
-          // },
-          // {
-          //   path: 'addsales',
-          //   component: AddShippingRepresentativeComponent,
-          //   canActivate: [permissionGuard('users', 'create')],
-          // },
-          // {
-          //   path: 'editsales/:id',
-          //   component: AddShippingRepresentativeComponent,
-          //   canActivate: [permissionGuard('users', 'edit')],
-          // },
+          {
+            path: 'merchants',
+            component: MerchantsViewComponent,
+            canActivate: [permissionOrRoleGuard('Merchants', 'View', [Role.ADMIN])],
+          },
+          {
+            path: 'merchants/details/:id',
+            component: MerchantsDetailsComponent,
+          },
+          {
+            path: 'merchants/edit/:id',
+            component: MerchantsEditComponent,
+            canActivate: [permissionOrRoleGuard('Merchants', 'Edit', [Role.ADMIN])],
+          },
+          {
+            path: 'merchants/create',
+            component: MerchantsEditComponent,
+            canActivate: [permissionOrRoleGuard('Merchants', 'Create', [Role.ADMIN])],
+          },
+          {
+            path: 'shipping-representatives',
+            component: ShippingRepresentativesViewComponent,
+            canActivate: [permissionOrRoleGuard('Delivary', 'View', [Role.ADMIN])],
+          },
+          {
+            path: 'shipping-representatives/details/:id',
+            component: ShippingRepresentativeDetailsComponent,
+          },
+          {
+            path: 'shipping-representatives/edit/:id',
+            component: ShippingRepresentativesEditComponent,
+            canActivate: [permissionOrRoleGuard('Delivary', 'Edit', [Role.ADMIN])],
+          },
+          {
+            path: 'shipping-representatives/create',
+            component: ShippingRepresentativesEditComponent,
+            canActivate: [permissionOrRoleGuard('Delivary', 'Create', [Role.ADMIN])],
+          },
         ],
       },
-      // {
-      //   path: 'orders',
-      //   canActivate: [permissionGuard('orders', 'view')],
-      //   children: [
-      //     {
-      //       path: '',
-      //       component: OrdersListComponent,
-      //     },
-      //     {
-      //       path: 'create',
-      //       component: OrderCreateComponent,
-      //       canActivate: [permissionGuard('orders', 'create')],
-      //     },
-      //     {
-      //       path: 'by-status',
-      //       component: OrdersByStatusComponent,
-      //     },
-      //     {
-      //       path: 'reports',
-      //       component: OrdersReportComponent,
-      //       canActivate: [permissionGuard('orders', 'viewReports')],
-      //     },
-      //     {
-      //       path: 'edit/:id',
-      //       component: OrderEditComponent,
-      //       canActivate: [permissionGuard('orders', 'edit')],
-      //     },
-      //     {
-      //       path: ':id',
-      //       component: OrderDetailComponent,
-      //     },
-      //   ],
-      // },
-      // {
-      //   path: 'Profile',
-      //   component: EditprofileComponent,
-      //   canActivate: [authGuard],
-      // },
+      {
+        path: 'orders',
+        // canActivate: [permissionGuard('orders', 'view')],
+        component: OrdersViewComponent
+      },
+      {
+        path: 'orders/create',
+        // canActivate: [permissionGuard('orders', 'view')],
+        component: OrdersAddComponent
+      },
+      {
+        path: 'orders/details/:id',
+        component: OrderDetailsComponent
+      },
       // {
       //   path: 'changePassword',
       //   component: ChangePasswordComponent,
@@ -475,6 +470,11 @@ export const routes: Routes = [
   //     },
   //   ],
   // },
+
+  {
+    path: 'profile',
+    component: ProfileComponent,
+  },
   {
     path: 'unauthorized',
     component: UnauthorizedComponent,

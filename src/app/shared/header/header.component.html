@@ -12,7 +12,58 @@
         [class.bi-x]="isMobileMenuOpen"
       ></i>
     </button>
-    <h1 class="page-title">ShipSmart</h1>
+    <!-- Conditionally show page-title or search bar based on isMobile -->
+    <h1 class="page-title" *ngIf="!isMobile">ShipSmart</h1>
+    <div class="search-container" *ngIf="isMobile">
+      <i class="bi bi-search search-icon"></i>
+      <input
+        #mobileSearchInput
+        type="text"
+        class="search-input"
+        placeholder="Search for Order..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput($event)"
+        (keydown.enter)="search()"
+        [class.loading]="isSearching"
+        autocomplete="off"
+        role="searchbox"
+        aria-label="Search"
+      />
+      <!-- Search Results Dropdown -->
+      <div
+        class="search-results"
+        *ngIf="(searchResults$ | async)?.length && searchQuery"
+      >
+        <div class="search-results-header">
+          <span>Search Results</span>
+          <button
+            class="clear-search"
+            (click)="clearSearchResults()"
+            aria-label="Clear search"
+          >
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+        <div class="search-results-list">
+          <button
+            *ngFor="
+              let result of searchResults$ | async;
+              trackBy: trackBySearchResultId
+            "
+            class="search-result-item"
+            (click)="onSearchResultClick(result)"
+          >
+            <i class="bi" [class]="getSearchResultIcon(result.type)"></i>
+            <div class="search-result-content">
+              <div class="search-result-title">{{ result.title }}</div>
+              <div class="search-result-description">
+                {{ result.description }}
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="header-center" *ngIf="!isMobile">
@@ -22,16 +73,15 @@
         #searchInput
         type="text"
         class="search-input"
-        placeholder="Search for Order..."
+        placeholder="Searching ..."
         [(ngModel)]="searchQuery"
         (input)="onSearchInput($event)"
-        (keypress)="onSearchKeyPress($event)"
+        (keydown.enter)="search()"
         [class.loading]="isSearching"
         autocomplete="off"
         role="searchbox"
         aria-label="Search"
       />
-
       <!-- Search Results Dropdown -->
       <div
         class="search-results"
@@ -139,77 +189,6 @@
     </div>
   </div>
 </header>
-
-<!-- Mobile Menu -->
-<div class="mobile-menu" [class.active]="isMobileMenuOpen">
-  <div class="mobile-menu-content">
-    <div class="mobile-search">
-      <div class="search-container">
-        <i class="bi bi-search search-icon"></i>
-        <input
-          #mobileSearchInput
-          type="text"
-          class="search-input"
-          placeholder="Search for Order..."
-          [(ngModel)]="searchQuery"
-          (input)="onSearchInput($event)"
-          (keypress)="onSearchKeyPress($event)"
-          [class.loading]="isSearching"
-          autocomplete="off"
-          role="searchbox"
-          aria-label="Search"
-        />
-        <div
-          class="search-results"
-          *ngIf="(searchResults$ | async)?.length && searchQuery"
-        >
-          <div class="search-results-header">
-            <span>Search Results</span>
-            <button
-              class="clear-search"
-              (click)="clearSearchResults()"
-              aria-label="Clear search"
-            >
-              <i class="bi bi-x"></i>
-            </button>
-          </div>
-          <div class="search-results-list">
-            <button
-              *ngFor="
-                let result of searchResults$ | async;
-                trackBy: trackBySearchResultId
-              "
-              class="search-result-item"
-              (click)="onSearchResultClick(result)"
-            >
-              <i class="bi" [class]="getSearchResultIcon(result.type)"></i>
-              <div class="search-result-content">
-                <div class="search-result-title">{{ result.title }}</div>
-                <div class="search-result-description">
-                  {{ result.description }}
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="mobile-menu-items">
-      <button class="mobile-menu-item" (click)="profile(); closeMobileMenu()">
-        <i class="bi bi-person"></i> Profile
-      </button>
-      <button class="mobile-menu-item" (click)="settings(); closeMobileMenu()">
-        <i class="bi bi-gear"></i> Settings
-      </button>
-      <button
-        class="mobile-menu-item text-danger"
-        (click)="confirmLogout(); closeMobileMenu()"
-      >
-        <i class="bi bi-box-arrow-right"></i> Logout
-      </button>
-    </div>
-  </div>
-</div>
 
 <!-- Logout Confirmation Dialog -->
 <div

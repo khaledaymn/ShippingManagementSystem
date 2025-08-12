@@ -24,10 +24,7 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
   tableConfig: TableConfig = {
     searchable: true,
     sortable: true,
-    selectable: false,
     pagination: true,
-    showHeader: true,
-    showFooter: true,
     pageSizeOptions: [5, 10, 25, 50],
     columns: [
       { key: "name", label: "Name", type: "text", sortable: true, align: "left" },
@@ -38,20 +35,34 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
       { key: "isDeleted", label: "Status", type: "action", sortable: false, width: "100px", align: "center" }
     ],
     actions: [
-      { action: "edit", label: "Edit Employee", icon: "bi-pencil", color: "primary" },
-      { action: "details", label: "View Details", icon: "bi-eye", color: "secondary" },
-      // { action: "update", label: "Toggle Status", icon: "bi-arrow-repeat", color: "warning" }
+      {
+        action: "edit",
+        label: "Edit Employee",
+        icon: "bi-pencil",
+        color: "primary",
+        visible: () => this.canEdit,
+      },
+      {
+        action: "details",
+        label: "View Details",
+        icon: "bi-eye",
+        color: "secondary"
+      },
     ],
     filters: [
-      { key: "search", label: "Search", type: "text", placeholder: "Search by employee name..." },
-      // { key: "branch", label: "Branch", type: "text", placeholder: "Filter by branch" },
+      {
+        key: "search",
+        label: "Search",
+        type: "text",
+        placeholder: "Search by employee name..."
+      },
       {
         key: "isDeleted",
         label: "Status",
         type: "select",
         options: [
-          { value: "true", label: "Inactive" },
-          { value: "false", label: "Active" }
+          { value: "false", label: "Inactive" },
+          { value: "true", label: "Active" }
         ],
         placeholder: "Filter by status"
       }
@@ -122,12 +133,18 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
     this.canEdit = this.authService.hasPermission("Employees", "Edit") || userRole === "Admin";
     this.canDelete = this.authService.hasPermission("Employees", "Delete") || userRole === "Admin";
 
+    if (!this.canDelete) {
+      this.tableConfig.columns = this.tableConfig.columns.filter(
+        (col) => col.key !== 'isDeleted'
+      );
+    }
 
   }
 
   private loadEmployees(): void {
     this.loading = true;
     this.error = null;
+    console.log(this.currentParams);
 
     this.employeeService
       .getAllEmployees(this.currentParams)
@@ -160,7 +177,7 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
           this.handleSearch(event.data as { search?: string });
           break;
         case "filter":
-          this.handleFilter(event.data as Partial<EmployeeParams>);
+          this.handleFilter(event.data as EmployeeParams);
           break;
         case "sort":
           this.handleSort(event.data as { column: string; direction: string });
@@ -184,76 +201,159 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  // private handleSearch(data: { search?: string }): void {
+  //   if (!data || typeof data.search !== "string") {
+  //     return;
+  //   }
+
+  //   const newParams = {
+  //     ...this.currentParams,
+  //     search: data.search?.trim() || undefined,
+  //     pageIndex: 1
+  //   };
+
+  //   if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
+  //     this.searchSubject$.next(newParams);
+  //   }
+  // }
+
+  // private handleFilter(data: Partial<EmployeeParams>): void {
+  //   if (!data) {
+  //     console.warn("Invalid filter data:", data);
+  //     this.notificationService.showWarning("Invalid filter input", 6000);
+  //     return;
+  //   }
+
+  //   const newParams: EmployeeParams = {
+  //     ...this.currentParams,
+  //     pageIndex: 1
+  //   };
+
+  //   if (data.search !== undefined) {
+  //     newParams.search = data.search?.trim() || undefined;
+  //   }
+
+  //   if (data.branch !== undefined) {
+  //     newParams.branch = data.branch?.trim() || undefined;
+  //   }
+
+  //   if (data.isActive !== undefined) {
+  //     newParams.isActive =  data.isActive;
+  //   } else {
+  //     newParams.isActive = undefined;
+  //   }
+
+  //   if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
+  //     this.filterSubject$.next(newParams);
+  //   }
+  // }
+
+  // private handleSort(data: { column: string; direction: string }): void {
+  //   if (!data?.column || !data?.direction) {
+  //     return;
+  //   }
+
+  //   const columnMap: { [key: string]: string } = {
+  //     name: "name",
+  //     email: "email",
+  //     creationDate: "createdAt"
+  //   };
+
+  //   const mappedColumn = columnMap[data.column] || data.column;
+  //   const newParams = {
+  //     ...this.currentParams,
+  //     sort: `${mappedColumn}_${data.direction}`,
+  //     pageIndex: 1
+  //   };
+
+  //   if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
+  //     this.currentParams = newParams;
+  //     this.loadEmployees();
+  //   }
+  // }
+
   private handleSearch(data: { search?: string }): void {
-    if (!data || typeof data.search !== "string") {
-      return;
-    }
-
-    const newParams = {
-      ...this.currentParams,
-      search: data.search?.trim() || undefined,
-      pageIndex: 1
-    };
-
-    if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
-      this.searchSubject$.next(newParams);
-    }
+  if (!data || typeof data.search !== "string") {
+    return;
   }
 
-  private handleFilter(data: Partial<EmployeeParams>): void {
-    if (!data) {
-      console.warn("Invalid filter data:", data);
-      this.notificationService.showWarning("Invalid filter input", 6000);
-      return;
-    }
+  const newParams = {
+    ...this.currentParams,
+    search: data.search?.trim() || undefined,
+    pageIndex: 1
+  };
 
-    const newParams: EmployeeParams = {
-      ...this.currentParams,
-      pageIndex: 1
+  if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
+    this.searchSubject$.next(newParams);
+  }
+}
+
+private handleFilter(data: any): void {
+
+  const defaultParams = {
+      pageIndex: 1,
+      pageSize: 10,
     };
+  const isEmpty = (obj: any): boolean => {
+    return Object.keys(obj).length === 0;
+  };
 
-    if (data.search !== undefined) {
-      newParams.search = data.search?.trim() || undefined;
+  if(isEmpty(data)){
+    this.currentParams = {
+      ...defaultParams,
     }
-
-    if (data.branch !== undefined) {
-      newParams.branch = data.branch?.trim() || undefined;
-    }
-
-    if (data.isActive !== undefined) {
-      newParams.isActive =  data.isActive;
-    } else {
-      newParams.isActive = undefined;
-    }
-
-    if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
-      this.filterSubject$.next(newParams);
-    }
+    this.loadEmployees();
+    return;
+  }
+  if (!data) {
+    console.warn("Invalid filter data:", data);
+    this.notificationService.showWarning("Invalid filter input", 6000);
+    return;
   }
 
-  private handleSort(data: { column: string; direction: string }): void {
-    if (!data?.column || !data?.direction) {
-      return;
-    }
+  const newParams: EmployeeParams = {
+    ...this.currentParams,
+    pageIndex: 1
+  };
 
-    const columnMap: { [key: string]: string } = {
-      name: "name",
-      email: "email",
-      creationDate: "createdAt"
-    };
-
-    const mappedColumn = columnMap[data.column] || data.column;
-    const newParams = {
-      ...this.currentParams,
-      sort: `${mappedColumn}_${data.direction}`,
-      pageIndex: 1
-    };
-
-    if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
-      this.currentParams = newParams;
-      this.loadEmployees();
-    }
+  if (data.search !== undefined) {
+    newParams.search = data.search?.trim() || undefined;
   }
+
+  if (data.isDeleted !== undefined) {
+    newParams.isActive = data.isDeleted;
+  } else {
+    newParams.isActive = undefined;
+  }
+
+  if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
+    this.filterSubject$.next(newParams);
+  }
+}
+
+private handleSort(data: { column: string; direction: string }): void {
+  if (!data?.column || !data?.direction) {
+    return;
+  }
+
+  const columnMap: { [key: string]: string } = {
+    name: "name",
+    email: "email",
+    creationDate: "createdAt"
+  };
+
+  const mappedColumn = columnMap[data.column] || data.column;
+  const newParams = {
+    ...this.currentParams,
+    sort: `${mappedColumn}_${data.direction}`,
+    pageIndex: 1
+  };
+
+  if (JSON.stringify(newParams) !== JSON.stringify(this.currentParams)) {
+    this.currentParams = newParams;
+    this.loadEmployees();
+  }
+}
 
   private handlePageChange(data: { pageIndex: number; pageSize: number }): void {
     if (!data || typeof data.pageIndex !== "number" || typeof data.pageSize !== "number") {
@@ -320,6 +420,7 @@ export class EmployeesViewComponent implements OnInit, OnDestroy {
       this.notificationService.showWarning("You do not have permission to delete or activate employees.", 6000);
       return;
     }
+
     const employee = this.tableData.items.find((e) => e.id === data.id);
     if (!employee) {
       this.notificationService.showWarning("Employee not found.", 6000);

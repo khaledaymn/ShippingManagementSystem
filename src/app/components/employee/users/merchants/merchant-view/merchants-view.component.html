@@ -1,28 +1,20 @@
-<div class="permissions-container">
+<div class="merchants-view-container">
   <app-notification></app-notification>
+
   <!-- Action Bar -->
   <div class="action-bar" [class.no-action-left]="!canCreate">
     <div class="action-left" *ngIf="canCreate">
-      <button class="btn btn-primary" (click)="addGroup()" [disabled]="loading">
+      <button class="btn btn-primary" (click)="onAdd()" [disabled]="isLoading">
         <i class="bi bi-plus-circle"></i>
-        Add New Group
+        Add New Merchant
       </button>
     </div>
-
     <div class="action-right" [class.no-action-left-right]="!canCreate">
-      <button
-        class="btn btn-outline-secondary"
-        (click)="exportGroups()"
-        [disabled]="loading"
-      >
+      <button class="btn btn-outline-secondary" (click)="onExport()" [disabled]="isLoading">
         <i class="bi bi-download"></i>
         Export
       </button>
-      <button
-        class="btn btn-outline-secondary"
-        (click)="refreshData()"
-        [disabled]="loading"
-      >
+      <button class="btn btn-outline-secondary" (click)="refreshData()" [disabled]="isLoading">
         <i class="bi bi-arrow-clockwise"></i>
         Refresh
       </button>
@@ -34,19 +26,19 @@
     <app-table
       [config]="tableConfig"
       [data]="tableData"
-      [loading]="loading"
+      [loading]="isLoading"
       [error]="error"
-      title="Permission Groups"
-      subtitle="Manage and configure user permission groups"
+      title="Merchants Management"
+      subtitle="Manage merchants and their information"
       (tableEvent)="onTableEvent($event)"
     ></app-table>
   </div>
 
   <!-- Confirmation Dialog -->
   <app-confirmation-dialog
-    [show]="showDialog"
+    [show]="showConfirmDialog"
     [data]="dialogData"
-    [loading]="loading"
+    [loading]="isLoading"
     (confirmed)="onConfirmDelete()"
     (cancelled)="onCancelDelete()"
   ></app-confirmation-dialog>

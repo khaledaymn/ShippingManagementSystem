@@ -1,0 +1,100 @@
+<div class="shipping-representative-details-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <button *ngIf="canEdit() && shippingRepresentative" (click)="onEdit()" class="btn btn-primary edit-button">
+      <i class="bi bi-pencil-square"></i> Edit
+    </button>
+    <h2 class="page-title">Shipping Representative Details</h2>
+    <button (click)="onBack()" class="btn btn-primary back-button">
+      <i class="bi bi-arrow-left"></i> Back to list
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner">
+      <div class="spinner-border"></div>
+      <p>Loading shipping representative details...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Shipping Representative Details Card -->
+  <div *ngIf="shippingRepresentative && !loading && !error" class="details-card">
+    <div class="card-header">
+      <h3>{{ shippingRepresentative.name }}</h3>
+      <span class="status-active">Active</span>
+    </div>
+    <div class="card-body">
+      <!-- Basic Information -->
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-person-fill"></i> Full Name</div>
+        <div class="value">{{ shippingRepresentative.name }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-envelope-fill"></i> Email Address</div>
+        <div class="value">
+          <a [href]="'mailto:' + shippingRepresentative.email" class="email-link">
+            {{ shippingRepresentative.email }}
+          </a>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-telephone-fill"></i> Phone Number</div>
+        <div class="value">
+          <a [href]="'tel:' + shippingRepresentative.phoneNumber" class="phone-link">
+            {{ shippingRepresentative.phoneNumber }}
+          </a>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-house-fill"></i> Address</div>
+        <div class="value">{{ shippingRepresentative.address || 'N/A' }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-calendar-fill"></i> Hiring Date</div>
+        <div class="value">{{ formatDate(shippingRepresentative.hiringDate) }}</div>
+      </div>
+      <!-- Commission Information -->
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-wallet-fill"></i> Discount Type</div>
+        <div class="value">
+          <span [class]="getDiscountTypeBadgeClass(shippingRepresentative.discountType)">
+            {{ getDiscountTypeText(shippingRepresentative.discountType) }}
+          </span>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-percent"></i> Company Percentage</div>
+        <div class="value percentage">{{companyPercentageSign() === '$' ? '$' : ''}}{{ shippingRepresentative.companyPercentage }}{{companyPercentageSign() === '%' ? '%' : ''}}</div>
+      </div>
+      <!-- Governorate Assignment -->
+      <div class="detail-item">
+        <div class="label"><i class="bi bi-geo-alt-fill"></i> Assigned Governorates</div>
+        <div class="value">
+          <div *ngIf="shippingRepresentative.governorates && shippingRepresentative.governorates.length > 0; else noGovernorates">
+            <span *ngFor="let governorate of shippingRepresentative.governorates" class="governorate-badge">
+              {{ governorate }}
+            </span>
+          </div>
+          <ng-template #noGovernorates>
+            <span class="text-muted">No governorates assigned</span>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Data State -->
+  <div *ngIf="!shippingRepresentative && !loading && !error" class="no-data-container">
+    <div class="no-data-message">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <p>No shipping representative details found.</p>
+    </div>
+  </div>
+</div>
+

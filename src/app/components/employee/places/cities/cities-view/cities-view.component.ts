@@ -24,10 +24,7 @@ export class CitiesViewComponent implements OnInit, OnDestroy {
   tableConfig: TableConfig = {
     searchable: true,
     sortable: true,
-    selectable: false,
     pagination: true,
-    showHeader: true,
-    showFooter: true,
     pageSizeOptions: [5, 10, 25, 50],
     columns: [
       { key: "name", label: "City Name", sortable: true, type: "text", align: "left" },
@@ -37,16 +34,16 @@ export class CitiesViewComponent implements OnInit, OnDestroy {
       { key: "isDeleted", label: "Status", sortable: false, type: "action", align: "center" }
     ],
     actions: [
-      { action: "edit", label: "Edit", icon: "bi-pencil", color: "primary" },
-      { action: "update", label: "Toggle Status", icon: "bi-arrow-repeat", color: "warning" }
+      { action: "edit", label: "Edit", icon: "bi-pencil", color: "primary",visible: () => this.canEdit },
+      { action: "update", label: "Toggle Status", icon: "bi-arrow-repeat", color: "warning",visible: () => this.canDelete }
     ],
     filters: [
       { key: "search", label: "Search", type: "text", placeholder: "Search by city name..." },
       { key: "governorateName", label: "Governorate", type: "text", placeholder: "Filter by governorate" },
-      { key: "minChargePrice", label: "Min Charge Price", type: "number", placeholder: "0.00", min: 0 },
-      { key: "maxChargePrice", label: "Max Charge Price", type: "number", placeholder: "999.99", min: 0 },
-      { key: "minPickUpPrice", label: "Min Pickup Price", type: "number", placeholder: "0.00", min: 0 },
-      { key: "maxPickUpPrice", label: "Max Pickup Price", type: "number", placeholder: "999.99", min: 0 },
+      { key: "minChargePrice", label: "Min Charge Price", type: "number", placeholder: "0.00"},
+      { key: "maxChargePrice", label: "Max Charge Price", type: "number", placeholder: "999.99" },
+      { key: "minPickUpPrice", label: "Min Pickup Price", type: "number", placeholder: "0.00"},
+      { key: "maxPickUpPrice", label: "Max Pickup Price", type: "number", placeholder: "999.99" },
       {
         key: "isDeleted",
         label: "Status",
@@ -127,21 +124,17 @@ export class CitiesViewComponent implements OnInit, OnDestroy {
       if (this.tableConfig.actions) {
         this.tableConfig.actions = this.tableConfig.actions.filter((action) => action.action !== "update");
       }
-    }
+      this.tableConfig.columns = this.tableConfig.columns.filter(
+        (col) => col.key !== 'isDeleted'
+      );
 
-    if (!this.canEdit) {
-      if (this.tableConfig.actions) {
-        this.tableConfig.actions = this.tableConfig.actions.filter((action) => action.action !== "edit");
-      }
-    }
-    if (!this.canEdit && !this.canDelete) {
-      this.tableConfig.actions = [];
     }
   }
 
   loadCities(): void {
     this.isLoading = true;
     this.error = null;
+    console.log(this.currentParams);
 
     this.cityService
       .getAllCities(this.currentParams)
@@ -215,12 +208,27 @@ export class CitiesViewComponent implements OnInit, OnDestroy {
   }
 
   private handleFilter(data: Partial<CityParams>): void {
+    const defaultParams = {
+      pageIndex: 1,
+      pageSize: 10,
+    };
+    const isEmpty = (obj: any): boolean => {
+      return Object.keys(obj).length === 0;
+    };
+
+    if(isEmpty(data)){
+      this.currentParams = {
+        ...defaultParams,
+      }
+      this.loadCities();
+      return;
+    }
+
     if (!data) {
       console.warn("Invalid filter data:", data);
       this.notificationService.showWarning("Invalid filter input", 6000);
       return;
     }
-
     const newParams: CityParams = {
       ...this.currentParams,
       pageIndex: 1
@@ -363,7 +371,7 @@ export class CitiesViewComponent implements OnInit, OnDestroy {
       return;
     }
     console.log(city);
-    
+
     if (!city.isDeleted) {
       this.dialogData = {
         title: "Activate City",

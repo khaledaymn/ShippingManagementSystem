@@ -1,0 +1,435 @@
+<div class="orders-add-container">
+  <app-notification></app-notification>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = null" aria-label="Close"></button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="page-title">
+          <i class="bi bi-plus-circle me-2"></i>
+          Create New Order
+        </h1>
+        <p class="page-subtitle">Add a new order to the system</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="back-button" (click)="onCancel()" [disabled]="loading">
+          <i class="bi bi-arrow-left me-2"></i>
+          Back to Orders
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Form -->
+  <div class="form-container">
+    <form [formGroup]="orderForm" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- Customer Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="bi bi-person me-2"></i>
+            Customer Information
+          </h3>
+        </div>
+        <div class="section-content">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="customerName" class="form-label">
+                  Customer Name <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="customerName"
+                  class="form-control"
+                  formControlName="customerName"
+                  [class.is-invalid]="isFieldInvalid('customerName')"
+                  placeholder="Enter customer name">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('customerName')">
+                  {{ getFieldError('customerName') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="customerPhone1" class="form-label">
+                  Primary Phone <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="tel"
+                  id="customerPhone1"
+                  class="form-control"
+                  formControlName="customerPhone1"
+                  [class.is-invalid]="isFieldInvalid('customerPhone1')"
+                  placeholder="Enter phone number">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('customerPhone1')">
+                  {{ getFieldError('customerPhone1') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="customerPhone2" class="form-label">Secondary Phone</label>
+                <input
+                  type="tel"
+                  id="customerPhone2"
+                  class="form-control"
+                  formControlName="customerPhone2"
+                  placeholder="Enter secondary phone">
+              </div>
+            </div>
+          </div>
+          <!-- Added conditional display for villageAndStreet field based on shippingToVillage checkbox -->
+          <div class="row" *ngIf="shouldShowVillageAndStreet">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="villageAndStreet" class="form-label">
+                  Address <span class="text-danger">*</span>
+                </label>
+                <textarea
+                  id="villageAndStreet"
+                  class="form-control"
+                  rows="3"
+                  formControlName="villageAndStreet"
+                  [class.is-invalid]="isFieldInvalid('villageAndStreet')"
+                  placeholder="Enter full address including village and street"></textarea>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('villageAndStreet')">
+                  {{ getFieldError('villageAndStreet') }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Details Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="bi bi-box me-2"></i>
+            Order Details
+          </h3>
+        </div>
+        <div class="section-content">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="orderPrice" class="form-label">
+                  Order Price <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="number"
+                    id="orderPrice"
+                    class="form-control"
+                    formControlName="orderPrice"
+                    [class.is-invalid]="isFieldInvalid('orderPrice')"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0">
+                </div>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('orderPrice')">
+                  {{ getFieldError('orderPrice') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="orderType" class="form-label">
+                  Order Type <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="orderType"
+                  class="form-select"
+                  formControlName="orderType"
+                  [class.is-invalid]="isFieldInvalid('orderType')">
+                  <option value="">Select Order Type</option>
+                  <option *ngFor="let option of orderTypeOptions" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('orderType')">
+                  {{ getFieldError('orderType') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="paymentType" class="form-label">
+                  Payment Type <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="paymentType"
+                  class="form-select"
+                  formControlName="paymentType"
+                  [class.is-invalid]="isFieldInvalid('paymentType')">
+                  <option value="">Select Payment Type</option>
+                  <option *ngFor="let option of paymentTypeOptions" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('paymentType')">
+                  {{ getFieldError('paymentType') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label class="form-label">Shipping Options</label>
+                <div class="form-check">
+                  <input
+                    class="form-check-input ms-1"
+                    type="checkbox"
+                    id="shippingToVillage"
+                    formControlName="shippingToVillage">
+                  <label class="form-check-label ms-3" for="shippingToVillage">
+                    Ship to Village
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location and Service Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="bi bi-geo-alt me-2"></i>
+            Location & Service
+          </h3>
+        </div>
+        <div class="section-content">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="cityId" class="form-label">
+                  City <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="cityId"
+                  class="form-select"
+                  formControlName="cityId"
+                  [class.is-invalid]="isFieldInvalid('cityId')">
+                  <option value="">Select City</option>
+                  <option *ngFor="let city of cities" [value]="city.id">
+                    {{ city.name }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('cityId')">
+                  {{ getFieldError('cityId') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="branchId" class="form-label">
+                  Branch <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="branchId"
+                  class="form-select"
+                  formControlName="branchId"
+                  [class.is-invalid]="isFieldInvalid('branchId')">
+                  <option value="">Select Branch</option>
+                  <option *ngFor="let branch of branches" [value]="branch.id">
+                    {{ branch.name }} - {{ branch.location }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('branchId')">
+                  {{ getFieldError('branchId') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="merchantId" class="form-label">
+                  Merchant <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="merchantId"
+                  class="form-select"
+                  formControlName="merchantId"
+                  [class.is-invalid]="isFieldInvalid('merchantId')">
+                  <option value="">Select Merchant</option>
+                  <option *ngFor="let merchant of merchants" [value]="merchant.id">
+                    {{ merchant.name }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('merchantId')">
+                  {{ getFieldError('merchantId') }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="chargeTypeId" class="form-label">
+                  Shipping Type <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="chargeTypeId"
+                  class="form-select"
+                  formControlName="chargeTypeId"
+                  [class.is-invalid]="isFieldInvalid('chargeTypeId')">
+                  <option value="">Select Shipping Type</option>
+                  <option *ngFor="let chargeType of chargeTypes" [value]="chargeType.id">
+                    {{ chargeType.name }} - {{chargeType.numOfDay}} Day - ${{ chargeType.extraPrice }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('chargeTypeId')">
+                  {{ getFieldError('chargeTypeId') }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="bi bi-box-seam me-2"></i>
+            Products
+          </h3>
+          <div class="section-actions">
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="addProduct()">
+              <i class="bi bi-plus me-1"></i>
+              Add Product
+            </button>
+          </div>
+        </div>
+        <div class="section-content">
+          <div class="products-list" formArrayName="products">
+            <div *ngFor="let product of products.controls; let i = index"
+                 class="product-item"
+                 [formGroupName]="i">
+              <div class="product-header">
+                <h5 class="product-title">Product {{ i + 1 }}</h5>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="removeProduct(i)"
+                  [disabled]="products.length === 1"
+                  aria-label="Remove Product">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">
+                      Product Name <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="name"
+                      [class.is-invalid]="isProductFieldInvalid(i, 'name')"
+                      placeholder="Enter product name">
+                    <div class="invalid-feedback" *ngIf="isProductFieldInvalid(i, 'name')">
+                      {{ getProductFieldError(i, 'name') }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label class="form-label">
+                      Weight (kg) <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      formControlName="weight"
+                      [class.is-invalid]="isProductFieldInvalid(i, 'weight')"
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0">
+                    <div class="invalid-feedback" *ngIf="isProductFieldInvalid(i, 'weight')">
+                      {{ getProductFieldError(i, 'weight') }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label class="form-label">
+                      Quantity <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      formControlName="quantity"
+                      [class.is-invalid]="isProductFieldInvalid(i, 'quantity')"
+                      placeholder="1"
+                      min="1">
+                    <div class="invalid-feedback" *ngIf="isProductFieldInvalid(i, 'quantity')">
+                      {{ getProductFieldError(i, 'quantity') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Weight Display -->
+          <div class="total-weight-display">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              <strong>Total Weight: {{ totalWeight | number:'1.2-2' }} kg</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <h3 class="section-title">
+            <i class="bi bi-chat-text me-2"></i>
+            Additional Notes
+          </h3>
+        </div>
+        <div class="section-content">
+          <div class="form-group">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea
+              id="notes"
+              class="form-control"
+              rows="4"
+              formControlName="notes"
+              placeholder="Enter any additional notes or special instructions..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline-secondary" (click)="onCancel()" [disabled]="loading">
+          <i class="bi bi-x-circle me-2"></i>
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading || orderForm.invalid">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!loading" class="bi bi-check-circle me-2"></i>
+          Create Order
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

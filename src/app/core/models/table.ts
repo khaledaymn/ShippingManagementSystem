@@ -15,6 +15,7 @@ export interface TableAction {
   action: string
   color?: "primary" | "secondary" | "danger" | "warning" | "success" | "info"
   disabled?: (item: any) => boolean
+  visible?: (item: any) => boolean
 }
 
 export interface TableFilter {

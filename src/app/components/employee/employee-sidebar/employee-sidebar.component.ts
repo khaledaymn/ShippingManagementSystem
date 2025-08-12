@@ -24,10 +24,10 @@ export class EmployeeSidebarComponent {
     'weight-settings': 'Settings',
     'shipping-types-settings': 'ChargeTypes',
     'permissions': 'Permissions',
-    'branches': 'Branches', // تصحيح من Branchs
+    'branches': 'Branches',
     'employees': 'Employees',
     'merchants': 'Merchants',
-    'sales-representatives': 'Delivary', // غير مدرج في modules
+    'sales-representatives': 'Delivary',
     'governorates': 'Governorates',
     'cities': 'Cities',
     'orders': 'Orders',
@@ -122,7 +122,7 @@ export class EmployeeSidebarComponent {
               id: "sales-representatives",
               title: "Sales Representatives",
               icon: "bi-person-check",
-              url: "/employee/users/sales-representatives",
+              url: "/employee/users/shipping-representatives",
             },
           ],
         },
@@ -130,13 +130,7 @@ export class EmployeeSidebarComponent {
           id: "orders",
           title: "Orders",
           icon: "bi-box-seam",
-          url: "/admin/orders",
-        },
-        {
-          id: "order-reports",
-          title: "Order Reports",
-          icon: "bi-file-earmark-text",
-          url: "/admin/order-reports",
+          url: "/employee/orders",
         },
       ],
     };

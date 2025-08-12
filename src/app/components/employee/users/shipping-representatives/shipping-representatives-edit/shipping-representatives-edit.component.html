@@ -1,0 +1,246 @@
+<div class="shipping-representatives-edit">
+  <app-notification></app-notification>
+  <!-- Form Header -->
+  <div class="form-header">
+    <h2>{{ getPageTitle() }}</h2>
+    <button (click)="onCancel()" class="back-button" [disabled]="isLoading">
+      <i class="bi bi-x-circle"></i> Cancel
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="isLoading" class="alert alert-info">
+    <i class="bi bi-hourglass-split"></i> Loading shipping representative data...
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="alert alert-success">
+    <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+  </div>
+
+  <!-- Shipping Representative Form -->
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    class="shipping-representative-form"
+  >
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label for="name">
+          <i class="bi bi-person-fill"></i> Full Name
+          <span class="required">*</span>
+        </label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          class="form-control"
+          placeholder="Enter full name"
+          maxlength="100"
+        />
+        <div *ngIf="isFieldInvalid('name')" class="validation-error">
+          {{ getFieldError('name') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="email">
+          <i class="bi bi-envelope-fill"></i> Email Address
+          <span class="required">*</span>
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="Enter email address"
+        />
+        <div *ngIf="isFieldInvalid('email')" class="validation-error">
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="phoneNumber">
+          <i class="bi bi-telephone-fill"></i> Phone Number
+          <span class="required">*</span>
+        </label>
+        <input
+          id="phoneNumber"
+          type="tel"
+          formControlName="phoneNumber"
+          class="form-control"
+          placeholder="Enter phone number"
+        />
+        <div *ngIf="isFieldInvalid('phoneNumber')" class="validation-error">
+          {{ getFieldError('phoneNumber') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label for="address">
+          <i class="bi bi-geo-alt-fill"></i> Address
+          <span class="required">*</span>
+        </label>
+        <textarea
+          id="address"
+          formControlName="address"
+          class="form-control"
+          placeholder="Enter full address"
+          rows="3"
+        ></textarea>
+        <div *ngIf="isFieldInvalid('address')" class="validation-error">
+          {{ getFieldError('address') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="discountType">
+          <i class="bi bi-currency-dollar"></i> Discount Type
+          <span class="required">*</span>
+        </label>
+        <select
+          id="discountType"
+          formControlName="discountType"
+          class="form-control"
+        >
+          <option value="" disabled>Select discount type</option>
+          <option *ngFor="let type of discountTypes" [value]="type.value">
+            {{ type.label }}
+          </option>
+        </select>
+        <div *ngIf="isFieldInvalid('discountType')" class="validation-error">
+          {{ getFieldError('discountType') }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="companyPercent">
+          <i class="bi bi-percent"></i> Company Amount
+          <span class="required">*</span>
+        </label>
+        <div class="input-group">
+          <input
+            id="companyPercent"
+            type="number"
+            formControlName="companyPercent"
+            class="form-control"
+            placeholder="Enter amount"
+            min="0"
+            step="0.01"
+          />
+          <span class="input-group-text">{{ getAmountSymbol() }}</span>
+        </div>
+        <div *ngIf="isFieldInvalid('companyPercent')" class="validation-error">
+          {{ getFieldError('companyPercent') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label for="governorateIds">
+          <i class="bi bi-geo-fill"></i> Assigned Governorates
+          <span class="required">*</span>
+        </label>
+        <select
+          id="governorateIds"
+          formControlName="governorateIds"
+          multiple
+          class="form-control select-multiple"
+          [disabled]="governorates.length === 0"
+        >
+          <option value="" disabled>
+            {{ governorates.length === 0 ? "Loading governorates..." : "Select governorates" }}
+          </option>
+          <option
+            *ngFor="let governorate of governorates"
+            [value]="governorate.id"
+          >
+            {{ governorate.name }}
+          </option>
+        </select>
+        <div class="form-help">
+          Hold Ctrl (Cmd on Mac) to select multiple governorates
+        </div>
+        <div *ngIf="isFieldInvalid('governorateIds')" class="validation-error">
+          {{ getFieldError('governorateIds') }}
+        </div>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!isEditMode">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">
+            <i class="bi bi-lock-fill"></i> Password
+            <span class="required">*</span>
+          </label>
+          <div class="input-group">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              class="form-control"
+              placeholder="Enter password"
+            />
+            <button
+              type="button"
+              class="input-group-text toggle-password"
+              (click)="togglePasswordVisibility()"
+              title="{{ showPassword ? 'Hide password' : 'Show password' }}"
+            >
+              <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+          <div *ngIf="isFieldInvalid('password')" class="validation-error">
+            {{ getFieldError('password') }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">
+            <i class="bi bi-lock-fill"></i> Confirm Password
+            <span class="required">*</span>
+          </label>
+          <div class="input-group">
+            <input
+              id="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              class="form-control"
+              placeholder="Confirm password"
+            />
+            <button
+              type="button"
+              class="input-group-text toggle-password"
+              (click)="toggleConfirmPasswordVisibility()"
+              title="{{ showConfirmPassword ? 'Hide password' : 'Show password' }}"
+            >
+              <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+          <div *ngIf="isFieldInvalid('confirmPassword')" class="validation-error">
+            {{ getFieldError('confirmPassword') }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        [disabled]="form.invalid || isLoading"
+        class="btn btn-primary"
+      >
+        <i class="bi bi-save"></i>
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+        {{ isEditMode ? "Update Shipping Representative" : "Add Shipping Representative" }}
+      </button>
+    </div>
+  </form>
+</div>

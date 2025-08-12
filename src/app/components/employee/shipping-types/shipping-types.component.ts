@@ -78,7 +78,7 @@ export class ShippingTypesComponent implements OnInit, OnDestroy {
         label: 'Edit',
         icon: 'bi-pencil',
         action: 'edit',
-        color: 'primary',
+        color: 'primary'
       },
     ] as TableAction[],
     filters: [
@@ -128,7 +128,6 @@ export class ShippingTypesComponent implements OnInit, OnDestroy {
     ] as TableFilter[],
     searchable: true,
     sortable: true,
-    selectable: false,
     pagination: true,
     pageSize: 10,
     pageSizeOptions: [5, 10, 15, 25, 50],
@@ -240,9 +239,6 @@ export class ShippingTypesComponent implements OnInit, OnDestroy {
       case 'action':
         this.handleAction(event.data);
         break;
-      case 'select':
-        this.handleSelection(event.data);
-        break;
       case 'update':
         this.handleDelete(event.data);
         break;
@@ -300,10 +296,6 @@ export class ShippingTypesComponent implements OnInit, OnDestroy {
         }
         break;
     }
-  }
-
-  private handleSelection(selectionData: any): void {
-    this.selectedItems = selectionData.selectedItems;
   }
 
   private handleDelete(data: any): void {
@@ -389,12 +381,5 @@ export class ShippingTypesComponent implements OnInit, OnDestroy {
     this.notificationService.showSuccess('Data exported successfully as CSV!', 5000);
   }
 
-  toggleSelection(): void {
-    this.tableConfig.selectable = !this.tableConfig.selectable;
-    this.selectedItems = [];
-    this.notificationService.showInfo(
-      `Row selection ${this.tableConfig.selectable ? 'enabled' : 'disabled'}`,
-      5000
-    );
-  }
+
 }

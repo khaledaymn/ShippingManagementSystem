@@ -34,10 +34,7 @@ export class PermissionsViewComponent implements OnInit, OnDestroy {
   tableConfig: TableConfig = {
     searchable: true,
     sortable: true,
-    selectable: false,
     pagination: true,
-    showHeader: true,
-    showFooter: true,
     pageSizeOptions: [5, 10, 25, 50],
     columns: [
       { key: "name", label: "Group Name", type: "text", sortable: true },
@@ -123,7 +120,7 @@ canCreate: boolean = false;
       this.authService.getUserRole() == 'Admin';
     this.canDelete = this.authService.hasPermission('Permissions', 'Delete')||
       this.authService.getUserRole() == 'Admin';
-      
+
     if (!this.canDelete) {
       this.tableConfig.actions = [
         { action: "edit", label: "Edit Permissions", icon: "bi-pencil", color: "primary" },
@@ -185,9 +182,6 @@ canCreate: boolean = false;
           break;
         case "page":
           this.handlePageChange(event.data as { pageIndex: number; pageSize: number });
-          break;
-        case "select":
-          this.handleSelection(event.data as { selectedItems: Group[] });
           break;
         case "action":
           this.handleAction(event.data as { action: string; item: Group });
@@ -276,20 +270,6 @@ canCreate: boolean = false;
       this.loadGroups();
       this.notificationService.showInfo(`Navigating to page ${data.pageIndex}`, 5000);
     }
-  }
-
-  private handleSelection(data: { selectedItems: Group[] }): void {
-    if (!data?.selectedItems || !Array.isArray(data.selectedItems)) {
-      console.warn("Invalid selection data:", data);
-      this.selectedItems = [];
-      this.notificationService.showWarning("Invalid selection data", 6000);
-      return;
-    }
-    this.selectedItems = data.selectedItems;
-    this.notificationService.showInfo(
-      `${data.selectedItems.length} group${data.selectedItems.length === 1 ? "" : "s"} selected`,
-      5000
-    );
   }
 
   private handleAction(data: { action: string; item: Group }): void {
@@ -439,15 +419,6 @@ canCreate: boolean = false;
     window.URL.revokeObjectURL(url);
 
     this.notificationService.showSuccess("Data exported successfully as CSV!", 5000);
-  }
-
-  toggleSelection(): void {
-    this.tableConfig.selectable = !this.tableConfig.selectable;
-    this.selectedItems = [];
-    this.notificationService.showInfo(
-      `Row selection ${this.tableConfig.selectable ? "enabled" : "disabled"}`,
-      5000
-    );
   }
 
   resetFilters(): void {
