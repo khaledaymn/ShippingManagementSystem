@@ -246,7 +246,7 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   .notification {
     background: #1f2937;
     color: #f9fafb;
@@ -268,4 +268,4 @@
   .notification-persistent-label {
     color: #9ca3af;
   }
-}
+} */

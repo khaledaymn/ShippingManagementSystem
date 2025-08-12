@@ -845,29 +845,219 @@
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   .header {
-    background-color: #1e293b;
+    background-color: #1f2937;
     border-bottom-color: #374151;
-    color: #f8fafc;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobile-menu-toggle {
+    color: #9ca3af;
+  }
+
+  .mobile-menu-toggle:hover {
+    background-color: #374151;
+    color: #e5e7eb;
   }
 
   .page-title {
-    color: #f8fafc;
+    background: linear-gradient(135deg, #e5e7eb, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .search-input {
     background-color: #374151;
     border-color: #4b5563;
-    color: #f8fafc;
+    color: #e5e7eb;
   }
 
-  .dropdown-menu,
-  .search-results,
-  .mobile-menu,
-  .logout-dialog-content,
+  .search-input:focus {
+    background-color: #4b5563;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+  }
+
+  .search-input:focus + .search-icon {
+    color: #60a5fa;
+  }
+
+  .search-input.loading {
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(96, 165, 250, 0.2),
+      transparent
+    );
+  }
+
+  .search-results {
+    background-color: #374151;
+    border: 1px solid #4b5563;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .search-results-header {
+    border-bottom-color: #4b5563;
+    color: #9ca3af;
+  }
+
+  .clear-search {
+    color: #9ca3af;
+  }
+
+  .clear-search:hover {
+    color: #e5e7eb;
+    background-color: #4b5563;
+  }
+
+  .search-result-item:hover {
+    background-color: #4b5563;
+  }
+
+  .search-result-item i {
+    color: #9ca3af;
+  }
+
+  .search-result-title {
+    color: #e5e7eb;
+  }
+
+  .search-result-description {
+    color: #9ca3af;
+  }
+
+  .user-profile-btn:hover {
+    background-color: #374151;
+  }
+
+  .user-avatar-fallback {
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  }
+
+  .user-name {
+    color: #e5e7eb;
+  }
+
+  .user-role {
+    color: #9ca3af;
+  }
+
+  .dropdown-arrow {
+    color: #9ca3af;
+  }
+
+  .dropdown-menu {
+    background-color: #374151;
+    border: 1px solid #4b5563;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .dropdown-user-name {
+    color: #e5e7eb;
+  }
+
+  .dropdown-user-email {
+    color: #9ca3af;
+  }
+
+  .dropdown-user-role {
+    color: #6b7280;
+  }
+
+  .dropdown-divider {
+    background-color: #4b5563;
+  }
+
+  .dropdown-item {
+    color: #e5e7eb;
+  }
+
+  .dropdown-item:hover {
+    background-color: #4b5563;
+  }
+
+  .dropdown-item i {
+    color: #9ca3af;
+  }
+
+  .dropdown-item::before {
+    background-color: rgba(96, 165, 250, 0.2);
+  }
+
+  .text-danger:hover::before {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+  }
+
+  .logout-dialog-content {
+    background-color: #374151;
+    border: 1px solid #4b5563;
+  }
+
+  .logout-dialog-header h3 {
+    color: #e5e7eb;
+  }
+
+  .logout-dialog-content p {
+    color: #9ca3af;
+  }
+
+  .close-btn {
+    color: #9ca3af;
+  }
+
+  .close-btn:hover {
+    color: #e5e7eb;
+    background-color: #4b5563;
+  }
+
+  .btn-cancel {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+
+  .btn-cancel:hover {
+    background-color: #4b5563;
+    border-color: #6b7280;
+  }
+
+  .btn-confirm {
+    background-color: #ef4444;
+    border-color: #ef4444;
+  }
+
+  .btn-confirm:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  }
+
   .notification {
     background-color: #374151;
-    color: #f8fafc;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
-}
+
+  .notification-message {
+    color: #e5e7eb;
+  }
+
+  .notification-close {
+    color: #9ca3af;
+  }
+
+  .notification-close:hover {
+    color: #e5e7eb;
+    background-color: #4b5563;
+  }
+
+  .back-to-top {
+    background: linear-gradient(135deg, #60a5fa, #2563eb);
+  }
+
+  .back-to-top:hover {
+    background: linear-gradient(135deg, #2563eb, #60a5fa);
+  }
+} */
