@@ -13,9 +13,9 @@
 .btn-primary:hover {
   background-color: #3a6ba3 !important;
 }
+
 /* Compact Header Section */
 .table-header {
-  /* background: linear-gradient(135deg, #2d5689 0%, #7c3aed 100%); */
   background: linear-gradient(135deg, #1e293b, #3b82f6);
   color: white;
   padding: 1rem 1.5rem;
@@ -491,10 +491,6 @@
   flex-shrink: 0;
 }
 
-/* .filters-section {
-  animation: slideDown 0.3s ease-out;
-} */
-
 /* Container for the toggle switch */
 .btn-toggle {
   position: relative;
@@ -557,6 +553,162 @@
   background-color: #d1d5db;
 }
 
+/* Mobile Wrapper */
+.mobile-wrapper {
+  display: none;
+  padding: 0.75rem 1rem;
+}
+
+.mobile-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-select {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.mobile-select .form-check-input {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid #2d5689;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mobile-select .form-check-input:checked {
+  background-color: #2d5689;
+  border-color: #2d5689;
+}
+
+.mobile-select .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(45, 86, 137, 0.25);
+}
+
+.mobile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mobile-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.2s ease;
+}
+
+.mobile-field:last-child {
+  border-bottom: none;
+}
+
+.mobile-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9375rem;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.mobile-label::after {
+  content: ":";
+  margin-left: 0.25rem;
+}
+
+.mobile-value {
+  color: #374151;
+  font-size: 0.9375rem;
+  text-align: right;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-weight: 400;
+}
+
+.mobile-value .badge {
+  font-size: 0.8125rem;
+  padding: 0.3rem 0.6rem;
+}
+
+.mobile-value .btn-toggle {
+  width: 40px;
+  height: 20px;
+}
+
+.mobile-value .btn-toggle::after {
+  width: 16px;
+  height: 16px;
+}
+
+.mobile-value .btn-success::after {
+  transform: translateY(-50%) translateX(20px);
+}
+
+.mobile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  justify-content: flex-end;
+}
+
+.mobile-actions .btn {
+  flex: 1 1 auto;
+  min-width: 120px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.mobile-actions .btn:hover {
+  border-color: #2d5689;
+  background-color: #f3f4f6;
+}
+
+.mobile-actions .btn-outline-primary {
+  border-color: #2d5689;
+  color: #2d5689;
+}
+
+.mobile-actions .btn-outline-primary:hover {
+  background-color: #2d5689;
+  color: #ffffff;
+}
+
+.mobile-actions .btn-outline-danger {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.mobile-actions .btn-outline-danger:hover {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.mobile-actions .btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 /* Enhanced Media Queries */
 @media (max-width: 992px) {
   .filters-grid {
@@ -592,6 +744,14 @@
 }
 
 @media (max-width: 768px) {
+  .table-wrapper {
+    display: none;
+  }
+
+  .mobile-wrapper {
+    display: block;
+  }
+
   .header-content {
     flex-direction: column;
     align-items: stretch;
@@ -633,27 +793,36 @@
     justify-content: center;
   }
 
-  /* Keep table structure, just make it smaller */
-  .table {
-    font-size: clamp(0.625rem, 1.8vw, 0.75rem);
-    min-width: 500px;
+  /* Mobile Card Adjustments */
+  .mobile-card {
+    padding: 0.75rem;
   }
 
-  .table thead th,
-  .table tbody td {
-    padding: clamp(0.3rem, 1vw, 0.5rem) clamp(0.4rem, 1.5vw, 0.6rem);
+  .mobile-field {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
   }
 
-  .table thead th {
-    font-size: clamp(0.5625rem, 1.5vw, 0.6875rem);
+  .mobile-label {
+    font-size: 0.875rem;
+    color: #6b7280;
   }
 
-  .select-column {
-    width: clamp(25px, 6vw, 35px);
+  .mobile-value {
+    text-align: right;
+    font-size: 0.875rem;
   }
 
-  .actions-column {
-    width: clamp(50px, 12vw, 70px);
+  .mobile-actions {
+    justify-content: stretch;
+  }
+
+  .mobile-actions .btn {
+    width: 100%;
+    font-size: 0.8125rem;
+    padding: 0.5rem;
   }
 
   /* Toggle Switch Adjustments */
@@ -694,24 +863,31 @@
   }
 
   .btn-filter,
-  .btn-actions,
   .page-link {
     min-height: 36px;
   }
 
-  /* Further reduce table sizes */
-  .table {
-    font-size: clamp(0.5625rem, 1.5vw, 0.6875rem);
-    min-width: 400px;
+  /* Mobile Card Further Adjustments */
+  .mobile-card {
+    margin-bottom: 0.75rem;
+    padding: 0.5rem;
   }
 
-  .table thead th,
-  .table tbody td {
-    padding: clamp(0.25rem, 0.8vw, 0.4rem) clamp(0.3rem, 1.2vw, 0.5rem);
+  .mobile-field {
+    font-size: 0.8125rem;
   }
 
-  .table thead th {
-    font-size: clamp(0.5rem, 1.2vw, 0.625rem);
+  .mobile-label {
+    font-size: 0.8125rem;
+  }
+
+  .mobile-value {
+    font-size: 0.8125rem;
+  }
+
+  .mobile-actions .btn {
+    min-width: 100px;
+    padding: 0.4rem;
   }
 
   /* Toggle Switch Adjustments */

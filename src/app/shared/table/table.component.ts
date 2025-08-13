@@ -335,7 +335,7 @@ export class TableComponent implements OnInit, OnDestroy, OnChanges {
     return this.currentSort.direction === "asc" ? "bi-sort-up text-primary" : "bi-sort-down text-primary"
   }
 
-  getSortIconClass(_column: TableColumn): string {
+  getSortIconClass(_column: TableColumn): string {    
     return "" // Unused, as getSortIcon now includes the class
   }
 
