@@ -30,6 +30,8 @@ export class EmployeesEditComponent implements OnInit, OnDestroy {
   successMessage: string | null = null;
   branches: Branch[] = [];
   groups: Group[] = [];
+  showPassword = false;
+  showConfirmPassword = false;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -137,6 +139,14 @@ export class EmployeesEditComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
   loadEmployeeData(id: string): void {
     this.isLoading = true;
     this.employeeService
@@ -160,7 +170,7 @@ export class EmployeesEditComponent implements OnInit, OnDestroy {
           this.notificationService.showSuccess("Employee details loaded successfully", 5000);
         },
         error: (error) => {
-          this.errorMessage = error.message || "Failed to load employee data";
+          this.errorMessage = error.message || "Failed to load employee employee data";
           this.notificationService.showError(this.errorMessage ??'', 8000);
           this.isLoading = false;
           this.router.navigate(["/employee/users/employees"]);

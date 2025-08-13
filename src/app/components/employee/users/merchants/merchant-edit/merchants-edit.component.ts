@@ -31,6 +31,8 @@ export class MerchantsEditComponent implements OnInit, OnDestroy {
   canUpdate = false;
   branches: Branch[] = [];
   cities: City[] = [];
+  showPassword = false;
+  showConfirmPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -73,15 +75,26 @@ export class MerchantsEditComponent implements OnInit, OnDestroy {
         rejectedOrderPercent: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
         specialPickup: [0, [Validators.min(0)]],
         password: [""],
+        confirmPassword: [""],
         branchIds: [[]],
         specialDeliveryPrices: this.fb.array<FormGroup>([]),
       },
-      { updateOn: "blur" }
+      { validators: this.passwordMatchValidator, updateOn: "blur" }
     );
   }
 
   get specialDeliveryPricesArray(): FormArray<FormGroup> {
     return this.merchantForm.get("specialDeliveryPrices") as FormArray<FormGroup>;
+  }
+
+  private passwordMatchValidator(form: FormGroup) {
+    const password = form.get("password")?.value;
+    const confirmPassword = form.get("confirmPassword")?.value;
+    if (!form.get("password")?.pristine && password && confirmPassword && password !== confirmPassword) {
+      form.get("confirmPassword")?.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    }
+    return null;
   }
 
   private checkPermissions(): void {
@@ -104,13 +117,15 @@ export class MerchantsEditComponent implements OnInit, OnDestroy {
     if (!this.isEditMode) {
       this.merchantForm.get("password")?.setValidators([
         Validators.required,
-        Validators.minLength(8),
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/),
+        Validators.minLength(6)
       ]);
+      this.merchantForm.get("confirmPassword")?.setValidators([Validators.required]);
     } else {
       this.merchantForm.get("password")?.clearValidators();
+      this.merchantForm.get("confirmPassword")?.clearValidators();
     }
     this.merchantForm.get("password")?.updateValueAndValidity();
+    this.merchantForm.get("confirmPassword")?.updateValueAndValidity();
   }
 
   private loadDropdownData(): void {
@@ -124,7 +139,7 @@ export class MerchantsEditComponent implements OnInit, OnDestroy {
       pageIndex: 1,
       pageSize: 1000,
       isDeleted: false,
-      };
+    };
     forkJoin([
       this.branchService.getAllBranches(branchParams),
       this.cityService.getAllCities(cityParams),
@@ -193,6 +208,14 @@ export class MerchantsEditComponent implements OnInit, OnDestroy {
 
   removeSpecialDeliveryPrice(index: number): void {
     this.specialDeliveryPricesArray.removeAt(index);
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   onSubmit(): void {
@@ -295,6 +318,7 @@ export class MerchantsEditComponent implements OnInit, OnDestroy {
       if (field.errors["min"]) return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least ${field.errors["min"].min}`;
       if (field.errors["max"]) return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} cannot exceed ${field.errors["max"].max}`;
       if (field.errors["pattern"]) return `Invalid ${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} format`;
+      if (field.errors["passwordMismatch"]) return "Passwords do not match";
     }
     return "";
   }

@@ -74,6 +74,7 @@
               [formControlName]="filter.key"
               [attr.aria-label]="filter.label || 'Text filter'"
               [title]="filter.label || 'Text filter'"
+              aria-label="'Text filter'"
             />
 
             <!-- Number Filter -->
@@ -87,6 +88,7 @@
               [formControlName]="filter.key"
               [attr.aria-label]="filter.label || 'Number filter'"
               [title]="filter.label || 'Number filter'"
+              aria-label="'Number filter'"
             />
 
             <!-- Select Filter -->
@@ -96,6 +98,7 @@
               [formControlName]="filter.key"
               [attr.aria-label]="filter.label || 'Select filter'"
               [title]="filter.label || 'Select filter'"
+              aria-label="'Select filter'"
             >
               <option value="">All {{ filter.label }}</option>
               <option *ngFor="let option of filter.options" [value]="option.value">
@@ -112,6 +115,7 @@
               [placeholder]="filter.placeholder || 'Select ' + (filter.label.toLowerCase() || 'date')"
               [attr.aria-label]="filter.label || 'Date filter'"
               [title]="filter.label || 'Date filter'"
+              aria-label="'Date filter'"
             />
 
             <!-- Boolean Filter -->
@@ -121,6 +125,7 @@
               [formControlName]="filter.key"
               [attr.aria-label]="filter.label || 'Boolean filter'"
               [title]="filter.label || 'Boolean filter'"
+              aria-label="'Boolean filter'"
             >
               <option value="">All</option>
               <option value="true">Yes</option>

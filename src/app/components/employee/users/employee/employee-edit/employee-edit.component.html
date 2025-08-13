@@ -183,7 +183,7 @@
           type="text"
           formControlName="permission"
           class="form-control"
-          placeholder="Enter permission"
+          placeholder проявление permission"
         />
         <div
           *ngIf="isFieldInvalid('permission')"
@@ -210,13 +210,23 @@
             <i class="bi bi-lock-fill"></i> Password
             <span class="required">*</span>
           </label>
-          <input
-            id="password"
-            type="password"
-            formControlName="password"
-            class="form-control"
-            placeholder="Enter password"
-          />
+          <div class="input-group">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              class="form-control"
+              placeholder="Enter password"
+            />
+            <button
+              type="button"
+              class="input-group-text toggle-password"
+              (click)="togglePasswordVisibility()"
+              title="{{ showPassword ? 'Hide password' : 'Show password' }}"
+            >
+              <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
           <div
             *ngIf="isFieldInvalid('password')"
             class="validation-error"
@@ -229,13 +239,23 @@
             <i class="bi bi-lock-fill"></i> Confirm Password
             <span class="required">*</span>
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            formControlName="confirmPassword"
-            class="form-control"
-            placeholder="Confirm password"
-          />
+          <div class="input-group">
+            <input
+              id="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              class="form-control"
+              placeholder="Confirm password"
+            />
+            <button
+              type="button"
+              class="input-group-text toggle-password"
+              (click)="toggleConfirmPasswordVisibility()"
+              title="{{ showConfirmPassword ? 'Hide password' : 'Show password' }}"
+            >
+              <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
           <div
             *ngIf="isFieldInvalid('confirmPassword')"
             class="validation-error"
