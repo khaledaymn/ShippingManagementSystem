@@ -18,16 +18,16 @@ import { Group, Module, ModulePermission, CreateGroup, UpdateGroup, PermissionVa
 export class PermissionsEditComponent implements OnInit, OnDestroy {
   permissionForm: FormGroup;
   modules: Module[] = [
-    { id: 1, name: 'Branchs', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 2, name: 'ChargeTypes', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 3, name: 'Employees', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 4, name: 'Cities', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 5, name: 'Governorates', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 6, name: 'Permissions', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 7, name: 'Merchants', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 8, name: 'Orders', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 9, name: 'Delivary', permissions: { view: false, create: false, update: false, delete: false } },
-    { id: 11, name: 'Settings', permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 1, name: 'Branchs'      , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 2, name: 'ChargeTypes'  , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 3, name: 'Employees'    , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 4, name: 'Cities'       , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 5, name: 'Governorates' , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 6, name: 'Permissions'  , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 7, name: 'Merchants'    , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 8, name: 'Orders'       , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 9, name: 'Delivary'     , permissions: { view: false, create: false, update: false, delete: false } },
+    { id: 11,name: 'Settings'     , permissions: { view: false, create: false, update: false, delete: false } },
   ];
   loading = false;
   saving = false;

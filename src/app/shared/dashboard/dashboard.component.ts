@@ -1,527 +1,309 @@
-import { Component, Input, type OnInit } from "@angular/core"
+import { Component, Input, type OnInit, type OnDestroy, HostListener } from "@angular/core"
 import { CommonModule } from "@angular/common"
+import { FormsModule } from "@angular/forms"
+import { Subject, interval, takeUntil, BehaviorSubject } from "rxjs"
 import { DashboardCardComponent } from "./dashboard-card/dashboard-card.component"
 import { ChartComponent } from "./chart/chart.component"
-import { DashboardConfig, UserRole } from "../../core/models/dashboard"
 
+export interface DashboardMetric {
+  id: string
+  title: string
+  value: string | number
+  change?: string
+  changeType?: "increase" | "decrease" | "neutral"
+  icon: string
+  color: "blue" | "green" | "red" | "yellow" | "purple" | "indigo"
+  description?: string
+  trend?: number[]
+  target?: number
+}
+
+export interface ChartData {
+  id: string
+  title: string
+  type: "line" | "bar" | "doughnut" | "area"
+  data: any[]
+  labels: string[]
+  color: string
+  isLoading?: boolean
+  lastUpdated?: Date
+}
+
+export interface DashboardConfig {
+  title: string
+  subtitle: string
+  metrics: DashboardMetric[]
+  charts: ChartData[]
+  quickActions: QuickAction[]
+  recentActivities: Activity[]
+  refreshInterval?: number
+}
+
+export interface QuickAction {
+  id: string
+  title: string
+  description: string
+  icon: string
+  color: string
+  url: string
+  badge?: string
+  isNew?: boolean
+}
+
+export interface Activity {
+  id: string
+  title: string
+  description: string
+  time: string
+  type: "success" | "warning" | "info" | "error"
+  icon: string
+  isRead?: boolean
+}
+
+export interface DashboardSettings {
+  autoRefresh: boolean
+  refreshInterval: number
+  compactView: boolean
+  showAnimations: boolean
+  theme: "light" | "dark" | "auto"
+}
 
 @Component({
   selector: "app-dashboard",
   standalone: true,
-  imports: [CommonModule, DashboardCardComponent, ChartComponent],
+  imports: [CommonModule, FormsModule, DashboardCardComponent, ChartComponent],
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.css"],
 })
-export class DashboardComponent implements OnInit {
-  @Input() userRole: UserRole = "admin"
+export class DashboardComponent implements OnInit, OnDestroy {
   @Input() dashboardConfig!: DashboardConfig
+  @Input() userRole = ""
+
+  private destroy$ = new Subject<void>()
+  private refreshSubject$ = new BehaviorSubject<boolean>(false)
+
   currentTime = new Date()
+  isLoading = false
+  showSettings = false
+  showNotifications = false
+  lastRefresh = new Date()
+
+  // Dashboard settings
+  settings: DashboardSettings = {
+    autoRefresh: true,
+    refreshInterval: 30000, // 30 seconds
+    compactView: false,
+    showAnimations: true,
+    theme: "auto",
+  }
+
+  // Notification system
+  notifications: Activity[] = []
+  unreadCount = 0
+
+  // Search and filter
+  searchQuery = ""
+  filteredActivities: Activity[] = []
+
+  // Performance metrics
+  loadTime = 0
+  lastUpdateTime = ""
 
   ngOnInit(): void {
-    //this.loadDashboardConfig()
+    this.loadSettings()
     this.updateTime()
+    this.setupAutoRefresh()
+    this.initializeNotifications()
+    this.filterActivities()
+    this.measureLoadTime()
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next()
+    this.destroy$.complete()
+    this.saveSettings()
+  }
+
+  @HostListener("window:beforeunload", ["$event"])
+  beforeUnload(): void {
+    this.saveSettings()
+  }
+
+  private measureLoadTime(): void {
+    const startTime = performance.now()
+    setTimeout(() => {
+      this.loadTime = Math.round(performance.now() - startTime)
+    }, 100)
+  }
+
+  private loadSettings(): void {
+    const saved = localStorage.getItem(`dashboard-settings-${this.userRole}`)
+    if (saved) {
+      this.settings = { ...this.settings, ...JSON.parse(saved) }
+    }
+  }
+
+  private saveSettings(): void {
+    localStorage.setItem(`dashboard-settings-${this.userRole}`, JSON.stringify(this.settings))
   }
 
   private updateTime(): void {
-    setInterval(() => {
-      this.currentTime = new Date()
-    }, 1000)
+    interval(1000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.currentTime = new Date()
+      })
   }
 
-  // private loadDashboardConfig(): void {
-  //   switch (this.userRole) {
-  //     case "admin":
-  //       this.dashboardConfig = this.getAdminDashboard()
-  //       break
-  //     case "employee":
-  //       this.dashboardConfig = this.getEmployeeDashboard()
-  //       break
-  //     case "delegate":
-  //       this.dashboardConfig = this.getDelegateDashboard()
-  //       break
-  //     case "merchant":
-  //       this.dashboardConfig = this.getMerchantDashboard()
-  //       break
-  //     default:
-  //       this.dashboardConfig = this.getAdminDashboard()
-  //   }
-  // }
+  private setupAutoRefresh(): void {
+    if (this.settings.autoRefresh) {
+      interval(this.settings.refreshInterval)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.refreshDashboard()
+        })
+    }
+  }
 
-  // private getAdminDashboard(): DashboardConfig {
-  //   return {
-  //     title: "Admin Dashboard",
-  //     subtitle: "System Overview & Management",
-  //     metrics: [
-  //       {
-  //         id: "total-users",
-  //         title: "Total Users",
-  //         value: "2,847",
-  //         change: "+12.5%",
-  //         changeType: "increase",
-  //         icon: "bi-people",
-  //         color: "blue",
-  //         description: "Active users in the system",
-  //       },
-  //       {
-  //         id: "total-orders",
-  //         title: "Total Orders",
-  //         value: "18,392",
-  //         change: "+8.2%",
-  //         changeType: "increase",
-  //         icon: "bi-box-seam",
-  //         color: "green",
-  //         description: "Orders processed this month",
-  //       },
-  //       {
-  //         id: "revenue",
-  //         title: "Revenue",
-  //         value: "$124,580",
-  //         change: "+15.3%",
-  //         changeType: "increase",
-  //         icon: "bi-currency-dollar",
-  //         color: "purple",
-  //         description: "Total revenue this month",
-  //       },
-  //       {
-  //         id: "system-health",
-  //         title: "System Health",
-  //         value: "99.8%",
-  //         change: "-0.1%",
-  //         changeType: "decrease",
-  //         icon: "bi-shield-check",
-  //         color: "indigo",
-  //         description: "System uptime",
-  //       },
-  //     ],
-  //     charts: [
-  //       {
-  //         id: "orders-chart",
-  //         title: "Orders Overview",
-  //         type: "line",
-  //         data: [120, 150, 180, 200, 170, 190, 220],
-  //         labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-  //         color: "#3b82f6",
-  //       },
-  //       {
-  //         id: "revenue-chart",
-  //         title: "Revenue Breakdown",
-  //         type: "doughnut",
-  //         data: [45, 25, 20, 10],
-  //         labels: ["Merchants", "Delegates", "Employees", "Others"],
-  //         color: "#8b5cf6",
-  //       },
-  //     ],
-  //     quickActions: [
-  //       {
-  //         id: "add-user",
-  //         title: "Add New User",
-  //         description: "Create employee, delegate, or merchant account",
-  //         icon: "bi-person-plus",
-  //         color: "#3b82f6",
-  //         url: "/admin/users/create",
-  //       },
-  //       {
-  //         id: "system-settings",
-  //         title: "System Settings",
-  //         description: "Configure system parameters and permissions",
-  //         icon: "bi-gear",
-  //         color: "#6b7280",
-  //         url: "/admin/settings",
-  //       },
-  //       {
-  //         id: "view-reports",
-  //         title: "Generate Reports",
-  //         description: "Create comprehensive system reports",
-  //         icon: "bi-file-earmark-text",
-  //         color: "#10b981",
-  //         url: "/admin/reports",
-  //       },
-  //     ],
-  //     recentActivities: [
-  //       {
-  //         id: "1",
-  //         title: "New merchant registered",
-  //         description: "TechCorp Solutions joined the platform",
-  //         time: "2 minutes ago",
-  //         type: "success",
-  //         icon: "bi-shop",
-  //       },
-  //       {
-  //         id: "2",
-  //         title: "System backup completed",
-  //         description: "Daily backup process finished successfully",
-  //         time: "1 hour ago",
-  //         type: "info",
-  //         icon: "bi-cloud-check",
-  //       },
-  //       {
-  //         id: "3",
-  //         title: "High order volume detected",
-  //         description: "Order processing queue is at 85% capacity",
-  //         time: "3 hours ago",
-  //         type: "warning",
-  //         icon: "bi-exclamation-triangle",
-  //       },
-  //     ],
-  //   }
-  // }
+  private initializeNotifications(): void {
+    this.notifications = this.dashboardConfig.recentActivities.map((activity) => ({
+      ...activity,
+      isRead: false,
+    }))
+    this.updateUnreadCount()
+  }
 
-  // private getEmployeeDashboard(): DashboardConfig {
-  //   return {
-  //     title: "Employee Dashboard",
-  //     subtitle: "Daily Tasks & Order Management",
-  //     metrics: [
-  //       {
-  //         id: "assigned-orders",
-  //         title: "Assigned Orders",
-  //         value: "47",
-  //         change: "+5",
-  //         changeType: "increase",
-  //         icon: "bi-clipboard-check",
-  //         color: "blue",
-  //         description: "Orders assigned to you today",
-  //       },
-  //       {
-  //         id: "completed-orders",
-  //         title: "Completed Orders",
-  //         value: "32",
-  //         change: "+8",
-  //         changeType: "increase",
-  //         icon: "bi-check-circle",
-  //         color: "green",
-  //         description: "Orders completed today",
-  //       },
-  //       {
-  //         id: "pending-orders",
-  //         title: "Pending Orders",
-  //         value: "15",
-  //         change: "-3",
-  //         changeType: "decrease",
-  //         icon: "bi-clock",
-  //         color: "yellow",
-  //         description: "Orders awaiting processing",
-  //       },
-  //       {
-  //         id: "efficiency-rate",
-  //         title: "Efficiency Rate",
-  //         value: "94.2%",
-  //         change: "+2.1%",
-  //         changeType: "increase",
-  //         icon: "bi-speedometer2",
-  //         color: "purple",
-  //         description: "Your processing efficiency",
-  //       },
-  //     ],
-  //     charts: [
-  //       {
-  //         id: "daily-performance",
-  //         title: "Daily Performance",
-  //         type: "bar",
-  //         data: [28, 35, 42, 38, 45, 32, 47],
-  //         labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-  //         color: "#10b981",
-  //       },
-  //       {
-  //         id: "order-status",
-  //         title: "Order Status Distribution",
-  //         type: "doughnut",
-  //         data: [32, 15, 8, 2],
-  //         labels: ["Completed", "Pending", "In Progress", "On Hold"],
-  //         color: "#3b82f6",
-  //       },
-  //     ],
-  //     quickActions: [
-  //       {
-  //         id: "process-order",
-  //         title: "Process Next Order",
-  //         description: "Continue with pending order processing",
-  //         icon: "bi-play-circle",
-  //         color: "#3b82f6",
-  //         url: "/employee/orders/next",
-  //       },
-  //       {
-  //         id: "view-schedule",
-  //         title: "View Schedule",
-  //         description: "Check your daily task schedule",
-  //         icon: "bi-calendar3",
-  //         color: "#8b5cf6",
-  //         url: "/employee/schedule",
-  //       },
-  //       {
-  //         id: "report-issue",
-  //         title: "Report Issue",
-  //         description: "Report order processing issues",
-  //         icon: "bi-exclamation-circle",
-  //         color: "#ef4444",
-  //         url: "/employee/issues/report",
-  //       },
-  //     ],
-  //     recentActivities: [
-  //       {
-  //         id: "1",
-  //         title: "Order #ORD-2024-001 completed",
-  //         description: "Successfully processed and marked as complete",
-  //         time: "5 minutes ago",
-  //         type: "success",
-  //         icon: "bi-check-circle",
-  //       },
-  //       {
-  //         id: "2",
-  //         title: "New order assigned",
-  //         description: "Order #ORD-2024-002 has been assigned to you",
-  //         time: "15 minutes ago",
-  //         type: "info",
-  //         icon: "bi-inbox",
-  //       },
-  //       {
-  //         id: "3",
-  //         title: "Break time reminder",
-  //         description: "You've been working for 3 hours straight",
-  //         time: "30 minutes ago",
-  //         type: "warning",
-  //         icon: "bi-cup-hot",
-  //       },
-  //     ],
-  //   }
-  // }
+  private updateUnreadCount(): void {
+    this.unreadCount = this.notifications.filter((n) => !n.isRead).length
+  }
 
-  // private getDelegateDashboard(): DashboardConfig {
-  //   return {
-  //     title: "Delegate Dashboard",
-  //     subtitle: "Delivery Management & Route Optimization",
-  //     metrics: [
-  //       {
-  //         id: "assigned-deliveries",
-  //         title: "Assigned Deliveries",
-  //         value: "23",
-  //         change: "+3",
-  //         changeType: "increase",
-  //         icon: "bi-truck",
-  //         color: "blue",
-  //         description: "Deliveries assigned for today",
-  //       },
-  //       {
-  //         id: "completed-deliveries",
-  //         title: "Completed Deliveries",
-  //         value: "18",
-  //         change: "+6",
-  //         changeType: "increase",
-  //         icon: "bi-check-circle",
-  //         color: "green",
-  //         description: "Deliveries completed today",
-  //       },
-  //       {
-  //         id: "remaining-deliveries",
-  //         title: "Remaining Deliveries",
-  //         value: "5",
-  //         change: "-3",
-  //         changeType: "decrease",
-  //         icon: "bi-hourglass-split",
-  //         color: "yellow",
-  //         description: "Deliveries pending completion",
-  //       },
-  //       {
-  //         id: "delivery-efficiency",
-  //         title: "Delivery Efficiency",
-  //         value: "96.7%",
-  //         change: "+1.8%",
-  //         changeType: "increase",
-  //         icon: "bi-speedometer",
-  //         color: "purple",
-  //         description: "On-time delivery rate",
-  //       },
-  //     ],
-  //     charts: [
-  //       {
-  //         id: "delivery-performance",
-  //         title: "Weekly Delivery Performance",
-  //         type: "area",
-  //         data: [15, 22, 18, 25, 20, 28, 23],
-  //         labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-  //         color: "#f59e0b",
-  //       },
-  //       {
-  //         id: "delivery-zones",
-  //         title: "Delivery Zones Coverage",
-  //         type: "doughnut",
-  //         data: [8, 6, 4, 5],
-  //         labels: ["Zone A", "Zone B", "Zone C", "Zone D"],
-  //         color: "#10b981",
-  //       },
-  //     ],
-  //     quickActions: [
-  //       {
-  //         id: "start-route",
-  //         title: "Start Delivery Route",
-  //         description: "Begin your optimized delivery route",
-  //         icon: "bi-geo-alt",
-  //         color: "#3b82f6",
-  //         url: "/delegate/deliveries/route",
-  //       },
-  //       {
-  //         id: "update-status",
-  //         title: "Update Delivery Status",
-  //         description: "Mark deliveries as completed or update status",
-  //         icon: "bi-clipboard-check",
-  //         color: "#10b981",
-  //         url: "/delegate/deliveries/update",
-  //       },
-  //       {
-  //         id: "report-delay",
-  //         title: "Report Delay",
-  //         description: "Report delivery delays or issues",
-  //         icon: "bi-exclamation-triangle",
-  //         color: "#ef4444",
-  //         url: "/delegate/deliveries/issues",
-  //       },
-  //     ],
-  //     recentActivities: [
-  //       {
-  //         id: "1",
-  //         title: "Delivery #DEL-2024-045 completed",
-  //         description: "Package delivered to customer successfully",
-  //         time: "10 minutes ago",
-  //         type: "success",
-  //         icon: "bi-check-circle",
-  //       },
-  //       {
-  //         id: "2",
-  //         title: "Route optimization updated",
-  //         description: "New optimal route calculated for remaining deliveries",
-  //         time: "25 minutes ago",
-  //         type: "info",
-  //         icon: "bi-arrow-repeat",
-  //       },
-  //       {
-  //         id: "3",
-  //         title: "Customer unavailable",
-  //         description: "Delivery #DEL-2024-043 rescheduled for tomorrow",
-  //         time: "1 hour ago",
-  //         type: "warning",
-  //         icon: "bi-person-x",
-  //       },
-  //     ],
-  //   }
-  // }
+  refreshDashboard(): void {
+    this.isLoading = true
+    this.lastRefresh = new Date()
+    this.lastUpdateTime = this.formatTime(this.lastRefresh)
 
-  // private getMerchantDashboard(): DashboardConfig {
-  //   return {
-  //     title: "Merchant Dashboard",
-  //     subtitle: "Sales Analytics & Inventory Management",
-  //     metrics: [
-  //       {
-  //         id: "total-sales",
-  //         title: "Total Sales",
-  //         value: "$8,420",
-  //         change: "+18.5%",
-  //         changeType: "increase",
-  //         icon: "bi-currency-dollar",
-  //         color: "green",
-  //         description: "Sales revenue this month",
-  //       },
-  //       {
-  //         id: "orders-received",
-  //         title: "Orders Received",
-  //         value: "156",
-  //         change: "+12",
-  //         changeType: "increase",
-  //         icon: "bi-bag-check",
-  //         color: "blue",
-  //         description: "New orders this week",
-  //       },
-  //       {
-  //         id: "pending-orders",
-  //         title: "Pending Orders",
-  //         value: "8",
-  //         change: "-4",
-  //         changeType: "decrease",
-  //         icon: "bi-clock-history",
-  //         color: "yellow",
-  //         description: "Orders awaiting fulfillment",
-  //       },
-  //       {
-  //         id: "customer-rating",
-  //         title: "Customer Rating",
-  //         value: "4.8",
-  //         change: "+0.2",
-  //         changeType: "increase",
-  //         icon: "bi-star-fill",
-  //         color: "purple",
-  //         description: "Average customer rating",
-  //       },
-  //     ],
-  //     charts: [
-  //       {
-  //         id: "sales-trend",
-  //         title: "Sales Trend",
-  //         type: "line",
-  //         data: [1200, 1450, 1380, 1650, 1420, 1580, 1720],
-  //         labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-  //         color: "#10b981",
-  //       },
-  //       {
-  //         id: "product-categories",
-  //         title: "Top Product Categories",
-  //         type: "bar",
-  //         data: [45, 35, 25, 20, 15],
-  //         labels: ["Electronics", "Clothing", "Books", "Home", "Sports"],
-  //         color: "#8b5cf6",
-  //       },
-  //     ],
-  //     quickActions: [
-  //       {
-  //         id: "add-product",
-  //         title: "Add New Product",
-  //         description: "Add products to your inventory",
-  //         icon: "bi-plus-circle",
-  //         color: "#3b82f6",
-  //         url: "/merchant/products/add",
-  //       },
-  //       {
-  //         id: "manage-inventory",
-  //         title: "Manage Inventory",
-  //         description: "Update stock levels and product details",
-  //         icon: "bi-boxes",
-  //         color: "#10b981",
-  //         url: "/merchant/inventory",
-  //       },
-  //       {
-  //         id: "view-analytics",
-  //         title: "View Analytics",
-  //         description: "Detailed sales and performance analytics",
-  //         icon: "bi-graph-up",
-  //         color: "#8b5cf6",
-  //         url: "/merchant/analytics",
-  //       },
-  //     ],
-  //     recentActivities: [
-  //       {
-  //         id: "1",
-  //         title: "New order received",
-  //         description: "Order #ORD-2024-156 for $245.00",
-  //         time: "3 minutes ago",
-  //         type: "success",
-  //         icon: "bi-bag-plus",
-  //       },
-  //       {
-  //         id: "2",
-  //         title: "Product stock low",
-  //         description: "iPhone 15 Pro has only 3 units remaining",
-  //         time: "20 minutes ago",
-  //         type: "warning",
-  //         icon: "bi-exclamation-triangle",
-  //       },
-  //       {
-  //         id: "3",
-  //         title: "Customer review received",
-  //         description: "5-star review for your Electronics category",
-  //         time: "1 hour ago",
-  //         type: "info",
-  //         icon: "bi-star",
-  //       },
-  //     ],
-  //   }
-  // }
+    // Simulate API call
+    setTimeout(() => {
+      this.isLoading = false
+      this.refreshSubject$.next(true)
+      this.showToast("Dashboard refreshed successfully", "success")
+    }, 1500)
+  }
+
+  toggleSettings(): void {
+    this.showSettings = !this.showSettings
+    if (this.showSettings) {
+      this.showNotifications = false
+    }
+  }
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications
+    if (this.showNotifications) {
+      this.showSettings = false
+      this.markAllAsRead()
+    }
+  }
+
+  markAllAsRead(): void {
+    this.notifications.forEach((n) => (n.isRead = true))
+    this.updateUnreadCount()
+  }
+
+  onSettingsChange(): void {
+    this.saveSettings()
+    if (this.settings.autoRefresh) {
+      this.setupAutoRefresh()
+    }
+
+    // Apply theme
+    document.documentElement.setAttribute("data-theme", this.settings.theme)
+
+    // Apply animations
+    document.documentElement.style.setProperty("--animation-duration", this.settings.showAnimations ? "0.3s" : "0s")
+  }
+
+  filterActivities(): void {
+    if (!this.searchQuery.trim()) {
+      this.filteredActivities = this.dashboardConfig.recentActivities
+    } else {
+      this.filteredActivities = this.dashboardConfig.recentActivities.filter(
+        (activity) =>
+          activity.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          activity.description.toLowerCase().includes(this.searchQuery.toLowerCase()),
+      )
+    }
+  }
+
+  onSearchChange(): void {
+    this.filterActivities()
+  }
+
+  exportData(): void {
+    const data = {
+      metrics: this.dashboardConfig.metrics,
+      charts: this.dashboardConfig.charts,
+      activities: this.dashboardConfig.recentActivities,
+      exportedAt: new Date().toISOString(),
+      userRole: this.userRole,
+    }
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `dashboard-data-${this.userRole}-${new Date().toISOString().split("T")[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+
+    this.showToast("Dashboard data exported successfully", "success")
+  }
+
+  printDashboard(): void {
+    window.print()
+  }
+
+  shareMetric(metric: DashboardMetric): void {
+    if (navigator.share) {
+      navigator.share({
+        title: `${metric.title} - ${this.dashboardConfig.title}`,
+        text: `${metric.title}: ${metric.value} (${metric.change || "No change"})`,
+        url: window.location.href,
+      })
+    } else {
+      // Fallback: copy to clipboard
+      const text = `${metric.title}: ${metric.value} (${metric.change || "No change"})`
+      navigator.clipboard.writeText(text).then(() => {
+        this.showToast("Metric copied to clipboard", "success")
+      })
+    }
+  }
+
+  private showToast(message: string, type: "success" | "error" | "info" | "warning"): void {
+    // Create toast notification
+    const toast = document.createElement("div")
+    toast.className = `toast toast-${type}`
+    toast.textContent = message
+
+    const container = document.querySelector(".toast-container") || this.createToastContainer()
+    container.appendChild(toast)
+
+    // Animate in
+    setTimeout(() => toast.classList.add("show"), 100)
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      toast.classList.remove("show")
+      setTimeout(() => container.removeChild(toast), 300)
+    }, 3000)
+  }
+
+  private createToastContainer(): HTMLElement {
+    const container = document.createElement("div")
+    container.className = "toast-container"
+    document.body.appendChild(container)
+    return container
+  }
 
   getGreeting(): string {
     const hour = this.currentTime.getHours()
@@ -531,12 +313,50 @@ export class DashboardComponent implements OnInit {
   }
 
   getRoleDisplayName(): string {
-    const roleNames = {
+    const roleNames: { [key: string]: string } = {
       admin: "Administrator",
       employee: "Employee",
-      delegate: "Delivery Delegate",
+      salesRep: "Sales Representative",
       merchant: "Merchant Partner",
     }
     return roleNames[this.userRole] || "User"
+  }
+
+  formatTime(date: Date): string {
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+  }
+
+  getMetricTrend(metric: DashboardMetric): string {
+    if (!metric.trend || metric.trend.length < 2) return "stable"
+    const last = metric.trend[metric.trend.length - 1]
+    const previous = metric.trend[metric.trend.length - 2]
+    return last > previous ? "up" : last < previous ? "down" : "stable"
+  }
+
+  getProgressPercentage(metric: DashboardMetric): number {
+    if (!metric.target) return 0
+    const numericValue =
+      typeof metric.value === "string" ? Number.parseFloat(metric.value.replace(/[^0-9.-]/g, "")) : metric.value
+    return Math.min((numericValue / metric.target) * 100, 100)
+  }
+
+  trackByMetricId(index: number, metric: DashboardMetric): string {
+    return metric.id
+  }
+
+  trackByChartId(index: number, chart: ChartData): string {
+    return chart.id
+  }
+
+  trackByActionId(index: number, action: QuickAction): string {
+    return action.id
+  }
+
+  trackByActivityId(index: number, activity: Activity): string {
+    return activity.id
   }
 }

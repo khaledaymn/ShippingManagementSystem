@@ -1,4 +1,320 @@
-<app-dashboard
-  [dashboardConfig]="dashboardConfig"
-  userRole="employee">
-</app-dashboard>
+<div class="employee-dashboard">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="dashboard-title">Employee Dashboard</h1>
+        <p class="dashboard-subtitle">Daily Tasks & Order Management</p>
+      </div>
+      <div class="header-right">
+        <div class="greeting">
+          <h2>Good Morning, Employee</h2>
+          <p class="current-time">{{ getFormattedDateTime() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Performance Metrics - Smaller Section -->
+  <section class="metrics-section" *ngIf="performanceMetrics?.length">
+    <div class="section-header">
+      <h3>Performance Overview</h3>
+    </div>
+    <div class="metrics-grid-compact">
+      <div
+        *ngFor="let metric of performanceMetrics"
+        class="metric-card-compact"
+        [style.border-top-color]="metric.color">
+        <div class="metric-icon-compact" [style.background-color]="metric.color">
+          <i [class]="metric.icon" [attr.aria-label]="metric.description" role="img"></i>
+        </div>
+        <div class="metric-content-compact">
+          <div class="metric-value-compact">{{ metric.value }}</div>
+          <div class="metric-title-compact">{{ metric.title }}</div>
+          <div
+            *ngIf="metric.change"
+            class="metric-change-compact"
+            [class.positive]="metric.changeType === 'increase'"
+            [class.negative]="metric.changeType === 'decrease'">
+            {{ metric.change }}
+            <i [class]="metric.changeType === 'increase' ? 'bi-arrow-up' : 'bi-arrow-down'" [attr.aria-hidden]="true"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Order Status Distribution - Bigger Section -->
+  <section class="order-status-section" *ngIf="orderStatusMetrics?.length">
+    <div class="section-header">
+      <h3>Order Status Overview</h3>
+    </div>
+    <div class="status-grid-large">
+      <div
+        *ngFor="let status of orderStatusMetrics"
+        class="status-card-large"
+        [style.border-left-color]="status.color">
+        <div class="status-icon-large" [style.color]="status.color">
+          <i [class]="status.icon" [attr.aria-label]="status.description" role="img"></i>
+        </div>
+        <div class="status-content-large">
+          <div class="status-value-large">{{ status.value }}</div>
+          <div class="status-title-large">{{ status.title }}</div>
+        </div>
+        <div class="hover-overlay"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Payment Types - Bigger Section -->
+  <section class="payment-section" *ngIf="paymentTypeMetrics?.length">
+    <div class="section-header">
+      <h3>Orders by Payment Type</h3>
+    </div>
+    <div class="payment-grid-large">
+      <div
+        *ngFor="let payment of paymentTypeMetrics"
+        class="payment-card-large"
+        [style.border-left-color]="payment.color">
+        <div class="payment-icon-large" [style.color]="payment.color">
+          <i [class]="payment.icon" [attr.aria-label]="payment.description" role="img"></i>
+        </div>
+        <div class="payment-content-large">
+          <div class="payment-value-large">{{ payment.value }}</div>
+          <div class="payment-title-large">{{ payment.title }}</div>
+        </div>
+        <div class="hover-overlay"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Analytics Overview - Enhanced Creative Charts -->
+  <section class="analytics-section">
+    <div class="section-header">
+      <h3>Analytics Overview</h3>
+      <!-- Removed View All link for cleaner design -->
+    </div>
+
+    <div class="charts-container">
+      <!-- Enhanced Monthly Performance Chart -->
+      <div class="chart-card-creative enhanced-chart" *ngIf="monthlyPerformanceChart">
+        <div class="chart-header">
+          <h4>{{ monthlyPerformanceChart.title }}</h4>
+          <div class="chart-stats">
+            <div class="stat-item">
+              <span class="stat-label">Average:</span>
+              <span class="stat-value">{{ getAveragePerformance() }}%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Best Month:</span>
+              <span class="stat-value">{{ getBestMonth().month }} ({{ getBestMonth().value }}%)</span>
+            </div>
+          </div>
+        </div>
+        <div class="chart-content">
+          <div class="line-chart-enhanced">
+            <svg viewBox="0 0 280 600" class="line-chart-svg" role="img" [attr.aria-label]="monthlyPerformanceChart.title">
+              <defs>
+                <linearGradient id="enhancedLineGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0%" style="stop-color:#1e293b;stop-opacity:0.8" />
+                  <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:0.6" />
+                  <stop offset="100%" style="stop-color:#60a5fa;stop-opacity:0.2" />
+                </linearGradient>
+                <filter id="glowEffect">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <filter id="dropShadow">
+                  <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#3b82f6" flood-opacity="0.3"/>
+                </filter>
+              </defs>
+
+              <!-- Enhanced Grid Lines -->
+              <g class="grid-lines">
+                <line *ngFor="let i of [80,85,90,95,100]"
+                      [attr.x1]="((i - 80) / 20) * 220 + 30" [attr.y1]="30"
+                      [attr.x2]="((i - 80) / 20) * 220 + 30" [attr.y2]="570"
+                      stroke="#e5e7eb" stroke-width="1" opacity="0.3"/>
+                <line *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12]"
+                      [attr.x1]="30" [attr.y1]="30 + ((i-1) * 45)"
+                      [attr.x2]="250" [attr.y2]="30 + ((i-1) * 45)"
+                      stroke="#f1f5f9" stroke-width="0.5" opacity="0.5"/>
+              </g>
+
+              <!-- Target Line -->
+              <line x1="30" y1="300" x2="250" y2="300"
+                    stroke="#10b981" stroke-width="2" stroke-dasharray="5,5" opacity="0.7">
+                <title>Target: 90%</title>
+              </line>
+
+              <!-- Enhanced Area and Line -->
+              <path [attr.d]="lineChartPathArea" fill="url(#enhancedLineGradient)" stroke="none"
+                    [class.chart-animated]="chartAnimationComplete"/>
+              <path [attr.d]="lineChartPathLine" fill="none" stroke="#3b82f6" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round" filter="url(#glowEffect)"
+                    [class.chart-animated]="chartAnimationComplete"/>
+
+              <!-- Enhanced Interactive Data Points -->
+              <g class="data-points">
+                <circle *ngFor="let point of animatedDataPoints; let i = index"
+                        [attr.cx]="point.x"
+                        [attr.cy]="point.y"
+                        [attr.r]="hoveredDataPoint === i ? 8 : 5"
+                        [attr.fill]="hoveredDataPoint === i ? '#1e40af' : '#3b82f6'"
+                        [attr.stroke]="hoveredDataPoint === i ? '#ffffff' : '#1e40af'"
+                        [attr.stroke-width]="hoveredDataPoint === i ? 3 : 2"
+                        [style.filter]="hoveredDataPoint === i ? 'url(#dropShadow)' : 'drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3))'"
+                        [class.data-point-enhanced]="true"
+                        [class.data-point-hovered]="hoveredDataPoint === i"
+                        [style.animation-delay]="point.delay + 'ms'"
+                        (mouseenter)="onDataPointHover(i)"
+                        (mouseleave)="onDataPointLeave()"
+                        style="cursor: pointer;">
+                  <title>{{ getDataPointTooltip(point) }}</title>
+                </circle>
+
+                <!-- Trend Indicators -->
+                <g *ngFor="let point of animatedDataPoints; let i = index">
+                  <path *ngIf="i > 0 && monthlyPerformanceChart && monthlyPerformanceChart.data[i] > monthlyPerformanceChart.data[i-1]"
+                        [attr.d]="'M ' + (point.x - 3) + ' ' + (point.y + 12) + ' L ' + point.x + ' ' + (point.y + 8) + ' L ' + (point.x + 3) + ' ' + (point.y + 12)"
+                        fill="#10b981" stroke="none" opacity="0.8">
+                    <title>Trending Up</title>
+                  </path>
+                  <path *ngIf="i > 0 && monthlyPerformanceChart && monthlyPerformanceChart.data[i] < monthlyPerformanceChart.data[i-1]"
+                        [attr.d]="'M ' + (point.x - 3) + ' ' + (point.y + 8) + ' L ' + point.x + ' ' + (point.y + 12) + ' L ' + (point.x + 3) + ' ' + (point.y + 8)"
+                        fill="#ef4444" stroke="none" opacity="0.8">
+                    <title>Trending Down</title>
+                  </path>
+                </g>
+              </g>
+            </svg>
+
+            <!-- Enhanced Labels -->
+            <div class="chart-labels-enhanced">
+              <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12]"
+                   class="chart-label-enhanced"
+                   [style.top]="(30 + (i-1) * 45) + 'px'">
+                <span class="month-number">{{ i }}</span>
+                <span class="month-name">{{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i-1] }}</span>
+              </div>
+            </div>
+
+            <div class="chart-values-enhanced">
+              <div *ngFor="let i of [80,85,90,95,100]"
+                   class="chart-value-enhanced"
+                   [style.left]="(((i - 80) / 20) * 220 + 30) + 'px'">
+                {{ i }}%
+              </div>
+            </div>
+
+            <!-- Performance Tooltip -->
+            <div *ngIf="hoveredDataPoint !== null && animatedDataPoints[hoveredDataPoint]"
+                 class="performance-tooltip"
+                 [style.left]="animatedDataPoints[hoveredDataPoint].x + 'px'"
+                 [style.top]="(animatedDataPoints[hoveredDataPoint].y - 40) + 'px'">
+              <div class="tooltip-content">
+                <div class="tooltip-month">Month {{ animatedDataPoints[hoveredDataPoint].month }}</div>
+                <div class="tooltip-value">{{ animatedDataPoints[hoveredDataPoint].value }}%</div>
+                <div class="tooltip-trend"
+                     [class.trend-up]="hoveredDataPoint > 0 && monthlyPerformanceChart && monthlyPerformanceChart.data[hoveredDataPoint] > monthlyPerformanceChart.data[hoveredDataPoint-1]"
+                     [class.trend-down]="hoveredDataPoint > 0 && monthlyPerformanceChart && monthlyPerformanceChart.data[hoveredDataPoint] < monthlyPerformanceChart.data[hoveredDataPoint-1]">
+                  <i [class]="hoveredDataPoint > 0 && monthlyPerformanceChart && monthlyPerformanceChart.data[hoveredDataPoint] > monthlyPerformanceChart.data[hoveredDataPoint-1] ? 'bi-trending-up' : 'bi-trending-down'"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Status Distribution Chart - Creative Multi-Ring Radial Chart -->
+      <div class="chart-card-creative" *ngIf="orderStatusChart">
+        <div class="chart-header">
+          <h4>{{ orderStatusChart.title }}</h4>
+        </div>
+        <div class="chart-content">
+          <div class="radial-chart-creative">
+            <svg viewBox="0 0 300 300" class="radial-chart-svg" role="img" [attr.aria-label]="orderStatusChart.title">
+              <defs>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+                <filter id="multiRingGlow">
+                  <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Enhanced multi-ring design with different radii and glowing effects -->
+              <circle cx="150" cy="150" r="120" fill="none" stroke="#f1f5f9" stroke-width="8" opacity="0.3"/>
+              <circle cx="150" cy="150" r="90" fill="none" stroke="#e2e8f0" stroke-width="6" opacity="0.4"/>
+              <circle cx="150" cy="150" r="60" fill="none" stroke="#cbd5e1" stroke-width="4" opacity="0.5"/>
+
+              <!-- Multi-ring segments with different radii for visual depth -->
+              <g *ngFor="let segment of radialSegments; let i = index">
+                <!-- Outer ring -->
+                <circle cx="150" cy="150"
+                        [attr.r]="120 - (i % 3) * 15"
+                        fill="none"
+                        [attr.stroke]="segment.color"
+                        [attr.stroke-width]="8 - (i % 3) * 2"
+                        [attr.stroke-dasharray]="segment.strokeDasharray"
+                        [attr.stroke-dashoffset]="segment.strokeDashoffset"
+                        [attr.transform]="'rotate(-90 150 150)'"
+                        filter="url(#multiRingGlow)"
+                        [attr.opacity]="0.8 + (i % 3) * 0.1"
+                        class="radial-segment">
+                  <title>{{ segment.label }}: {{ segment.value }}</title>
+                </circle>
+              </g>
+            </svg>
+            <div class="radial-center">
+              <div class="center-value-creative">{{data()}}</div>
+              <div class="center-label-creative">Total Orders</div>
+            </div>
+          </div>
+          <div class="chart-legend-creative">
+            <div *ngFor="let label of orderStatusChart.labels; let i = index"
+                 class="legend-item-creative">
+              <div class="legend-indicator" [style.background-color]="orderStatusChart.colors?.[i]"></div>
+              <span class="legend-text">{{ label }}</span>
+              <span class="legend-value">{{ orderStatusChart.data[i] }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions-section" *ngIf="quickActions?.length">
+    <div class="section-header">
+      <h3>Quick Actions</h3>
+    </div>
+    <div class="actions-grid">
+      <button
+        *ngFor="let action of quickActions"
+        class="action-card"
+        (click)="onQuickAction(action)"
+        [style.border-left-color]="action.color"
+        [attr.aria-label]="action.description">
+        <div class="action-icon" [style.color]="action.color">
+          <i [class]="action.icon" [attr.aria-hidden]="true"></i>
+        </div>
+        <div class="action-content">
+          <div class="action-title">{{ action.title }}</div>
+          <div class="action-description">{{ action.description }}</div>
+        </div>
+      </button>
+    </div>
+  </section>
+</div>

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { ChartData } from "../../../core/models/dashboard";
+import { ChartData } from "../../dashboard/dashboard.component";
 
 @Component({
   selector: "app-chart",

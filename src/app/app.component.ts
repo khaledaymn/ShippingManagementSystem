@@ -40,6 +40,7 @@ isHasRole = false;
   ) {}
 
   ngOnInit(): void {
+    // window.scrollTo({ top: 0, behavior: 'instant' });
     this.checkMobileView()
     this.loadUserRole()
     this.authService.currentUser$.subscribe((user) => {
