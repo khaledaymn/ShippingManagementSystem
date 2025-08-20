@@ -1,57 +1,57 @@
-import { Component, OnInit } from "@angular/core"
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from "@angular/core"
 import { CommonModule } from "@angular/common"
+import { FormsModule } from "@angular/forms"
 import { Router } from "@angular/router"
+import { DashboardService } from "../../../core/services/dashboard.service"
+import {
+  DashboardSummary,
+  DashboardMetric,
+  ChartData,
+  QuickAction,
+  Activity,
+  DashboardConfig,
+} from "../../../core/models/dashboard"
+import { Subject, takeUntil, interval } from "rxjs"
 
-interface DashboardMetric {
+interface Notification {
   id: string
+  type: "success" | "warning" | "error" | "info"
   title: string
-  value: string | number
-  change?: string
-  changeType?: "increase" | "decrease"
-  icon: string
-  color: string
-  description: string
+  message: string
+  timestamp: Date
+  read: boolean
 }
 
-interface ChartData {
-  id: string
-  title: string
-  type: "bar" | "line" | "doughnut"
-  data: number[]
-  labels: string[]
-  colors?: string[]
-}
-
-interface QuickAction {
-  title: string
-  description: string
-  icon: string
-  color: string
-  route: string
+interface FilterOption {
+  label: string
+  value: string
+  active: boolean
 }
 
 @Component({
   selector: "app-employee-dashboard",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: "./employee-dashboard.component.html",
   styleUrls: ["./employee-dashboard.component.css"],
 })
-export class EmployeeDashboardComponent implements OnInit {
-  // Main Performance Metrics
+export class EmployeeDashboardComponent implements OnInit, OnDestroy {
+  @ViewChild("searchInput") searchInput!: ElementRef<HTMLInputElement>
+
+  private destroy$ = new Subject<void>()
+
+  dashboardSummary: DashboardSummary | null = null
+  dashboardConfig: DashboardConfig | null = null
+
   performanceMetrics: DashboardMetric[] = []
 
-  // Order Status Cards
   orderStatusMetrics: DashboardMetric[] = []
 
-  // Payment Type Cards
   paymentTypeMetrics: DashboardMetric[] = []
 
-  // Charts
   monthlyPerformanceChart: ChartData | null = null
   orderStatusChart: ChartData | null = null
 
-  // Enhanced chart properties
   lineChartPathArea = ""
   lineChartPathLine = ""
   animatedDataPoints: Array<{
@@ -71,187 +71,350 @@ export class EmployeeDashboardComponent implements OnInit {
     strokeDashoffset: number
   }> = []
 
-  // Quick Actions
   quickActions: QuickAction[] = []
 
-  // Current date and time
+  recentActivities: Activity[] = []
+
+  notifications: Notification[] = []
+  unreadNotifications = 0
+  showNotifications = false
+
+  searchQuery = ""
+  filterOptions: FilterOption[] = [
+    { label: "All Orders", value: "all", active: true },
+    { label: "Pending", value: "pending", active: false },
+    { label: "In Progress", value: "in-progress", active: false },
+    { label: "Completed", value: "completed", active: false },
+  ]
+  activeFilter = "all"
+
   currentDateTime = new Date()
 
-  // Chart interaction states
   hoveredDataPoint: number | null = null
   chartAnimationComplete = false
+  selectedMetric: string | null = null
 
-  constructor(private router: Router) {}
+  loading = false
+  error: string | null = null
+  refreshing = false
+  lastUpdated: Date | null = null
+
+  viewMode: "grid" | "list" | "compact" = "grid"
+  showAdvancedMetrics = false
+
+  exportInProgress = false
+
+  totalOrdersToday = 0
+  completionRate = 0
+  averageProcessingTime = 0
+  topPerformingMonth = ""
+
+  constructor(
+    private router: Router,
+    private dashboardService: DashboardService,
+  ) {}
 
   ngOnInit(): void {
     this.loadData()
+    this.setupRealTimeUpdates()
+    this.initializeNotifications()
+    // console.log(this.orderStatusChart);
 
-    // Update time every minute
-    setInterval(() => {
-      this.currentDateTime = new Date()
-    }, 60000)
+    interval(60000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.currentDateTime = new Date()
+      })
 
-    // Trigger chart animation after component loads
     setTimeout(() => {
       this.chartAnimationComplete = true
     }, 500)
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next()
+    this.destroy$.complete()
+  }
+
+  private setupRealTimeUpdates(): void {
+    interval(300000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.refreshData()
+      })
+  }
+
+  private initializeNotifications(): void {
+    this.notifications = [
+      {
+        id: "1",
+        type: "info",
+        title: "New Order Assigned",
+        message: "You have been assigned 3 new orders for processing.",
+        timestamp: new Date(),
+        read: false,
+      },
+      {
+        id: "2",
+        type: "success",
+        title: "Target Achieved",
+        message: "Congratulations! You have achieved your daily target.",
+        timestamp: new Date(Date.now() - 3600000),
+        read: false,
+      },
+    ]
+    this.updateNotificationCount()
+  }
+
   private loadData(): void {
-    const mockData = {
-      // Main performance metrics
-      assignedOrders: 47,
-      completedOrders: 32,
-      pendingOrders: 15,
-      efficiencyRate: 94.2,
-      changeAssigned: 5,
-      changeCompleted: 8,
-      changePending: -3,
-      changeEfficiency: 2.1,
+    this.loading = true
+    this.error = null
 
-      // Order status distribution
-      ordersByState: {
-        New: 12,
-        Pending: 15,
-        "In Progress": 8,
-        Delivered: 32,
-        Cancelled: 3,
-        "On Hold": 5,
-        Returned: 2,
-        Rejected: 1,
-      },
+    // const userId = this.getCurrentUserId()
 
-      // Payment types
-      ordersByPaymentType: {
-        "Cash on Delivery": 35,
-        "Credit Card": 28,
-        "Bank Transfer": 12,
-        "Digital Wallet": 3,
-      },
+    this.dashboardService
+      .getDashboardSummary()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: DashboardSummary) => {
+          console.log(data);
 
-      // Enhanced monthly performance with more detailed data
-      monthlyPerformance: {
-        1: { value: 85, trend: "up", target: 90 },
-        2: { value: 92, trend: "up", target: 90 },
-        3: { value: 88, trend: "down", target: 90 },
-        4: { value: 95, trend: "up", target: 90 },
-        5: { value: 91, trend: "down", target: 90 },
-        6: { value: 97, trend: "up", target: 90 },
-        7: { value: 89, trend: "down", target: 90 },
-        8: { value: 94, trend: "up", target: 90 },
-        9: { value: 96, trend: "up", target: 90 },
-        10: { value: 93, trend: "down", target: 90 },
-        11: { value: 98, trend: "up", target: 90 },
-        12: { value: 94, trend: "down", target: 90 },
-      },
+          this.dashboardSummary = data
+          this.transformServiceDataToMetrics(data)
+          this.computeDashboardStatistics(data)
+          this.generateRecentActivities(data)
+          this.lastUpdated = new Date()
+          this.loading = false
+
+          this.addNotification(
+            "success",
+            "Dashboard Updated",
+            `Loaded ${data.totalOrders} orders with ${data.efficiencyRate}% efficiency rate.`,
+          )
+        },
+        error: (error) => {
+          console.error("Failed to load dashboard data:", error)
+          this.error = "Failed to load dashboard data. Please try again."
+          this.loading = false
+          this.addNotification("error", "Data Load Failed", "Unable to load dashboard data. Please refresh the page.")
+        },
+      })
+  }
+
+  refreshData(): void {
+    this.refreshing = true
+    const userId = this.getCurrentUserId()
+
+    this.dashboardService
+      .getDashboardSummary(userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: DashboardSummary) => {
+          this.dashboardSummary = data
+          this.transformServiceDataToMetrics(data)
+          this.computeDashboardStatistics(data)
+          this.generateRecentActivities(data)
+          this.lastUpdated = new Date()
+          this.refreshing = false
+          this.addNotification("success", "Data Refreshed", "Dashboard data has been updated successfully.")
+        },
+        error: (error) => {
+          console.error("Failed to refresh dashboard data:", error)
+          this.refreshing = false
+          this.addNotification("error", "Refresh Failed", "Unable to refresh dashboard data.")
+        },
+      })
+  }
+
+  formatStatusTitle(status: string): string {
+    switch (status) {
+        case "New":
+            return "New Orders";
+        case "Pendding":
+            return "Pending Orders";
+        case "DeliveredToTheRepresentative":
+            return "Delivered to Representative";
+        case "Delivered":
+            return "Delivered Orders";
+        case "CannotBeReached":
+            return "Cannot Be Reached";
+        case "PostPoned":
+            return "Postponed Orders";
+        case "PartiallyDelivered":
+            return "Partially Delivered";
+        case "CanceledByCustomer":
+            return "Canceled by Customer";
+        case "RejectedWithPayment":
+            return "Rejected with Payment";
+        case "RejectedWithPartialPayment":
+            return "Rejected with Partial Payment";
+        case "RejectedWithoutPayment":
+            return "Rejected without Payment";
+        default:
+            return status;
     }
+  }
 
-    // Transform data into metrics
+  private formatPaymentTitle(type: string): string {
+    switch (type) {
+        case "CashOnDelivery":
+            return "Cash on Delivery";
+        case "PaidInAdvance":
+            return "Paid in Advance";
+        case "ExchangeOrder":
+            return "Exchange Order";
+        default:
+            return type;
+    }
+  }
+
+  private transformServiceDataToMetrics(data: DashboardSummary): void {
     this.performanceMetrics = [
       {
-        id: "assigned-orders",
         title: "Assigned Orders",
-        value: mockData.assignedOrders,
-        change: `+${mockData.changeAssigned}`,
-        changeType: "increase",
+        value: data.assignedOrders,
+        change: data.changeAssigned,
+        changeType: (data.changeAssigned || 0) >= 0 ? "increase" : "decrease",
         icon: "bi-clipboard-check",
         color: "#3b82f6",
         description: "Orders assigned to you today",
       },
       {
-        id: "completed-orders",
         title: "Completed Orders",
-        value: mockData.completedOrders,
-        change: `+${mockData.changeCompleted}`,
-        changeType: "increase",
+        value: data.completedOrders,
+        change: data.changeCompleted,
+        changeType: (data.changeCompleted || 0) >= 0 ? "increase" : "decrease",
         icon: "bi-check-circle",
         color: "#10b981",
         description: "Orders completed today",
       },
       {
-        id: "pending-orders",
         title: "Pending Orders",
-        value: mockData.pendingOrders,
-        change: `${mockData.changePending}`,
-        changeType: "decrease",
+        value: data.pendingOrders,
+        change: data.changePending,
+        changeType: (data.changePending || 0) >= 0 ? "increase" : "decrease",
         icon: "bi-clock",
         color: "#f59e0b",
         description: "Orders awaiting processing",
       },
       {
-        id: "efficiency-rate",
         title: "Efficiency Rate",
-        value: `${mockData.efficiencyRate}%`,
-        change: `+${mockData.changeEfficiency}%`,
-        changeType: "increase",
+        value: `${data.efficiencyRate}%`,
+        change: data.changeEfficiency,
+        changeType: (data.changeEfficiency || 0) >= 0 ? "increase" : "decrease",
         icon: "bi-speedometer2",
         color: "#8b5cf6",
         description: "Your processing efficiency",
       },
     ]
 
-    // Order status metrics
-    this.orderStatusMetrics = Object.entries(mockData.ordersByState).map(([status, count]) => ({
-      id: status.toLowerCase().replace(" ", "-"),
-      title: status,
+    this.orderStatusMetrics = Object.entries(data.ordersByState || {}).map(([status, count]) => ({
+      title: this.formatStatusTitle(status),
       value: count,
       icon: this.getStatusIcon(status),
       color: this.getStatusColor(status),
       description: `${status} orders`,
     }))
 
-    // Payment type metrics
-    this.paymentTypeMetrics = Object.entries(mockData.ordersByPaymentType).map(([type, count]) => ({
-      id: type.toLowerCase().replace(" ", "-"),
-      title: type,
+    this.paymentTypeMetrics = Object.entries(data.ordersByPaymentType || {}).map(([type, count]) => ({
+      title: this.formatPaymentTitle(type),
       value: count,
       icon: this.getPaymentIcon(type),
       color: this.getPaymentColor(type),
       description: `Orders paid via ${type}`,
     }))
 
-    // Enhanced monthly performance chart
-    const performanceValues = Object.values(mockData.monthlyPerformance).map((item) => item.value)
-    const performanceLabels = Object.keys(mockData.monthlyPerformance)
+    // Extract values from MonthlyPerformanceData objects for chart display
+    const performanceValues = Object.values(data.monthlyPerformance || {}).map((perfData) => perfData.value)
+    const performanceLabels = Object.keys(data.monthlyPerformance || {})
 
     this.monthlyPerformanceChart = {
-      id: "monthly-performance",
-      title: "Monthly Performance Trend",
       type: "line",
-      data: performanceValues,
-      labels: performanceLabels,
-      colors: ["#3b82f6", "#10b981", "#f59e0b"],
+      data: {
+        labels: performanceLabels,
+        datasets: [
+          {
+            label: "Monthly Performance",
+            data: performanceValues,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          tooltip: { enabled: true },
+        },
+        scales: {
+          y: { beginAtZero: true, max: 100 },
+        },
+      },
+      title: "Monthly Performance Trend",
     }
 
-    // Order status chart
+    const statusLabels = Object.keys(data.ordersByState || {})
+    const statusValues = Object.values(data.ordersByState || {})
+    const statusColors = ["#3b82f6", "#f59e0b", "#06b6d4", "#10b981", "#ef4444", "#8b5cf6", "#84cc16", "#f97316", "#9f1239", "#be123c", "#e11d48"]
+
     this.orderStatusChart = {
-      id: "order-status-distribution",
-      title: "Order Status Distribution",
       type: "doughnut",
-      data: Object.values(mockData.ordersByState),
-      labels: Object.keys(mockData.ordersByState),
-      colors: ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16", "#f97316"],
+      data: {
+        labels: statusLabels,
+        values: statusValues,
+        colors: statusColors,
+        datasets: [
+          {
+            data: statusValues,
+            backgroundColor: statusColors,
+            borderWidth: 2,
+            borderColor: "#ffffff",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: { enabled: true },
+        },
+      },
+      title: "Order Status Distribution",
     }
 
-    // Quick actions
     this.quickActions = [
       {
         title: "View Orders",
-        description: "Check your assigned orders",
         icon: "bi-list-check",
-        color: "#3b82f6",
         route: "/employee/orders",
+        color: "#3b82f6",
+        description: "Check your assigned orders",
       },
       {
         title: "Add Order",
-        description: "Create a new order",
         icon: "bi-plus-circle",
-        color: "#10b981",
         route: "/employee/orders/create",
+        color: "#10b981",
+        description: "Create a new order",
+      },
+      {
+        title: "Reports",
+        icon: "bi-graph-up",
+        route: "/employee/reports",
+        color: "#8b5cf6",
+        description: "View performance reports",
+      },
+      {
+        title: "Settings",
+        icon: "bi-gear",
+        route: "/employee/settings",
+        color: "#6b7280",
+        description: "Manage your preferences",
       },
     ]
 
-    // Precompute enhanced chart paths and segments
     if (this.monthlyPerformanceChart) {
       this.lineChartPathArea = this.getEnhancedLineChartPath(this.monthlyPerformanceChart, true)
       this.lineChartPathLine = this.getEnhancedLineChartPath(this.monthlyPerformanceChart, false)
@@ -262,55 +425,216 @@ export class EmployeeDashboardComponent implements OnInit {
     }
   }
 
-  private getStatusIcon(status: string): string {
+  private computeDashboardStatistics(data: DashboardSummary): void {
+    this.totalOrdersToday = data.assignedOrders + data.completedOrders + data.pendingOrders
+    this.completionRate = data.totalOrders > 0 ? (data.completedOrders / data.totalOrders) * 100 : 0
+    this.averageProcessingTime = data.averageWeight || 0
+
+    const monthlyData = data.monthlyPerformance || {}
+
+    // Extract values from MonthlyPerformanceData objects
+    const performanceEntries = Object.entries(monthlyData)
+    if (performanceEntries.length > 0) {
+      const performanceValues = performanceEntries.map(([month, perfData]) => perfData.value)
+      const maxPerformance = Math.max(...performanceValues)
+      const maxEntry = performanceEntries.find(([month, perfData]) => perfData.value === maxPerformance)
+      this.topPerformingMonth = maxEntry ? maxEntry[0] : "N/A"
+    } else {
+      this.topPerformingMonth = "N/A"
+    }
+  }
+
+  private generateRecentActivities(data: DashboardSummary): void {
+    this.recentActivities = [
+      {
+        id: "1",
+        title: "Orders Processed",
+        description: `Completed ${data.completedOrders} orders today`,
+        timestamp: new Date(),
+        type: "order",
+        icon: "bi-check-circle",
+      },
+      {
+        id: "2",
+        title: "Efficiency Update",
+        description: `Current efficiency rate: ${data.efficiencyRate}%`,
+        timestamp: new Date(Date.now() - 1800000),
+        type: "system",
+        icon: "bi-speedometer2",
+      },
+      {
+        id: "3",
+        title: "Revenue Generated",
+        description: `Total revenue: $${data.totalRevenue.toLocaleString()}`,
+        timestamp: new Date(Date.now() - 3600000),
+        type: "system",
+        icon: "bi-currency-dollar",
+      },
+    ]
+  }
+
+  private getCurrentUserId(): string | undefined {
+    return undefined
+  }
+
+ private getStatusIcon(status: string): string {
     const iconMap: { [key: string]: string } = {
       New: "bi-plus-circle",
-      Pending: "bi-clock",
-      "In Progress": "bi-arrow-clockwise",
+      Pendding: "bi-clock",
+      DeliveredToTheRepresentative: "bi-truck",
       Delivered: "bi-check-circle",
-      Cancelled: "bi-x-circle",
-      "On Hold": "bi-pause-circle",
-      Returned: "bi-arrow-return-left",
-      Rejected: "bi-exclamation-circle",
+      CannotBeReached: "bi-telephone-x",
+      PostPoned: "bi-calendar-x",
+      PartiallyDelivered: "bi-box-seam",
+      CanceledByCustomer: "bi-x-circle",
+      RejectedWithPayment: "bi-x-octagon",
+      RejectedWithPartialPayment: "bi-x-octagon-fill",
+      RejectedWithoutPayment: "bi-x-square",
     }
     return iconMap[status] || "bi-circle"
-  }
+}
 
-  private getStatusColor(status: string): string {
+private getStatusColor(status: string): string {
     const colorMap: { [key: string]: string } = {
       New: "#3b82f6",
-      Pending: "#f59e0b",
-      "In Progress": "#06b6d4",
+      Pendding: "#f59e0b",
+      DeliveredToTheRepresentative: "#06b6d4",
       Delivered: "#10b981",
-      Cancelled: "#ef4444",
-      "On Hold": "#8b5cf6",
-      Returned: "#f97316",
-      Rejected: "#dc2626",
+      CannotBeReached: "#ef4444",
+      PostPoned: "#8b5cf6",
+      PartiallyDelivered: "#f97316",
+      CanceledByCustomer: "#dc2626",
+      RejectedWithPayment: "#9f1239",
+      RejectedWithPartialPayment: "#be123c",
+      RejectedWithoutPayment: "#e11d48",
     }
     return colorMap[status] || "#6b7280"
-  }
+}
 
-  private getPaymentIcon(type: string): string {
+private getPaymentIcon(type: string): string {
     const iconMap: { [key: string]: string } = {
-      "Cash on Delivery": "bi-cash",
-      "Credit Card": "bi-credit-card",
-      "Bank Transfer": "bi-bank",
-      "Digital Wallet": "bi-wallet2",
+      CashOnDelivery: "bi-cash",
+      PaidInAdvance: "bi-credit-card",
+      ExchangeOrder: "bi-arrow-repeat",
     }
     return iconMap[type] || "bi-currency-dollar"
-  }
+}
 
-  private getPaymentColor(type: string): string {
+private getPaymentColor(type: string): string {
     const colorMap: { [key: string]: string } = {
-      "Cash on Delivery": "#10b981",
-      "Credit Card": "#3b82f6",
-      "Bank Transfer": "#8b5cf6",
-      "Digital Wallet": "#f59e0b",
+      CashOnDelivery: "#10b981",
+      PaidInAdvance: "#3b82f6",
+      ExchangeOrder: "#8b5cf6",
     }
     return colorMap[type] || "#6b7280"
+}
+  addNotification(type: Notification["type"], title: string, message: string): void {
+    const notification: Notification = {
+      id: Date.now().toString(),
+      type,
+      title,
+      message,
+      timestamp: new Date(),
+      read: false,
+    }
+    this.notifications.unshift(notification)
+    this.updateNotificationCount()
+
+    if (type === "success") {
+      setTimeout(() => {
+        this.removeNotification(notification.id)
+      }, 5000)
+    }
+  }
+
+  removeNotification(id: string): void {
+    this.notifications = this.notifications.filter((n) => n.id !== id)
+    this.updateNotificationCount()
+  }
+
+  markNotificationAsRead(id: string): void {
+    const notification = this.notifications.find((n) => n.id === id)
+    if (notification) {
+      notification.read = true
+      this.updateNotificationCount()
+    }
+  }
+
+  markAllNotificationsAsRead(): void {
+    this.notifications.forEach((n) => (n.read = true))
+    this.updateNotificationCount()
+  }
+
+  private updateNotificationCount(): void {
+    this.unreadNotifications = this.notifications.filter((n) => !n.read).length
+  }
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications
+  }
+
+  onSearchChange(): void {
+    if (this.searchQuery.trim()) {
+      console.log("Searching dashboard data for:", this.searchQuery)
+    }
+  }
+
+  onFilterChange(filter: FilterOption): void {
+    this.filterOptions.forEach((f) => (f.active = false))
+    filter.active = true
+    this.activeFilter = filter.value
+    console.log("Filtering dashboard by:", this.activeFilter)
+  }
+
+  clearSearch(): void {
+    this.searchQuery = ""
+    this.onSearchChange()
+  }
+
+  setViewMode(mode: "grid" | "list" | "compact"): void {
+    this.viewMode = mode
+  }
+
+  toggleAdvancedMetrics(): void {
+    this.showAdvancedMetrics = !this.showAdvancedMetrics
+  }
+
+  selectMetric(metricId: string): void {
+    this.selectedMetric = this.selectedMetric === metricId ? null : metricId
+  }
+
+  async exportDashboardData(format: "csv" | "pdf" | "excel"): Promise<void> {
+    this.exportInProgress = true
+    try {
+      const exportData = {
+        summary: this.dashboardSummary,
+        metrics: this.performanceMetrics,
+        activities: this.recentActivities,
+        exportDate: new Date().toISOString(),
+        format: format,
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      console.log("Exporting dashboard data:", exportData)
+
+      this.addNotification(
+        "success",
+        "Export Complete",
+        `Dashboard data exported as ${format.toUpperCase()} with ${this.totalOrdersToday} orders.`,
+      )
+    } catch (error) {
+      this.addNotification("error", "Export Failed", "Unable to export dashboard data.")
+    } finally {
+      this.exportInProgress = false
+    }
   }
 
   onQuickAction(action: QuickAction): void {
+    console.log(`Quick action used: ${action.title}`, {
+      currentMetrics: this.performanceMetrics,
+      totalOrders: this.totalOrdersToday,
+    })
+
     this.router.navigate([action.route])
   }
 
@@ -325,20 +649,31 @@ export class EmployeeDashboardComponent implements OnInit {
     })
   }
 
+  getRelativeTime(date: Date): string {
+    const now = new Date()
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
+
+    if (diffInMinutes < 1) return "Just now"
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`
+    return `${Math.floor(diffInMinutes / 1440)}d ago`
+  }
+
   private getEnhancedLineChartPath(chart: ChartData | null, isArea: boolean): string {
-    if (!chart || chart.type !== "line" || !chart.data || chart.data.length === 0) {
+    if (!chart || chart.type !== "line" || !chart.data?.datasets?.[0]?.data) {
       return ""
     }
 
+    const data = chart.data.datasets[0].data as number[]
     const width = 280
     const height = 600
     const padding = 30
-    const maxValue = 100
-    const minValue = 80
-    const range = maxValue - minValue
-    const dataPoints = chart.data.length
+    const maxValue = Math.max(...data)
+    const minValue = Math.min(...data)
+    const range = maxValue - minValue || 1
+    const dataPoints = data.length
 
-    const points = chart.data.map((value, index) => {
+    const points = data.map((value, index) => {
       const x = padding + ((value - minValue) / range) * (width - 2 * padding)
       const y = padding + index * ((height - 2 * padding) / (dataPoints - 1))
       return `${x},${y}`
@@ -350,7 +685,6 @@ export class EmployeeDashboardComponent implements OnInit {
       return `M ${padding},${height - padding} L ${firstPoint[0]},${firstPoint[1]} L ${points.join(" L ")} L ${lastPoint[0]},${height - padding} Z`
     }
 
-    // Create smooth curve using quadratic bezier curves
     if (points.length < 2) return `M ${points.join(" L ")}`
 
     let path = `M ${points[0]}`
@@ -371,19 +705,20 @@ export class EmployeeDashboardComponent implements OnInit {
     month: number
     delay: number
   }> {
-    if (!chart || !chart.data || chart.data.length === 0) {
+    if (!chart || !chart.data?.datasets?.[0]?.data) {
       return []
     }
 
+    const data = chart.data.datasets[0].data as number[]
     const width = 280
     const height = 600
     const padding = 30
-    const maxValue = 100
-    const minValue = 80
-    const range = maxValue - minValue
-    const dataPoints = chart.data.length
+    const maxValue = Math.max(...data)
+    const minValue = Math.min(...data)
+    const range = maxValue - minValue || 1
+    const dataPoints = data.length
 
-    return chart.data.map((value, index) => {
+    return data.map((value, index) => {
       const x = padding + ((value - minValue) / range) * (width - 2 * padding)
       const y = padding + index * ((height - 2 * padding) / (dataPoints - 1))
       return {
@@ -403,22 +738,25 @@ export class EmployeeDashboardComponent implements OnInit {
     percentage: number
     offset: number
   }> {
-    if (!chart || chart.type !== "doughnut" || !chart.data || !chart.labels) {
+    if (!chart || chart.type !== "doughnut" || !chart.data?.datasets?.[0]?.data || !chart.data?.labels) {
       return []
     }
 
-    const total = chart.data.reduce((sum, value) => sum + value, 0)
+    const data = chart.data.datasets[0].data as number[]
+    const labels = chart.data.labels as string[]
+    const colors = chart.data.datasets[0].backgroundColor as string[]
+    const total = data.reduce((sum, value) => sum + value, 0)
     let cumulativePercentage = 0
 
-    return chart.data.map((value, index) => {
+    return data.map((value, index) => {
       const percentage = total > 0 ? (value / total) * 100 : 0
       const offset = cumulativePercentage
       cumulativePercentage += percentage
 
       return {
         value,
-        label: chart.labels![index],
-        color: chart.colors?.[index] || this.getDefaultColor(index),
+        label: labels[index],
+        color: colors?.[index] || this.getDefaultColor(index),
         percentage,
         offset,
       }
@@ -431,10 +769,11 @@ export class EmployeeDashboardComponent implements OnInit {
   }
 
   getChartMaxValue(chart: ChartData | null): number {
-    if (!chart || !chart.data || chart.data.length === 0) {
+    if (!chart || !chart.data?.datasets?.[0]?.data) {
       return 100
     }
-    return Math.max(...chart.data)
+    const data = chart.data.datasets[0].data as number[]
+    return Math.max(...data)
   }
 
   getBarHeight(value: number, maxValue: number): number {
@@ -442,7 +781,9 @@ export class EmployeeDashboardComponent implements OnInit {
   }
 
   data() {
-    return this.orderStatusChart?.data.reduce((a, b) => a + b, 0)
+    if (!this.orderStatusChart?.data?.datasets?.[0]?.data) return 0
+    const data = this.orderStatusChart.data.datasets[0].data as number[]
+    return data.reduce((a, b) => a + b, 0)
   }
 
   getLineChartPath(chart: ChartData | null, isArea: boolean): string {
@@ -457,15 +798,18 @@ export class EmployeeDashboardComponent implements OnInit {
     strokeDasharray: string
     strokeDashoffset: number
   }> {
-    if (!chart || !chart.data || !chart.labels) {
+    if (!chart || !chart.data?.datasets?.[0]?.data || !chart.data?.labels) {
       return []
     }
 
-    const total = chart.data.reduce((sum, value) => sum + value, 0)
+    const data = chart.data.datasets[0].data as number[]
+    const labels = chart.data.labels as string[]
+    const colors = chart.data.datasets[0].backgroundColor as string[]
+    const total = data.reduce((sum, value) => sum + value, 0)
     const circumference = 2 * Math.PI * 120
     let cumulativePercentage = 0
 
-    return chart.data.map((value, index) => {
+    return data.map((value, index) => {
       const percentage = total > 0 ? (value / total) * 100 : 0
       const strokeLength = (percentage / 100) * circumference
       const offset = circumference - (cumulativePercentage / 100) * circumference
@@ -473,8 +817,8 @@ export class EmployeeDashboardComponent implements OnInit {
 
       return {
         value,
-        label: chart.labels![index],
-        color: chart.colors?.[index] || this.getDefaultColor(index),
+        label: labels[index],
+        color: colors?.[index] || this.getDefaultColor(index),
         percentage,
         strokeDasharray: `${strokeLength} ${circumference - strokeLength}`,
         strokeDashoffset: offset,
@@ -501,15 +845,26 @@ export class EmployeeDashboardComponent implements OnInit {
   }
 
   getAveragePerformance(): number {
-    if (!this.monthlyPerformanceChart?.data) return 0
-    const sum = this.monthlyPerformanceChart.data.reduce((a, b) => a + b, 0)
-    return Math.round((sum / this.monthlyPerformanceChart.data.length) * 10) / 10
+    if (!this.monthlyPerformanceChart?.data?.datasets?.[0]?.data) return 0
+    const data = this.monthlyPerformanceChart.data.datasets[0].data as number[]
+    const sum = data.reduce((a, b) => a + b, 0)
+    return Math.round((sum / data.length) * 10) / 10
   }
 
   getBestMonth(): { month: number; value: number } {
-    if (!this.monthlyPerformanceChart?.data) return { month: 1, value: 0 }
-    const maxValue = Math.max(...this.monthlyPerformanceChart.data)
-    const maxIndex = this.monthlyPerformanceChart.data.indexOf(maxValue)
+    if (!this.monthlyPerformanceChart?.data?.datasets?.[0]?.data) return { month: 1, value: 0 }
+    const data = this.monthlyPerformanceChart.data.datasets[0].data as number[]
+    const maxValue = Math.max(...data)
+    const maxIndex = data.indexOf(maxValue)
     return { month: maxIndex + 1, value: maxValue }
   }
+
+  getTotalRevenue(): number {
+    return this.dashboardSummary?.totalRevenue || 0
+  }
+
+  getAverageWeight(): number {
+    return this.dashboardSummary?.averageWeight || 0
+  }
+
 }

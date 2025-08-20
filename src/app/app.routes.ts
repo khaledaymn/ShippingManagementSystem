@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { EmployeeSidebarComponent } from './components/employee/employee-sidebar/employee-sidebar.component';
-import { DashboardComponent } from './shared/dashboard/dashboard.component';
+// import { DashboardComponent } from './shared/dashboard/dashboard.component';
 import { EmployeeDashboardComponent } from './components/employee/employee-dashboard/employee-dashboard.component';
 import { StandardsViewComponent } from './components/employee/settings/standards-view/standards-view.component';
 import { StandardsEditComponent } from './components/employee/settings/standards-edit/standards-edit.component';

@@ -1,46 +1,31 @@
-// import { Injectable } from '@angular/core';
-// import { Observable } from 'rxjs';
-// import { OrderService } from './order.service';
-// import { OrderFilterParams, OrdersResponse } from '../models/order.model';
+import { Injectable } from "@angular/core"
+import { HttpClient, HttpErrorResponse } from "@angular/common/http"
+import { Observable, throwError } from "rxjs"
+import { catchError } from "rxjs/operators"
+import { DashboardSummary } from "../models/dashboard"
+import { environment } from "../../../enviroments/environment"
 
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class DashboardService {
-//   constructor(private orderAwareService: OrderService) {}
+@Injectable({
+  providedIn: "root",
+})
+export class DashboardService {
+  private apiUrl = environment.apiUrl + "/Dashboard"
 
-//   // Get orders for a specific merchant by ID and status
-//   getMerchantOrders(merchantId: string, status: string): Observable<OrdersResponse> {
-//     const params: OrderFilterParams = {
-//       pageIndex: 1,
-//       pageSize: 100,
-//       merchantId,
-//       status
-//     };
+  constructor(private http: HttpClient) {}
 
-//     return this.orderService.getOrders(params);
-//   }
+  getDashboardSummary(userId?: string): Observable<DashboardSummary> {
+    const url = userId ? `${this.apiUrl}?userId=${userId}` : `${this.apiUrl}`
+    return this.http.get<DashboardSummary>(url).pipe(catchError(this.handleError))
+  }
 
-//   // Get orders for a specific representative by ID and status
-//   getRepresentativeOrders(representativeId: string, status: string): Observable<OrdersResponse> {
-//     const params: OrderFilterParams = {
-//       pageIndex: 1,
-//       pageSize: 100,
-//       representativeId,
-//       status
-//     };
-
-//     return this.orderService.getOrders(params);
-//   }
-
-//   // Get all orders filtered by status
-//   getAllOrders(status: string): Observable<OrdersResponse> {
-//     const params: OrderFilterParams = {
-//       pageIndex: 1,
-//       pageSize: 100,
-//       status
-//     };
-
-//     return this.orderService.getOrders(params);
-//   }
-// }
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = "An unexpected error occurred"
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = `Client Error: ${error.error.message}`
+    } else {
+      errorMessage = `Server Error: ${error.status} - ${error.message}`
+    }
+    console.error(errorMessage)
+    return throwError(() => new Error(errorMessage))
+  }
+}

@@ -92,7 +92,7 @@
   <section class="analytics-section">
     <div class="section-header">
       <h3>Analytics Overview</h3>
-      <!-- Removed View All link for cleaner design -->
+      <!-- <a routerLink="/analytics" class="view-all-link" aria-label="View all analytics">View All <i class="bi-arrow-right" aria-hidden="true"></i></a> -->
     </div>
 
     <div class="charts-container">
@@ -229,10 +229,10 @@
         </div>
       </div>
 
-      <!-- Order Status Distribution Chart - Creative Multi-Ring Radial Chart -->
+      <!-- Order Status Distribution Chart - Creative Radial Chart -->
       <div class="chart-card-creative" *ngIf="orderStatusChart">
         <div class="chart-header">
-          <h4>{{ orderStatusChart.title }}</h4>
+          <h4>{{orderStatusChart.title }}</h4>
         </div>
         <div class="chart-content">
           <div class="radial-chart-creative">
@@ -245,37 +245,23 @@
                     <feMergeNode in="SourceGraphic"/>
                   </feMerge>
                 </filter>
-                <filter id="multiRingGlow">
-                  <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
               </defs>
-
-              <!-- Enhanced multi-ring design with different radii and glowing effects -->
-              <circle cx="150" cy="150" r="120" fill="none" stroke="#f1f5f9" stroke-width="8" opacity="0.3"/>
-              <circle cx="150" cy="150" r="90" fill="none" stroke="#e2e8f0" stroke-width="6" opacity="0.4"/>
-              <circle cx="150" cy="150" r="60" fill="none" stroke="#cbd5e1" stroke-width="4" opacity="0.5"/>
-
-              <!-- Multi-ring segments with different radii for visual depth -->
-              <g *ngFor="let segment of radialSegments; let i = index">
-                <!-- Outer ring -->
-                <circle cx="150" cy="150"
-                        [attr.r]="120 - (i % 3) * 15"
-                        fill="none"
-                        [attr.stroke]="segment.color"
-                        [attr.stroke-width]="8 - (i % 3) * 2"
-                        [attr.stroke-dasharray]="segment.strokeDasharray"
-                        [attr.stroke-dashoffset]="segment.strokeDashoffset"
-                        [attr.transform]="'rotate(-90 150 150)'"
-                        filter="url(#multiRingGlow)"
-                        [attr.opacity]="0.8 + (i % 3) * 0.1"
-                        class="radial-segment">
-                  <title>{{ segment.label }}: {{ segment.value }}</title>
-                </circle>
-              </g>
+              <circle cx="150" cy="150" r="120" fill="none" stroke="#f1f5f9" stroke-width="8"/>
+              <circle cx="150" cy="150" r="90" fill="none" stroke="#f1f5f9" stroke-width="6"/>
+              <circle cx="150" cy="150" r="60" fill="none" stroke="#f1f5f9" stroke-width="4"/>
+              <circle *ngFor="let segment of radialSegments; let i = index"
+                      cx="150" cy="150"
+                      [attr.r]="120 - (i * 30)"
+                      fill="none"
+                      [attr.stroke]="segment.color"
+                      [attr.stroke-width]="8"
+                      [attr.stroke-dasharray]="segment.strokeDasharray"
+                      [attr.stroke-dashoffset]="segment.strokeDashoffset"
+                      [attr.transform]="'rotate(-90 150 150)'"
+                      filter="url(#glow)"
+                      class="radial-segment">
+                <title>{{ segment.label }}: {{ segment.value }}</title>
+              </circle>
             </svg>
             <div class="radial-center">
               <div class="center-value-creative">{{data()}}</div>
@@ -283,11 +269,12 @@
             </div>
           </div>
           <div class="chart-legend-creative">
-            <div *ngFor="let label of orderStatusChart.labels; let i = index"
+            <!-- Fixed chart labels access to use data property instead of direct labels -->
+            <div *ngFor="let label of orderStatusChart.data?.labels; let i = index"
                  class="legend-item-creative">
-              <div class="legend-indicator" [style.background-color]="orderStatusChart.colors?.[i]"></div>
-              <span class="legend-text">{{ label }}</span>
-              <span class="legend-value">{{ orderStatusChart.data[i] }}</span>
+              <div class="legend-indicator" [style.background-color]="orderStatusChart.data?.colors?.[i]"></div>
+              <span class="legend-text">{{ formatStatusTitle(label) }}</span>
+              <span class="legend-value">{{ orderStatusChart.data?.values?.[i] }}</span>
             </div>
           </div>
         </div>
