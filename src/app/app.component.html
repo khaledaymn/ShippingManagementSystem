@@ -1,26 +1,30 @@
-<div class="app-container" *ngIf="isAuthenticated && isHasRole">
-  <!-- Employee Sidebar -->
+<div class="app-container" [class.sidebar-open]="isMobileSidebarOpen && isMobile">
+  <app-header
+    (mobileMenuToggle)="onHeaderMobileMenuToggle()"
+    (closeModals)="onCloseModals()"
+    [isMobileMenuOpen]="isMobileSidebarOpen"
+  ></app-header>
 
-    <app-employee-sidebar
-      *ngIf="currentUserRole === 'employee'"
-      [isCollapsed]="isSidebarCollapsed"
-      [isMobileOpen]="isMobileSidebarOpen"
-      (itemClick)="onSidebarItemClick($event)"
-      (mobileToggle)="onMobileSidebarToggle($event)"
-      [style.zIndex]="isSidebarCollapsed ? '0' : '1001'"
-    >
-    </app-employee-sidebar>
+  <app-employee-sidebar
+    [isCollapsed]="isSidebarCollapsed"
+    [isMobileOpen]="isMobileSidebarOpen"
+    (itemClick)="onSidebarItemClick($event)"
+    (mobileToggle)="onMobileSidebarToggle($event)"
+  ></app-employee-sidebar>
 
-  <!-- Main Content Area -->
-  <div class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
-    <app-header (mobileMenuToggle)="onHeaderMobileMenuToggle()"></app-header>
-
-    <main class="content-area">
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <div class="content-area">
       <router-outlet></router-outlet>
-    </main>
-  </div>
+    </div>
+  </main>
 </div>
 
-<ng-container *ngIf="!isAuthenticated || !isHasRole">
-  <router-outlet></router-outlet>
-</ng-container>
+<div
+  class="access-denied-container"
+  *ngIf="!isAuthenticated || !isHasRole"
+>
+  <div class="access-denied-card">
+    <h2 class="access-denied-message">Access Denied</h2>
+    <button class="logout-button" (click)="logout()">Logout</button>
+  </div>
+</div>

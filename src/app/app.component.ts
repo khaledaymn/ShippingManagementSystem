@@ -16,7 +16,7 @@ type UserRole = "employee" | "Admin" | "merchant"
     RouterOutlet,
     HeaderComponent,
     EmployeeSidebarComponent,
-],
+  ],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"],
 })
@@ -31,25 +31,95 @@ export class AppComponent implements OnInit {
   isMobileSidebarOpen = false
   isMobile = false
 
-isAuthenticated = false;
-isHasRole = false;
-  userRole: string | null = null;
+  isAuthenticated = false
+  isHasRole = false
+  userRole: string | null = null
+
+  // Sidebar configuration
+  sidebarConfig = {
+    brandTitle: "ShipSmart",
+    brandSubtitle: "employee",
+    brandIcon: "/Logo.png",
+    userRole: "employee",
+    menuItems: [
+      {
+        id: "dashboard",
+        title: "Dashboard",
+        icon: "bi-speedometer2",
+        url: "/employee/dashboard",
+      },
+      {
+        id: "orders",
+        title: "Orders",
+        icon: "bi-cart",
+        children: [
+          {
+            id: "orders-list",
+            title: "All Orders",
+            icon: "bi-list-ul",
+            url: "/employee/orders",
+            badge: "employee",
+          },
+          {
+            id: "orders-create",
+            title: "Create Order",
+            icon: "bi-plus-circle",
+            url: "/employee/orders/create",
+            badge: "employee",
+          },
+        ],
+      },
+      {
+        id: "users",
+        title: "Users",
+        icon: "bi-person",
+        children: [
+          {
+            id: "employees",
+            title: "Employees",
+            icon: "bi-person-check",
+            url: "/employee/users/employees",
+            badge: "Admin",
+          },
+          {
+            id: "merchants",
+            title: "Merchants",
+            icon: "bi-shop",
+            url: "/employee/users/merchants",
+            badge: "Admin",
+          },
+          {
+            id: "shipping-representatives",
+            title: "Shipping Representatives",
+            icon: "bi-truck",
+            url: "/employee/users/shipping-representatives",
+            badge: "Admin",
+          },
+        ],
+      },
+      {
+        id: "settings",
+        title: "Settings",
+        icon: "bi-gear",
+        url: "/employee/settings/general-settings",
+      },
+    ],
+  }
+
   constructor(
     private authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    // window.scrollTo({ top: 0, behavior: 'instant' });
     this.checkMobileView()
     this.loadUserRole()
     this.authService.currentUser$.subscribe((user) => {
-      this.isAuthenticated = !!user;
-      this.isHasRole = !!user?.roleId;
-      this.userRole = user?.roleId || null;
-      console.log(this.userRole);
-    });
-
+      this.isAuthenticated = !!user
+      this.isHasRole = !!user?.roleId
+      this.userRole = user?.roleId || null
+      console.log('App: User role updated:', this.userRole) // Debug log
+    })
   }
 
   private checkMobileView(): void {
@@ -57,42 +127,55 @@ isHasRole = false;
     if (!this.isMobile) {
       this.isMobileSidebarOpen = false
     }
+    console.log('App: isMobile:', this.isMobile, 'isMobileSidebarOpen:', this.isMobileSidebarOpen) // Debug log
   }
 
   private loadUserRole(): void {
-    // In a real app, this would come from your authentication service
-    // For demo purposes, you can change this value to test different sidebars
     const storedRole = localStorage.getItem("userRole") as UserRole
     if (storedRole && ["employee", "delivery", "merchant"].includes(storedRole)) {
       this.currentUserRole = storedRole
+      this.sidebarConfig.userRole = storedRole
     }
+    console.log('App: Loaded user role:', this.currentUserRole) // Debug log
   }
 
   onSidebarItemClick(item: MenuItem): void {
-    // Handle sidebar item clicks here
-    // Navigation is handled by the sidebar components themselves
+    console.log('App: Sidebar item clicked:', item) // Debug log
+    if (item.url) {
+      this.isMobileSidebarOpen = false
+      this.router.navigate([item.url])
+    }
   }
 
   onMobileSidebarToggle(isOpen: boolean): void {
+    console.log('App: Received mobileToggle:', isOpen) // Debug log
     this.isMobileSidebarOpen = isOpen
   }
 
   onHeaderMobileMenuToggle(): void {
     this.isMobileSidebarOpen = !this.isMobileSidebarOpen
+    console.log('App: Header mobile menu toggled:', this.isMobileSidebarOpen) // Debug log
   }
 
-  // Method to switch user roles (for testing purposes)
+  onCloseModals(): void {
+    console.log('App: Received closeModals') // Debug log
+    this.isMobileSidebarOpen = false
+  }
+
   switchUserRole(role: UserRole): void {
     this.currentUserRole = role
     localStorage.setItem("userRole", role)
-    // In a real app, this would trigger a re-authentication or role change process
-  }
-  logout(): void {
-    this.authService.logout();
-    this.isAuthenticated = false;
-    this.userRole = null;
-    this.isHasRole = false;
-    this.router.navigate(['/auth/login']);
+    this.sidebarConfig.userRole = role
+    console.log('App: Switched user role:', role) // Debug log
   }
 
+  logout(): void {
+    this.authService.logout()
+    this.isAuthenticated = false
+    this.userRole = null
+    this.isHasRole = false
+    this.isMobileSidebarOpen = false
+    this.router.navigate(['/auth/login'])
+    console.log('App: Logged out') // Debug log
+  }
 }

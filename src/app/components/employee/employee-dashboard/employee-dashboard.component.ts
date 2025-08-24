@@ -426,7 +426,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
       {
         title: "Settings",
         icon: "bi-gear",
-        route: "/employee/settings",
+        route: "/employee/general-settings",
         color: "#6b7280",
         description: "Manage your preferences",
       },
