@@ -38,11 +38,21 @@ export interface DashboardMetric {
   title: string
   value: string | number
   change?: number
-  changeType?: "increase" | "decrease" | "neutral"
+  changeType?: "increase" | "decrease"
   icon: string
   color: string
-  description?: string
+  description: string
 }
+
+// export interface DashboardMetric {
+//   title: string
+//   value: string | number
+//   change?: number
+//   changeType?: "increase" | "decrease" | "neutral"
+//   icon: string
+//   color: string
+//   description?: string
+// }
 
 export interface ChartData {
   type: "line" | "bar" | "doughnut" | "area"

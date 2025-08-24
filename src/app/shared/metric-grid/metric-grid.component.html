@@ -1,0 +1,17 @@
+<section class="metrics-section">
+  <div class="section-header" *ngIf="title">
+    <h3>{{ title }}</h3>
+  </div>
+  <div
+    class="metrics-grid"
+    [class.metrics-grid-compact]="size === 'compact'"
+    [class.metrics-grid-large]="size === 'large'"
+    [style.grid-template-columns]="'repeat(' + columns + ', 1fr)'"
+  >
+    <app-metric-card
+      *ngFor="let metric of metrics"
+      [metric]="metric"
+      [size]="size"
+    ></app-metric-card>
+  </div>
+</section>

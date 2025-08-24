@@ -1,11 +1,4 @@
-.employee-dashboard {
-  min-height: 100vh;
-  background: #f8fafc;
-  padding: 0;
-}
-
-/* Remove styles that are now in shared components - keep only analytics section styles */
-.analytics-section {
+.metrics-section {
   max-width: 1200px;
   margin: 0 auto 2rem auto;
   padding: 0 2rem;
@@ -25,26 +18,39 @@
   margin: 0;
 }
 
-.charts-container {
+.metrics-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: 1rem;
+}
+
+.metrics-grid-compact {
+  gap: 1rem;
+}
+
+.metrics-grid-large {
+  gap: 1.5rem;
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .charts-container {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
 @media (max-width: 768px) {
-  .analytics-section {
+  .metrics-section {
     padding: 0 1rem;
   }
 
-  .charts-container {
-    grid-template-columns: 1fr;
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
   }
 }

@@ -1,0 +1,271 @@
+<div class="chart-card-creative" [class.enhanced-chart]="chartData.type === 'line'">
+  <div class="chart-header">
+    <h4>{{ chartData.title }}</h4>
+    <div class="chart-stats" *ngIf="showStats && chartData.type === 'line'">
+      <div class="stat-item">
+        <span class="stat-label">Average:</span>
+        <span class="stat-value">{{ getAveragePerformance() }}%</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Best Month:</span>
+        <span class="stat-value">{{ getBestMonth().month }} ({{ getBestMonth().value }}%)</span>
+      </div>
+    </div>
+  </div>
+  <div class="chart-content">
+    <!-- Line Chart -->
+    <div class="line-chart-enhanced" *ngIf="chartData.type === 'line'">
+      <svg
+        viewBox="0 0 280 600"
+        class="line-chart-svg"
+        role="img"
+        [attr.aria-label]="chartData.title"
+      >
+        <defs>
+          <linearGradient
+            id="enhancedLineGradient"
+            x1="0%"
+            y1="100%"
+            x2="0%"
+            y2="0%"
+          >
+            <stop offset="0%" style="stop-color: #1e293b; stop-opacity: 0.8" />
+            <stop offset="50%" style="stop-color: #3b82f6; stop-opacity: 0.6" />
+            <stop offset="100%" style="stop-color: #60a5fa; stop-opacity: 0.2" />
+          </linearGradient>
+          <filter id="glowEffect">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="dropShadow">
+            <feDropShadow
+              dx="0"
+              dy="2"
+              stdDeviation="3"
+              flood-color="#3b82f6"
+              flood-opacity="0.3"
+            />
+          </filter>
+        </defs>
+
+        <!-- Enhanced Grid Lines -->
+        <g class="grid-lines">
+          <line
+            *ngFor="let i of [80, 85, 90, 95, 100]"
+            [attr.x1]="((i - 80) / 20) * 220 + 30"
+            [attr.y1]="30"
+            [attr.x2]="((i - 80) / 20) * 220 + 30"
+            [attr.y2]="570"
+            stroke="#e5e7eb"
+            stroke-width="1"
+            opacity="0.3"
+          />
+          <line
+            *ngFor="let i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+            [attr.x1]="30"
+            [attr.y1]="30 + (i - 1) * 45"
+            [attr.x2]="250"
+            [attr.y2]="30 + (i - 1) * 45"
+            stroke="#f1f5f9"
+            stroke-width="0.5"
+            opacity="0.5"
+          />
+        </g>
+
+        <!-- Target Line -->
+        <line
+          x1="30"
+          y1="300"
+          x2="250"
+          y2="300"
+          stroke="#10b981"
+          stroke-width="2"
+          stroke-dasharray="5,5"
+          opacity="0.7"
+        >
+          <title>Target: 90%</title>
+        </line>
+
+        <!-- Enhanced Area and Line -->
+        <path
+          [attr.d]="lineChartPathArea"
+          fill="url(#enhancedLineGradient)"
+          stroke="none"
+          [class.chart-animated]="chartAnimationComplete"
+        />
+        <path
+          [attr.d]="lineChartPathLine"
+          fill="none"
+          stroke="#3b82f6"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          filter="url(#glowEffect)"
+          [class.chart-animated]="chartAnimationComplete"
+        />
+
+        <!-- Enhanced Interactive Data Points -->
+        <g class="data-points">
+          <circle
+            *ngFor="let point of animatedDataPoints; let i = index"
+            [attr.cx]="point.x"
+            [attr.cy]="point.y"
+            [attr.r]="hoveredDataPoint === i ? 8 : 5"
+            [attr.fill]="hoveredDataPoint === i ? '#1e40af' : '#3b82f6'"
+            [attr.stroke]="hoveredDataPoint === i ? '#ffffff' : '#1e40af'"
+            [attr.stroke-width]="hoveredDataPoint === i ? 3 : 2"
+            [style.filter]="
+              hoveredDataPoint === i
+                ? 'url(#dropShadow)'
+                : 'drop-shadow(0 2px 4px rgba(59, 130, 246, 0.3))'
+            "
+            [class.data-point-enhanced]="true"
+            [class.data-point-hovered]="hoveredDataPoint === i"
+            [style.animation-delay]="point.delay + 'ms'"
+            (mouseenter)="onDataPointHover(i)"
+            (mouseleave)="onDataPointLeave()"
+            style="cursor: pointer"
+          >
+            <title>{{ getDataPointTooltip(point) }}</title>
+          </circle>
+        </g>
+      </svg>
+
+      <!-- Enhanced Labels -->
+      <div class="chart-labels-enhanced">
+        <div
+          *ngFor="let i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+          class="chart-label-enhanced"
+          [style.top]="30 + (i - 1) * 45 + 'px'"
+        >
+          <span class="month-number">{{ i }}</span>
+          <span class="month-name">{{
+            [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec"
+            ][i - 1]
+          }}</span>
+        </div>
+      </div>
+
+      <div class="chart-values-enhanced">
+        <div
+          *ngFor="let i of [80, 85, 90, 95, 100]"
+          class="chart-value-enhanced"
+          [style.left]="((i - 80) / 20) * 220 + 30 + 'px'"
+        >
+          {{ i }}%
+        </div>
+      </div>
+
+      <!-- Performance Tooltip -->
+      <div
+        *ngIf="hoveredDataPoint !== null && animatedDataPoints[hoveredDataPoint]"
+        class="performance-tooltip"
+        [style.left]="animatedDataPoints[hoveredDataPoint].x + 'px'"
+        [style.top]="animatedDataPoints[hoveredDataPoint].y - 40 + 'px'"
+      >
+        <div class="tooltip-content">
+          <div class="tooltip-month">
+            Month {{ animatedDataPoints[hoveredDataPoint].month }}
+          </div>
+          <div class="tooltip-value">
+            {{ animatedDataPoints[hoveredDataPoint].value }}%
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Radial Chart -->
+    <div class="radial-chart-creative" *ngIf="chartData.type === 'doughnut'">
+      <svg
+        viewBox="0 0 300 300"
+        class="radial-chart-svg"
+        role="img"
+        [attr.aria-label]="chartData.title"
+      >
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <circle
+          cx="150"
+          cy="150"
+          r="120"
+          fill="none"
+          stroke="#f1f5f9"
+          stroke-width="8"
+        />
+        <circle
+          cx="150"
+          cy="150"
+          r="90"
+          fill="none"
+          stroke="#f1f5f9"
+          stroke-width="6"
+        />
+        <circle
+          cx="150"
+          cy="150"
+          r="60"
+          fill="none"
+          stroke="#f1f5f9"
+          stroke-width="4"
+        />
+        <circle
+          *ngFor="let segment of radialSegments; let i = index"
+          cx="150"
+          cy="150"
+          [attr.r]="120 - i * 30"
+          fill="none"
+          [attr.stroke]="segment.color"
+          [attr.stroke-width]="8"
+          [attr.stroke-dasharray]="segment.strokeDasharray"
+          [attr.stroke-dashoffset]="segment.strokeDashoffset"
+          [attr.transform]="'rotate(-90 150 150)'"
+          filter="url(#glow)"
+          class="radial-segment"
+        >
+          <title>{{ segment.label }}: {{ segment.value }}</title>
+        </circle>
+      </svg>
+      <div class="radial-center">
+        <div class="center-value-creative">{{ getTotalValue() }}</div>
+        <div class="center-label-creative">Total Orders</div>
+      </div>
+    </div>
+
+    <!-- Chart Legend for Radial Chart -->
+    <div class="chart-legend-creative" *ngIf="chartData.type === 'doughnut'">
+      <div
+        *ngFor="let label of chartData.data?.labels; let i = index"
+        class="legend-item-creative"
+      >
+        <div
+          class="legend-indicator"
+          [style.background-color]="chartData.data.colors?.[i]"
+        ></div>
+        <span class="legend-text">{{ label }}</span>
+        <span class="legend-value">{{ chartData.data.values?.[i] }}</span>
+      </div>
+    </div>
+  </div>
+</div>

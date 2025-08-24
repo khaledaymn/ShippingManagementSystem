@@ -1,0 +1,58 @@
+<div
+  class="metric-card"
+  [class.metric-card-compact]="size === 'compact'"
+  [class.metric-card-large]="size === 'large'"
+  [style.border-top-color]="size === 'compact' ? metric.color : null"
+  [style.border-left-color]="size === 'large' ? metric.color : null"
+>
+  <div
+    class="metric-icon"
+    [class.metric-icon-compact]="size === 'compact'"
+    [class.metric-icon-large]="size === 'large'"
+    [style.background-color]="size === 'compact' ? metric.color : null"
+    [style.color]="size === 'large' ? metric.color : 'white'"
+  >
+    <i
+      [class]="metric.icon"
+      [attr.aria-label]="metric.description"
+      role="img"
+    ></i>
+  </div>
+  <div
+    class="metric-content"
+    [class.metric-content-compact]="size === 'compact'"
+    [class.metric-content-large]="size === 'large'"
+  >
+    <div
+      class="metric-value"
+      [class.metric-value-compact]="size === 'compact'"
+      [class.metric-value-large]="size === 'large'"
+    >
+      {{ metric.value }}
+    </div>
+    <div
+      class="metric-title"
+      [class.metric-title-compact]="size === 'compact'"
+      [class.metric-title-large]="size === 'large'"
+    >
+      {{ metric.title }}
+    </div>
+    <div
+      *ngIf="metric.change && size === 'compact'"
+      class="metric-change metric-change-compact"
+      [class.positive]="metric.changeType === 'increase'"
+      [class.negative]="metric.changeType === 'decrease'"
+    >
+      {{ metric.change }}
+      <i
+        [class]="
+          metric.changeType === 'increase'
+            ? 'bi-arrow-up'
+            : 'bi-arrow-down'
+        "
+        [attr.aria-hidden]="true"
+      ></i>
+    </div>
+  </div>
+  <div *ngIf="size === 'large'" class="hover-overlay"></div>
+</div>

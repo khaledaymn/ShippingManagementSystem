@@ -3,15 +3,13 @@ import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
 import { Router } from "@angular/router"
 import { DashboardService } from "../../../core/services/dashboard.service"
-import {
-  DashboardSummary,
-  DashboardMetric,
-  ChartData,
-  QuickAction,
-  Activity,
-  DashboardConfig,
-} from "../../../core/models/dashboard"
+import { DashboardSummary, Activity, DashboardConfig, DashboardMetric } from "../../../core/models/dashboard"
 import { Subject, takeUntil, interval } from "rxjs"
+
+import { MetricGridComponent } from "../../../shared/metric-grid/metric-grid.component"
+import { ChartComponent, ChartData } from "../../../shared/chart/chart.component"
+import { QuickActionsComponent, QuickAction } from "../../../shared/quick-actions/quick-actions.component"
+import { DashboardHeaderComponent } from "../../../shared/dashboard-header/dashboard-header.component"
 
 interface Notification {
   id: string
@@ -31,7 +29,14 @@ interface FilterOption {
 @Component({
   selector: "app-employee-dashboard",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MetricGridComponent,
+    ChartComponent,
+    QuickActionsComponent,
+    DashboardHeaderComponent,
+  ],
   templateUrl: "./employee-dashboard.component.html",
   styleUrls: ["./employee-dashboard.component.css"],
 })
@@ -177,7 +182,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: DashboardSummary) => {
-          console.log(data);
+          console.log(data)
 
           this.dashboardSummary = data
           this.transformServiceDataToMetrics(data)
@@ -228,43 +233,43 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
 
   formatStatusTitle(status: string): string {
     switch (status) {
-        case "New":
-            return "New Orders";
-        case "Pendding":
-            return "Pending Orders";
-        case "DeliveredToTheRepresentative":
-            return "Delivered to Representative";
-        case "Delivered":
-            return "Delivered Orders";
-        case "CannotBeReached":
-            return "Cannot Be Reached";
-        case "PostPoned":
-            return "Postponed Orders";
-        case "PartiallyDelivered":
-            return "Partially Delivered";
-        case "CanceledByCustomer":
-            return "Canceled by Customer";
-        case "RejectedWithPayment":
-            return "Rejected with Payment";
-        case "RejectedWithPartialPayment":
-            return "Rejected with Partial Payment";
-        case "RejectedWithoutPayment":
-            return "Rejected without Payment";
-        default:
-            return status;
+      case "New":
+        return "New Orders"
+      case "Pendding":
+        return "Pending Orders"
+      case "DeliveredToTheRepresentative":
+        return "Delivered to Representative"
+      case "Delivered":
+        return "Delivered Orders"
+      case "CannotBeReached":
+        return "Cannot Be Reached"
+      case "PostPoned":
+        return "Postponed Orders"
+      case "PartiallyDelivered":
+        return "Partially Delivered"
+      case "CanceledByCustomer":
+        return "Canceled by Customer"
+      case "RejectedWithPayment":
+        return "Rejected with Payment"
+      case "RejectedWithPartialPayment":
+        return "Rejected with Partial Payment"
+      case "RejectedWithoutPayment":
+        return "Rejected without Payment"
+      default:
+        return status
     }
   }
 
   private formatPaymentTitle(type: string): string {
     switch (type) {
-        case "CashOnDelivery":
-            return "Cash on Delivery";
-        case "PaidInAdvance":
-            return "Paid in Advance";
-        case "ExchangeOrder":
-            return "Exchange Order";
-        default:
-            return type;
+      case "CashOnDelivery":
+        return "Cash on Delivery"
+      case "PaidInAdvance":
+        return "Paid in Advance"
+      case "ExchangeOrder":
+        return "Exchange Order"
+      default:
+        return type
     }
   }
 
@@ -357,7 +362,19 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
 
     const statusLabels = Object.keys(data.ordersByState || {})
     const statusValues = Object.values(data.ordersByState || {})
-    const statusColors = ["#3b82f6", "#f59e0b", "#06b6d4", "#10b981", "#ef4444", "#8b5cf6", "#84cc16", "#f97316", "#9f1239", "#be123c", "#e11d48"]
+    const statusColors = [
+      "#3b82f6",
+      "#f59e0b",
+      "#06b6d4",
+      "#10b981",
+      "#ef4444",
+      "#8b5cf6",
+      "#84cc16",
+      "#f97316",
+      "#9f1239",
+      "#be123c",
+      "#e11d48",
+    ]
 
     this.orderStatusChart = {
       type: "doughnut",
@@ -477,7 +494,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
     return undefined
   }
 
- private getStatusIcon(status: string): string {
+  private getStatusIcon(status: string): string {
     const iconMap: { [key: string]: string } = {
       New: "bi-plus-circle",
       Pendding: "bi-clock",
@@ -492,9 +509,9 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
       RejectedWithoutPayment: "bi-x-square",
     }
     return iconMap[status] || "bi-circle"
-}
+  }
 
-private getStatusColor(status: string): string {
+  private getStatusColor(status: string): string {
     const colorMap: { [key: string]: string } = {
       New: "#3b82f6",
       Pendding: "#f59e0b",
@@ -509,25 +526,26 @@ private getStatusColor(status: string): string {
       RejectedWithoutPayment: "#e11d48",
     }
     return colorMap[status] || "#6b7280"
-}
+  }
 
-private getPaymentIcon(type: string): string {
+  private getPaymentIcon(type: string): string {
     const iconMap: { [key: string]: string } = {
       CashOnDelivery: "bi-cash",
       PaidInAdvance: "bi-credit-card",
       ExchangeOrder: "bi-arrow-repeat",
     }
     return iconMap[type] || "bi-currency-dollar"
-}
+  }
 
-private getPaymentColor(type: string): string {
+  private getPaymentColor(type: string): string {
     const colorMap: { [key: string]: string } = {
       CashOnDelivery: "#10b981",
       PaidInAdvance: "#3b82f6",
       ExchangeOrder: "#8b5cf6",
     }
     return colorMap[type] || "#6b7280"
-}
+  }
+
   addNotification(type: Notification["type"], title: string, message: string): void {
     const notification: Notification = {
       id: Date.now().toString(),
@@ -629,6 +647,7 @@ private getPaymentColor(type: string): string {
     }
   }
 
+  // Quick action method now handled by shared component
   onQuickAction(action: QuickAction): void {
     console.log(`Quick action used: ${action.title}`, {
       currentMetrics: this.performanceMetrics,

@@ -1,0 +1,22 @@
+<section class="quick-actions-section" *ngIf="actions?.length">
+  <div class="section-header">
+    <h3>{{ title }}</h3>
+  </div>
+  <div class="actions-grid">
+    <button
+      *ngFor="let action of actions"
+      class="action-card"
+      (click)="onActionClick(action)"
+      [style.border-left-color]="action.color"
+      [attr.aria-label]="action.description"
+    >
+      <div class="action-icon" [style.color]="action.color">
+        <i [class]="action.icon" [attr.aria-hidden]="true"></i>
+      </div>
+      <div class="action-content">
+        <div class="action-title">{{ action.title }}</div>
+        <div class="action-description">{{ action.description }}</div>
+      </div>
+    </button>
+  </div>
+</section>

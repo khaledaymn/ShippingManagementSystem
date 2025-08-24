@@ -1,0 +1,12 @@
+<div class="section-header">
+  <h3>{{ title }}</h3>
+  <a
+    *ngIf="showViewAll && viewAllLink"
+    [routerLink]="viewAllLink"
+    class="view-all-link"
+    [attr.aria-label]="'View all ' + title.toLowerCase()"
+  >
+    {{ viewAllText }}
+    <i class="bi-arrow-right" aria-hidden="true"></i>
+  </a>
+</div>
