@@ -39,7 +39,7 @@ export interface ResetPasswordRequest {
 export enum Role {
   ADMIN = "Admin",
   EMPLOYEE = "Employee",
-  SALES_REPRESENTATIVE = "Sales Representative",
+  SALES_REPRESENTATIVE = "Delivery",
   MERCHANT = "Merchant",
   DELEGATE = "Delegate",
 }

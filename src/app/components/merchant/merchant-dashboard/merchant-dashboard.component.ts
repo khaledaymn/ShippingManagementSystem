@@ -5,11 +5,11 @@ import { Router } from "@angular/router"
 import { DashboardService } from "../../../core/services/dashboard.service"
 import { DashboardSummary, Activity, DashboardConfig, DashboardMetric } from "../../../core/models/dashboard"
 import { Subject, takeUntil, interval } from "rxjs"
-
 import { MetricGridComponent } from "../../../shared/metric-grid/metric-grid.component"
 import { ChartComponent, ChartData } from "../../../shared/chart/chart.component"
 import { QuickActionsComponent, QuickAction } from "../../../shared/quick-actions/quick-actions.component"
 import { DashboardHeaderComponent } from "../../../shared/dashboard-header/dashboard-header.component"
+import { AuthService } from "../../../core/services/auth.service"
 
 interface Notification {
   id: string
@@ -27,7 +27,7 @@ interface FilterOption {
 }
 
 @Component({
-  selector: "app-employee-dashboard",
+  selector: "app-merchant-dashboard",
   standalone: true,
   imports: [
     CommonModule,
@@ -37,10 +37,10 @@ interface FilterOption {
     QuickActionsComponent,
     DashboardHeaderComponent,
   ],
-  templateUrl: "./employee-dashboard.component.html",
-  styleUrls: ["./employee-dashboard.component.css"],
+  templateUrl: "./merchant-dashboard.component.html",
+  styleUrls: ["./merchant-dashboard.component.css"],
 })
-export class EmployeeDashboardComponent implements OnInit, OnDestroy {
+export class merchantDashboardComponent implements OnInit, OnDestroy {
   @ViewChild("searchInput") searchInput!: ElementRef<HTMLInputElement>
 
   private destroy$ = new Subject<void>()
@@ -117,15 +117,15 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private dashboardService: DashboardService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadData()
     this.setupRealTimeUpdates()
     this.initializeNotifications()
-    // console.log(this.orderStatusChart);
 
-    interval(4000)
+    interval(6000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.currentDateTime = new Date()
@@ -142,7 +142,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
   }
 
   private setupRealTimeUpdates(): void {
-    interval(2000)
+    interval(3000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.refreshData()
@@ -175,10 +175,10 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
     this.loading = true
     this.error = null
 
-    // const userId = this.getCurrentUserId()
+    const userId = this.getCurrentUserId()
 
     this.dashboardService
-      .getDashboardSummary()
+      .getDashboardSummary(userId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: DashboardSummary) => {
@@ -207,10 +207,10 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
 
   refreshData(): void {
     this.refreshing = true
-    // const userId = this.getCurrentUserId()
+    const userId = this.getCurrentUserId()
 
     this.dashboardService
-      .getDashboardSummary()
+      .getDashboardSummary(userId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: DashboardSummary) => {
@@ -261,8 +261,8 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
 
   private formatPaymentTitle(type: string): string {
     switch (type) {
-      case "CashOnDelivery":
-        return "Cash on Delivery"
+      case "CashOnmerchant":
+        return "Cash on merchant"
       case "PaidInAdvance":
         return "Paid in Advance"
       case "ExchangeOrder":
@@ -404,28 +404,28 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
       {
         title: "View Orders",
         icon: "bi-list-check",
-        route: "/employee/orders",
+        route: "/merchant/orders",
         color: "#3b82f6",
         description: "Check your assigned orders",
       },
       {
         title: "Add Order",
         icon: "bi-plus-circle",
-        route: "/employee/orders/create",
+        route: "/merchant/orders/create",
         color: "#10b981",
         description: "Create a new order",
       },
       {
         title: "Reports",
         icon: "bi-graph-up",
-        route: "/employee/reports",
+        route: "/merchant/reports",
         color: "#8b5cf6",
         description: "View performance reports",
       },
       {
         title: "Settings",
         icon: "bi-gear",
-        route: "/employee/general-settings",
+        route: "/merchant/general-settings",
         color: "#6b7280",
         description: "Manage your preferences",
       },
@@ -489,6 +489,14 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
     ]
   }
 
+  private getCurrentUserId(): string | undefined {
+    let userId = undefined
+    this.authService.currentUser$.subscribe(
+      (id) => userId = id
+    )
+    return userId
+  }
+
   private getStatusIcon(status: string): string {
     const iconMap: { [key: string]: string } = {
       New: "bi-plus-circle",
@@ -525,7 +533,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
 
   private getPaymentIcon(type: string): string {
     const iconMap: { [key: string]: string } = {
-      CashOnDelivery: "bi-cash",
+      CashOnmerchant: "bi-cash",
       PaidInAdvance: "bi-credit-card",
       ExchangeOrder: "bi-arrow-repeat",
     }
@@ -534,7 +542,7 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
 
   private getPaymentColor(type: string): string {
     const colorMap: { [key: string]: string } = {
-      CashOnDelivery: "#10b981",
+      CashOnmerchant: "#10b981",
       PaidInAdvance: "#3b82f6",
       ExchangeOrder: "#8b5cf6",
     }

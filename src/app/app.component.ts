@@ -5,6 +5,9 @@ import { HeaderComponent } from "./shared/header/header.component"
 import { MenuItem } from "./shared/sidebar/sidebar.component"
 import { EmployeeSidebarComponent } from "./components/employee/employee-sidebar/employee-sidebar.component"
 import { AuthService } from "./core/services/auth.service"
+import { deliverySidebarComponent } from "./components/delivery/delivery-sidebar/delivery-sidebar.component";
+import { merchantDashboardComponent } from "./components/merchant/merchant-dashboard/merchant-dashboard.component";
+import { merchantSidebarComponent } from "./components/merchant/merchant-sidebar/merchant-sidebar.component";
 
 type UserRole = "employee" | "Admin" | "merchant"
 
@@ -16,7 +19,9 @@ type UserRole = "employee" | "Admin" | "merchant"
     RouterOutlet,
     HeaderComponent,
     EmployeeSidebarComponent,
-  ],
+    deliverySidebarComponent,
+    merchantSidebarComponent
+],
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"],
 })
@@ -118,7 +123,6 @@ export class AppComponent implements OnInit {
       this.isAuthenticated = !!user
       this.isHasRole = !!user?.roleId
       this.userRole = user?.roleId || null
-      console.log('App: User role updated:', this.userRole) // Debug log
     })
   }
 
@@ -127,7 +131,6 @@ export class AppComponent implements OnInit {
     if (!this.isMobile) {
       this.isMobileSidebarOpen = false
     }
-    console.log('App: isMobile:', this.isMobile, 'isMobileSidebarOpen:', this.isMobileSidebarOpen) // Debug log
   }
 
   private loadUserRole(): void {
@@ -136,11 +139,9 @@ export class AppComponent implements OnInit {
       this.currentUserRole = storedRole
       this.sidebarConfig.userRole = storedRole
     }
-    console.log('App: Loaded user role:', this.currentUserRole) // Debug log
   }
 
   onSidebarItemClick(item: MenuItem): void {
-    console.log('App: Sidebar item clicked:', item) // Debug log
     if (item.url) {
       this.isMobileSidebarOpen = false
       this.router.navigate([item.url])
@@ -148,17 +149,14 @@ export class AppComponent implements OnInit {
   }
 
   onMobileSidebarToggle(isOpen: boolean): void {
-    console.log('App: Received mobileToggle:', isOpen) // Debug log
     this.isMobileSidebarOpen = isOpen
   }
 
   onHeaderMobileMenuToggle(): void {
     this.isMobileSidebarOpen = !this.isMobileSidebarOpen
-    console.log('App: Header mobile menu toggled:', this.isMobileSidebarOpen) // Debug log
   }
 
   onCloseModals(): void {
-    console.log('App: Received closeModals') // Debug log
     this.isMobileSidebarOpen = false
   }
 
@@ -166,7 +164,6 @@ export class AppComponent implements OnInit {
     this.currentUserRole = role
     localStorage.setItem("userRole", role)
     this.sidebarConfig.userRole = role
-    console.log('App: Switched user role:', role) // Debug log
   }
 
   logout(): void {
@@ -176,6 +173,5 @@ export class AppComponent implements OnInit {
     this.isHasRole = false
     this.isMobileSidebarOpen = false
     this.router.navigate(['/auth/login'])
-    console.log('App: Logged out') // Debug log
   }
 }

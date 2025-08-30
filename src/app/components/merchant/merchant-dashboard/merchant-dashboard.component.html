@@ -1,0 +1,68 @@
+<div class="merchant-dashboard">
+  <!-- Replace header with shared component -->
+  <app-dashboard-header
+    title="merchant Dashboard"
+    subtitle="Daily Tasks & Order Management"
+    greeting="Good Morning"
+    userName="merchant"
+    [currentDateTime]="currentDateTime"
+  ></app-dashboard-header>
+
+  <!-- Replace performance metrics with shared component -->
+  <app-metric-grid
+    *ngIf="performanceMetrics?.length"
+    [metrics]="performanceMetrics"
+    title="Performance Overview"
+    size="compact"
+    [columns]="4"
+  ></app-metric-grid>
+
+  <!-- Replace order status with shared component -->
+  <app-metric-grid
+    *ngIf="orderStatusMetrics?.length"
+    [metrics]="orderStatusMetrics"
+    title="Order Status Overview"
+    size="large"
+    [columns]="4"
+  ></app-metric-grid>
+
+  <!-- Replace payment types with shared component -->
+  <app-metric-grid
+    *ngIf="paymentTypeMetrics?.length"
+    [metrics]="paymentTypeMetrics"
+    title="Orders by Payment Type"
+    size="large"
+    [columns]="4"
+  ></app-metric-grid>
+
+  <!-- Replace analytics section with shared chart components -->
+  <section class="analytics-section">
+    <div class="section-header">
+      <h3>Analytics Overview</h3>
+    </div>
+
+    <div class="charts-container">
+      <!-- Enhanced Monthly Performance Chart -->
+      <app-chart
+        *ngIf="monthlyPerformanceChart"
+        [chartData]="monthlyPerformanceChart"
+        [showStats]="true"
+      ></app-chart>
+
+      <!-- Order Status Distribution Chart -->
+      <app-chart
+        *ngIf="orderStatusChart"
+        [chartData]="orderStatusChart"
+        [showStats]="false"
+      ></app-chart>
+    </div>
+  </section>
+
+  <!-- Replace quick actions with shared component -->
+  <app-quick-actions
+    *ngIf="quickActions?.length"
+    [actions]="quickActions"
+    title="Quick Actions"
+    (actionClick)="onQuickAction($event)"
+  ></app-quick-actions>
+</div>

@@ -37,6 +37,13 @@ import { OrdersViewComponent } from './components/employee/order/order-view/orde
 import { OrderDetailsComponent } from './components/employee/order/order-details/order-details.component';
 import { OrdersAddComponent } from './components/employee/order/order-add/order-add.component';
 import { ProfileComponent } from './shared/profile/profile.component';
+import { deliveryDashboardComponent } from './components/delivery/delivery-dashboard/delivery-dashboard.component';
+import { DeliveryOrdersViewComponent } from './components/delivery/order/order-view/order-view.component';
+import { DeliveryOrderDetailsComponent } from './components/delivery/order/order-details/order-details.component';
+import { merchantDashboardComponent } from './components/merchant/merchant-dashboard/merchant-dashboard.component';
+import { MerchantOrdersViewComponent } from './components/merchant/order/order-view/order-view.component';
+import { MerchantOrderDetailsComponent } from './components/merchant/order/order-details/order-details.component';
+import { MerchantOrdersAddComponent } from './components/merchant/order/order-add/order-add.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -231,246 +238,61 @@ export const routes: Routes = [
       },
       {
         path: 'orders',
-        // canActivate: [permissionGuard('orders', 'view')],
+        canActivate: [permissionOrRoleGuard('Orders', 'View',[Role.ADMIN])],
         component: OrdersViewComponent
       },
       {
+        path: 'orders/details/:id',
+        canActivate: [permissionOrRoleGuard('Orders', 'View',[Role.ADMIN])],
+        component: OrderDetailsComponent
+      },
+      {
         path: 'orders/create',
-        // canActivate: [permissionGuard('orders', 'view')],
+        canActivate: [permissionOrRoleGuard('Orders', 'Create',[Role.ADMIN])],
         component: OrdersAddComponent
+      },
+    ],
+  },
+  {
+    path: 'delivery',
+    canActivate: [authGuard, roleGuard([Role.SALES_REPRESENTATIVE])],
+     children: [
+      {
+        path: 'dashboard',
+        component: deliveryDashboardComponent,
+      },
+      {
+        path: 'orders',
+        component: DeliveryOrdersViewComponent
       },
       {
         path: 'orders/details/:id',
-        component: OrderDetailsComponent
+        component: DeliveryOrderDetailsComponent
       },
-      // {
-      //   path: 'changePassword',
-      //   component: ChangePasswordComponent,
-      //   canActivate: [authGuard],
-      // },
-    ],
+    ]
   },
-  // {
-  //   path: 'employee',
-  //   canActivate: [authGuard, roleGuard(['employee'])],
-  //   children: [
-  //     {
-  //       path: 'dashboard',
-  //       component: EmployeeDashboardComponent,
-  //       canActivate: [permissionGuard('dashboard', 'view')],
-  //     },
-  //     {
-  //       path: 'Settings',
-  //       canActivate: [permissionGuard('settings', 'view')],
-  //       children: [
-  //         {
-  //           path: 'generalSetting',
-  //           component: StandardComponent,
-  //           children: [
-  //             {
-  //               path: ':id/edit',
-  //               component: StandardFormComponent,
-  //               canActivate: [permissionGuard('settings', 'edit')],
-  //             },
-  //           ],
-  //         },
-  //         {
-  //           path: 'Permissions',
-  //           canActivate: [permissionGuard('permissions', 'view')],
-  //           children: [
-  //             {
-  //               path: 'Groups',
-  //               component: GroupComponent,
-  //               children: [
-  //                 {
-  //                   path: 'add',
-  //                   component: MeduleComponent,
-  //                   canActivate: [permissionGuard('permissions', 'create')],
-  //                 },
-  //               ],
-  //             },
-  //           ],
-  //         },
-  //         // {
-  //         //   path: 'Branch',
-  //         //   component: BranchComponent,
-  //         //   canActivate: [permissionGuard('branch', 'view')],
-  //         //   children: [
-  //         //     {
-  //         //       path: ':id/edit',
-  //         //       component: BranchFormComponent,
-  //         //       canActivate: [permissionGuard('branch', 'edit')],
-  //         //     },
-  //         //   ],
-  //         // },
-  //       ],
-  //     },
-  //     // {
-  //     //   path: 'users',
-  //     //   canActivate: [permissionGuard('users', 'view')],
-  //     //   children: [
-  //     //     {
-  //     //       path: 'Employees',
-  //     //       component: EmployeeComponent,
-  //     //       children: [
-  //     //         {
-  //     //           path: ':id/edit',
-  //     //           component: EmployeeFormComponent,
-  //     //           canActivate: [permissionGuard('users', 'edit')],
-  //     //         },
-  //     //       ],
-  //     //     },
-  //     //     // {
-  //     //     //   path: 'shipping-representatives',
-  //     //     //   component: ShippingRepresentativeListComponent,
-  //     //     //   children: [
-  //     //     //     {
-  //     //     //       path: ':id/edit',
-  //     //     //       component: AddShippingRepresentativeComponent,
-  //     //     //       canActivate: [permissionGuard('users', 'edit')],
-  //     //     //     },
-  //     //     //   ],
-  //     //     // },
-  //     //     // {
-  //     //     //   path: 'merchants',
-  //     //     //   component: MerchantsComponent,
-  //     //     // },
-  //     //   ],
-  //     // },
-  //     // {
-  //     //   path: 'Places',
-  //     //   canActivate: [permissionGuard('places', 'view')],
-  //     //   children: [
-  //     //     {
-  //     //       path: 'City',
-  //     //       component: CityComponent,
-  //     //       children: [
-  //     //         {
-  //     //           path: ':id/edit',
-  //     //           component: CityFormComponent,
-  //     //           canActivate: [permissionGuard('places', 'edit')],
-  //     //         },
-  //     //       ],
-  //     //     },
-  //     //   ],
-  //     // },
-  //     // {
-  //     //   path: 'orders',
-  //     //   canActivate: [permissionGuard('orders', 'view')],
-  //     //   children: [
-  //     //     {
-  //     //       path: '',
-  //     //       component: OrdersListComponent,
-  //     //     },
-  //     //     {
-  //     //       path: 'create',
-  //     //       component: OrderCreateComponent,
-  //     //       canActivate: [permissionGuard('orders', 'create')],
-  //     //     },
-  //     //     {
-  //     //       path: 'by-status',
-  //     //       component: OrdersByStatusComponent,
-  //     //     },
-  //     //     {
-  //     //       path: 'reports',
-  //     //       component: OrdersReportComponent,
-  //     //       canActivate: [permissionGuard('orders', 'viewReports')],
-  //     //     },
-  //     //     {
-  //     //       path: 'edit/:id',
-  //     //       component: OrderEditComponent,
-  //     //       canActivate: [permissionGuard('orders', 'edit')],
-  //     //     },
-  //     //     {
-  //     //       path: ':id',
-  //     //       component: OrderDetailComponent,
-  //     //     },
-  //     //   ],
-  //     // },
-  //     // {
-  //     //   path: 'Profile',
-  //     //   component: EditprofileComponent,
-  //     //   canActivate: [authGuard],
-  //     // },
-  //   ],
-  // },
-  // {
-  //   path: 'merchant',
-  //   canActivate: [authGuard, roleGuard(['merchant'])],
-  //   children: [
-  //     {
-  //       path: 'dashboard',
-  //       component: MerchantDashboardComponent,
-  //       canActivate: [permissionGuard('dashboard', 'view')],
-  //     },
-  //     {
-  //       path: 'orders',
-  //       canActivate: [permissionGuard('orders', 'view')],
-  //       children: [
-  //         {
-  //           path: '',
-  //           component: OrderListForMerchantComponent,
-  //         },
-  //         {
-  //           path: 'reports',
-  //           component: OrdersReportComponent,
-  //           canActivate: [permissionGuard('orders', 'viewReports')],
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       path: 'Profile',
-  //       component: EditprofileComponent,
-  //       canActivate: [authGuard],
-  //     },
-  //     {
-  //       path: 'changePassword',
-  //       component: ChangePasswordComponent,
-  //       canActivate: [authGuard],
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: 'sales',
-  //   canActivate: [authGuard, roleGuard(['sales'])],
-  //   children: [
-  //     {
-  //       path: 'dashboard',
-  //       component: SalesDashboardComponent,
-  //       canActivate: [permissionGuard('dashboard', 'view')],
-  //     },
-  //     {
-  //       path: 'orders',
-  //       canActivate: [permissionGuard('orders', 'view')],
-  //       children: [
-  //         {
-  //           path: '',
-  //           component: OrderListForSalesComponent,
-  //         },
-  //         {
-  //           path: 'by-status',
-  //           component: OrdersByStatusComponent,
-  //         },
-  //         {
-  //           path: 'reports',
-  //           component: OrdersReportComponent,
-  //           canActivate: [permissionGuard('orders', 'viewReports')],
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       path: 'Profile',
-  //       component: EditprofileComponent,
-  //       canActivate: [authGuard],
-  //     },
-  //     {
-  //       path: 'changePassword',
-  //       component: ChangePasswordComponent,
-  //       canActivate: [authGuard],
-  //     },
-  //   ],
-  // },
-
+  {
+    path: 'merchant',
+    canActivate: [authGuard, roleGuard([Role.MERCHANT])],
+     children: [
+      {
+        path: 'dashboard',
+        component: merchantDashboardComponent,
+      },
+      {
+        path: 'orders',
+        component: MerchantOrdersViewComponent
+      },
+      {
+        path: 'orders/details/:id',
+        component: MerchantOrderDetailsComponent
+      },
+      {
+        path: 'orders/create',
+        component: MerchantOrdersAddComponent
+      },
+    ]
+  },
   {
     path: 'profile',
     component: ProfileComponent,
@@ -484,72 +306,3 @@ export const routes: Routes = [
     component: NotFoundComponent,
   },
 ];
-
-// export const routes: Routes = [
-//   {
-//     path: '',
-//     redirectTo:'/dashboard',
-//     pathMatch: 'full'
-//   },
-//   {
-//     path:"dashboard",
-//     component: EmployeeDashboardComponent
-//   },
-//   {
-//     path:"settings",
-//     component: StandardsViewComponent
-//   },
-//   {
-//     path: "settings/edit/:id",
-//     component: StandardsEditComponent,
-//     data: { title: "Edit Standard" },
-//   },
-//   {
-//     path: "shipping-types",
-//     component: ShippingTypesComponent
-//   },
-//   {
-//     path: "shipping-types/create",
-//     component: ShippingTypesFormComponent
-//   },
-//   {
-//     path: "shipping-types/edit/:id",
-//     component: ShippingTypesFormComponent
-//   },
-//   {
-//     path: "branches",
-//     component: BranchesViewComponent
-//   },
-//   {
-//     path: "branches/create",
-//     component: BranchesEditComponent
-//   },
-//   {
-//     path: "branches/edit/:id",
-//     component: BranchesEditComponent
-//   },
-//   {
-//     path: "permissions",
-//     component: PermissionsViewComponent
-//   },
-//   {
-//     path: "permissions/add",
-//     component: PermissionsEditComponent
-//   },
-//   {
-//     path: "permissions/edit/:id",
-//     component: PermissionsEditComponent
-//   },
-//   {
-//     path: "login",
-//     component: LoginComponent
-//   },
-//   {
-//     path: "forgot-password",
-//     component: ForgotPasswordComponent
-//   },
-//   {
-//     path: "reset-password",
-//     component: ResetPasswordComponent
-//   }
-// ];

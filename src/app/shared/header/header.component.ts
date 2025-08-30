@@ -24,6 +24,7 @@ import { Employee, EmployeeParams } from "../../core/models/employee"
 import { Merchant, MerchantQueryParams } from "../../core/models/merchant"
 import { Order, OrderParams } from "../../core/models/order"
 import { ShippingRepresentative, ShippingRepresentativeQueryParams } from "../../core/models/shipping-representative"
+import { Role } from "../../core/models/user"
 
 interface SearchResult {
   id: string
@@ -225,91 +226,213 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
     this.searchQuery = target.value
   }
 
-  onSearchKeyPress(event: KeyboardEvent): void {
-    if (event.key === "Enter") {
-      event.preventDefault()
-      this.search()
-    }
+  // onSearchKeyPress(event: KeyboardEvent): void {
+  //   if (event.key === "Enter") {
+  //     event.preventDefault()
+  //     this.search()
+  //   }
+  // }
+
+  // private async performSearch(query: string): Promise<void> {
+  //   if (!query.trim()) return
+
+  //   this.isSearching = true
+
+  //   if (this.userRole !== 'Admin') {
+  //     this.showNotification("Search is available only for administrators", "warning")
+  //     this.isSearching = false
+  //     return
+  //   }
+
+  //   try {
+  //     const employeeParams: EmployeeParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true }
+  //     const merchantParams: MerchantQueryParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true }
+  //     const orderParams: OrderParams = { pageIndex: 1, pageSize: 5, search: query, isDeleted: false }
+  //     const repParams: ShippingRepresentativeQueryParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true }
+
+  //     const [
+  //       employeesRes,
+  //       merchantsRes,
+  //       ordersRes,
+  //       repsRes
+  //     ] = await Promise.all([
+  //       lastValueFrom(this.employeeService.getAllEmployees(employeeParams)),
+  //       lastValueFrom(this.merchantService.getMerchants(merchantParams)),
+  //       lastValueFrom(this.orderService.getOrders(orderParams)),
+  //       lastValueFrom(this.shippingRepresentativeService.getShippingRepresentatives(repParams)),
+  //     ])
+
+  //     const results: SearchResult[] = []
+
+  //     employeesRes.data.forEach((employee: Employee) => {
+  //       results.push({
+  //         id: employee.id.toString(),
+  //         title: `${employee.name || 'Unnamed Employee'} (Employee)`,
+  //         description: `Email: ${employee.email || 'N/A'}, Branch: ${employee.branches?.map(b => b.name).join(', ') || 'N/A'}`,
+  //         type: "user",
+  //         url: `/employee/users/employees/details/${employee.id}`
+  //       })
+  //     })
+
+  //     merchantsRes.data.forEach((merchant: Merchant) => {
+  //       results.push({
+  //         id: merchant.id.toString(),
+  //         title: `${merchant.name || 'Unnamed Merchant'} (Merchant)`,
+  //         description: `Store: ${merchant.storeName || 'N/A'}, Email: ${merchant.email || 'N/A'}`,
+  //         type: "user",
+  //         url: `/employee/users/merchants/details/${merchant.id}`
+  //       })
+  //     })
+
+  //     ordersRes.data.forEach((order: Order) => {
+  //       results.push({
+  //         id: order.id.toString(),
+  //         title: `Order #${order.id} (Order)`,
+  //         description: `Customer: ${order.customerName || 'N/A'}, State: ${order.orderState || 'N/A'}, City: ${order.cityName || 'N/A'}`,
+  //         type: "document",
+  //         url: `/employee/orders/details/${order.id}`
+  //       })
+  //     })
+
+  //     repsRes.data.forEach((rep: ShippingRepresentative) => {
+  //       results.push({
+  //         id: rep.id.toString(),
+  //         title: `${rep.name || 'Unnamed Representative'} (Shipping Representative)`,
+  //         description: `Email: ${rep.email || 'N/A'}, Governorates: ${rep.governorates?.join(', ') || 'N/A'}`,
+  //         type: "user",
+  //         url: `/employee/users/shipping-representatives/details/${rep.id}`
+  //       })
+  //     })
+
+  //     this._searchResults$.next(results)
+  //   } catch (error) {
+  //     console.error("Search error:", error)
+  //   } finally {
+  //     this.isSearching = false
+  //   }
+  // }
+
+   private getCurrentUserId(): string | undefined {
+    let userId = undefined
+    this.authService.currentUser$.subscribe(
+      (id) => userId = id?.id
+    )
+    return userId
   }
 
   private async performSearch(query: string): Promise<void> {
-    if (!query.trim()) return
+    if (!query.trim()) return;
 
-    this.isSearching = true
-
-    if (this.userRole !== 'Admin') {
-      this.showNotification("Search is available only for administrators", "warning")
-      this.isSearching = false
-      return
-    }
+    this.isSearching = true;
 
     try {
-      const employeeParams: EmployeeParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true }
-      const merchantParams: MerchantQueryParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true }
-      const orderParams: OrderParams = { pageIndex: 1, pageSize: 5, search: query, isDeleted: false }
-      const repParams: ShippingRepresentativeQueryParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true }
+        const results: SearchResult[] = [];
+        const orderParams: OrderParams = {
+            pageIndex: 1,
+            pageSize: 5,
+            search: query,
+            isDeleted: false
+        };
 
-      const [
-        employeesRes,
-        merchantsRes,
-        ordersRes,
-        repsRes
-      ] = await Promise.all([
-        lastValueFrom(this.employeeService.getAllEmployees(employeeParams)),
-        lastValueFrom(this.merchantService.getMerchants(merchantParams)),
-        lastValueFrom(this.orderService.getOrders(orderParams)),
-        lastValueFrom(this.shippingRepresentativeService.getShippingRepresentatives(repParams)),
-      ])
+        // Get the current user's ID and role
+        const userId = await this.getCurrentUserId();
 
-      const results: SearchResult[] = []
+        // Determine the base URL path based on user role
+        let orderUrlBase: string;
+        switch (this.userRole) {
+            case Role.MERCHANT:
+                orderUrlBase = '/merchant/orders/details';
+                if (!userId) {
+                    this.isSearching = false;
+                    return;
+                }
+                orderParams.merchantId = userId;
+                break;
+            case Role.DELEGATE:
+            case Role.SALES_REPRESENTATIVE:
+                orderUrlBase = '/delivery/orders/details';
+                if (!userId) {
+                    this.isSearching = false;
+                    return;
+                }
+                orderParams.shippingRepresentativeId = userId;
+                break;
+            case Role.ADMIN:
+            case Role.EMPLOYEE:
+                orderUrlBase = '/employee/orders/details';
+                break;
+            default:
+                this.isSearching = false;
+                return;
+        }
 
-      employeesRes.data.forEach((employee: Employee) => {
-        results.push({
-          id: employee.id.toString(),
-          title: `${employee.name || 'Unnamed Employee'} (Employee)`,
-          description: `Email: ${employee.email || 'N/A'}, Branch: ${employee.branches?.map(b => b.name).join(', ') || 'N/A'}`,
-          type: "user",
-          url: `/employee/users/employees/details/${employee.id}`
-        })
-      })
+        // Perform search for Orders (for all allowed roles)
+        const ordersRes = await lastValueFrom(this.orderService.getOrders(orderParams));
+        ordersRes.data.forEach((order: Order) => {
+            results.push({
+                id: order.id.toString(),
+                title: `Order #${order.id} (Order)`,
+                description: `Customer: ${order.customerName || 'N/A'}, State: ${order.orderState || 'N/A'}, City: ${order.cityName || 'N/A'}`,
+                type: "document",
+                url: `${orderUrlBase}/${order.id}`
+            });
+        });
 
-      merchantsRes.data.forEach((merchant: Merchant) => {
-        results.push({
-          id: merchant.id.toString(),
-          title: `${merchant.name || 'Unnamed Merchant'} (Merchant)`,
-          description: `Store: ${merchant.storeName || 'N/A'}, Email: ${merchant.email || 'N/A'}`,
-          type: "user",
-          url: `/employee/users/merchants/details/${merchant.id}`
-        })
-      })
+        // Allow full search for Admins and Employees
+        if (this.userRole === Role.ADMIN || this.userRole === Role.EMPLOYEE) {
+            const employeeParams: EmployeeParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true };
+            const merchantParams: MerchantQueryParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true };
+            const repParams: ShippingRepresentativeQueryParams = { pageIndex: 1, pageSize: 5, search: query, isActive: true };
 
-      ordersRes.data.forEach((order: Order) => {
-        results.push({
-          id: order.id.toString(),
-          title: `Order #${order.id} (Order)`,
-          description: `Customer: ${order.customerName || 'N/A'}, State: ${order.orderState || 'N/A'}, City: ${order.cityName || 'N/A'}`,
-          type: "document",
-          url: `/employee/orders/details/${order.id}`
-        })
-      })
+            const [
+                employeesRes,
+                merchantsRes,
+                repsRes
+            ] = await Promise.all([
+                lastValueFrom(this.employeeService.getAllEmployees(employeeParams)),
+                lastValueFrom(this.merchantService.getMerchants(merchantParams)),
+                lastValueFrom(this.shippingRepresentativeService.getShippingRepresentatives(repParams)),
+            ]);
 
-      repsRes.data.forEach((rep: ShippingRepresentative) => {
-        results.push({
-          id: rep.id.toString(),
-          title: `${rep.name || 'Unnamed Representative'} (Shipping Representative)`,
-          description: `Email: ${rep.email || 'N/A'}, Governorates: ${rep.governorates?.join(', ') || 'N/A'}`,
-          type: "user",
-          url: `/employee/users/shipping-representatives/details/${rep.id}`
-        })
-      })
+            employeesRes.data.forEach((employee: Employee) => {
+                results.push({
+                    id: employee.id.toString(),
+                    title: `${employee.name || 'Unnamed Employee'} (Employee)`,
+                    description: `Email: ${employee.email || 'N/A'}, Branch: ${employee.branches?.map(b => b.name).join(', ') || 'N/A'}`,
+                    type: "user",
+                    url: `/employee/users/employees/details/${employee.id}`
+                });
+            });
 
-      this._searchResults$.next(results)
+            merchantsRes.data.forEach((merchant: Merchant) => {
+                results.push({
+                    id: merchant.id.toString(),
+                    title: `${merchant.name || 'Unnamed Merchant'} (Merchant)`,
+                    description: `Store: ${merchant.storeName || 'N/A'}, Email: ${merchant.email || 'N/A'}`,
+                    type: "user",
+                    url: `/employee/users/merchants/details/${merchant.id}`
+                });
+            });
+
+            repsRes.data.forEach((rep: ShippingRepresentative) => {
+                results.push({
+                    id: rep.id.toString(),
+                    title: `${rep.name || 'Unnamed Representative'} (Shipping Representative)`,
+                    description: `Email: ${rep.email || 'N/A'}, Governorates: ${rep.governorates?.join(', ') || 'N/A'}`,
+                    type: "user",
+                    url: `/employee/users/shipping-representatives/details/${rep.id}`
+                });
+            });
+        }
+
+        this._searchResults$.next(results);
     } catch (error) {
-      console.error("Search error:", error)
+        console.error("Search error:", error);
+        this.showNotification("Search failed", "error");
     } finally {
-      this.isSearching = false
+        this.isSearching = false;
     }
-  }
+}
 
   clearSearchResults(): void {
     this._searchResults$.next([])

@@ -1,0 +1,50 @@
+.merchant-dashboard {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding: 0;
+}
+
+/* Remove styles that are now in shared components - keep only analytics section styles */
+.analytics-section {
+  max-width: 1200px;
+  margin: 0 auto 2rem auto;
+  padding: 0 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.charts-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-section {
+    padding: 0 1rem;
+  }
+
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+}

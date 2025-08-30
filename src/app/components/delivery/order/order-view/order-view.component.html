@@ -1,0 +1,95 @@
+<div class="orders-view-container">
+  <app-notification></app-notification>
+
+  <!-- Action Bar -->
+  <div class="no-action-left action-bar">
+    <div class="action-right no-action-left-right" >
+      <button type="button" class="btn btn-outline-secondary" (click)="printAllOrders()" [disabled]="loading || orders.length === 0">
+        <i class="bi bi-printer me-2"></i>
+        Print All Orders
+      </button>
+      <button class="btn btn-outline-secondary" (click)="onExport()" [disabled]="loading">
+        <i class="bi bi-download"></i>
+        Export
+      </button>
+      <button class="btn btn-outline-secondary" (click)="refreshData()" [disabled]="loading">
+        <i class="bi bi-arrow-clockwise"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-card">
+    <app-table
+      [config]="tableConfig"
+      [data]="tableData"
+      [loading]="loading"
+      [error]="error"
+      title="Orders Management"
+      subtitle="Manage orders and their status"
+      (tableEvent)="onTableEvent($event)"
+    ></app-table>
+  </div>
+
+  <!-- Change Status Modal -->
+  <div class="modal fade" [class.show]="showChangeStatusModal" [style.display]="showChangeStatusModal ? 'block' : 'none'" tabindex="-1" *ngIf="showChangeStatusModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Change Order Status</h5>
+          <button type="button" class="btn-close" (click)="closeChangeStatusModal()"
+          aria-label="Close"></button>
+        </div>
+        <form [formGroup]="changeStatusForm" (ngSubmit)="onChangeStatus()">
+          <div class="modal-body">
+            <div class="mb-3" *ngIf="selectedOrder">
+              <h6>Order Information</h6>
+              <p><strong>Order ID:</strong> #{{ selectedOrder.id }}</p>
+              <p><strong>Customer:</strong> {{ selectedOrder.customerName }}</p>
+              <p><strong>Current Status:</strong> {{ formatOrderStatus(selectedOrder.orderState) }}</p>
+            </div>
+
+            <div class="mb-3">
+              <label for="orderState" class="form-label">New Status *</label>
+              <select class="form-select" id="orderState" formControlName="orderState" required>
+                <option value="">Select Status</option>
+                <option *ngFor="let option of orderStateOptions" [value]="option.value" [disabled]="option.value === 'Pendding' || option.value === 'New'">
+                  {{ option.label }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="changeStatusForm.get('orderState')?.invalid && changeStatusForm.get('orderState')?.touched">
+                Please select a status.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="notes" class="form-label">Notes</label>
+              <textarea class="form-control" id="notes" formControlName="notes" rows="3" placeholder="Optional notes about the status change"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeChangeStatusModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="changeStatusForm.invalid || loading">
+              <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade show" *ngIf="showChangeStatusModal || showAssignDeliveryModal"></div>
+
+  <!-- Confirmation Dialog -->
+  <app-confirmation-dialog
+    [show]="showConfirmDialog"
+    [data]="dialogData"
+    [loading]="loading"
+    (confirmed)="onConfirmDelete()"
+    (cancelled)="onCancelDelete()"
+  ></app-confirmation-dialog>
+</div>

@@ -94,13 +94,10 @@ isHasRole = false;
         this.router.navigate(["/employee/dashboard"])
         break
       case Role.SALES_REPRESENTATIVE:
-        this.router.navigate(["/dashboard"])
+        this.router.navigate(["/delivery/dashboard"])
         break
       case Role.MERCHANT:
-        this.router.navigate(["/dashboard"])
-        break
-      case Role.DELEGATE:
-        this.router.navigate(["/dashboard"])
+        this.router.navigate(["/merchant/dashboard"])
         break
       default:
         this.router.navigate(["/"])

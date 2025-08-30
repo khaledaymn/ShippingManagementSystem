@@ -1,4 +1,8 @@
-<div class="app-container" [class.sidebar-open]="isMobileSidebarOpen && isMobile">
+<div
+  class="app-container"
+  *ngIf="isAuthenticated && isHasRole"
+  [class.sidebar-open]="isMobileSidebarOpen && isMobile"
+>
   <app-header
     (mobileMenuToggle)="onHeaderMobileMenuToggle()"
     (closeModals)="onCloseModals()"
@@ -6,11 +10,28 @@
   ></app-header>
 
   <app-employee-sidebar
+    *ngIf="userRole === 'Employee' || userRole === 'Admin'"
     [isCollapsed]="isSidebarCollapsed"
     [isMobileOpen]="isMobileSidebarOpen"
     (itemClick)="onSidebarItemClick($event)"
     (mobileToggle)="onMobileSidebarToggle($event)"
   ></app-employee-sidebar>
+
+  <app-delivery-sidebar
+    *ngIf="userRole === 'Delivery'"
+    [isCollapsed]="isSidebarCollapsed"
+    [isMobileOpen]="isMobileSidebarOpen"
+    (itemClick)="onSidebarItemClick($event)"
+    (mobileToggle)="onMobileSidebarToggle($event)"
+  ></app-delivery-sidebar>
+
+  <app-merchant-sidebar
+    *ngIf="userRole === 'Merchant'"
+    [isCollapsed]="isSidebarCollapsed"
+    [isMobileOpen]="isMobileSidebarOpen"
+    (itemClick)="onSidebarItemClick($event)"
+    (mobileToggle)="onMobileSidebarToggle($event)"
+  ></app-merchant-sidebar>
 
   <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
     <div class="content-area">
@@ -19,7 +40,7 @@
   </main>
 </div>
 
-<div
+<!-- <div
   class="access-denied-container"
   *ngIf="!isAuthenticated || !isHasRole"
 >
@@ -27,4 +48,8 @@
     <h2 class="access-denied-message">Access Denied</h2>
     <button class="logout-button" (click)="logout()">Logout</button>
   </div>
-</div>
+</div> -->
+
+<ng-container *ngIf="!isAuthenticated || !isHasRole">
+  <router-outlet></router-outlet>
+</ng-container>
