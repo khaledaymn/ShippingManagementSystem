@@ -182,7 +182,6 @@ export class merchantDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: DashboardSummary) => {
-
           this.dashboardSummary = data
           this.transformServiceDataToMetrics(data)
           this.computeDashboardStatistics(data)
@@ -492,7 +491,7 @@ export class merchantDashboardComponent implements OnInit, OnDestroy {
   private getCurrentUserId(): string | undefined {
     let userId = undefined
     this.authService.currentUser$.subscribe(
-      (id) => userId = id
+      (id) => userId = id?.id
     )
     return userId
   }
