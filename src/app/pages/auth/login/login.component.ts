@@ -19,8 +19,11 @@ export class LoginComponent implements OnInit {
   isLoading = false
   errorMessage = ""
   showPassword = false
-isAuthenticated = false;
-isHasRole = false;
+  isAuthenticated = false;
+  isHasRole = false;
+  Emails:string[] =["admin@gmail.com","marwa.hany@store.com",'amira.khaled@company.com']
+  Passwords: string[]= ['P@ssword123','Marwa#7890','Amira!3456']
+  Role:string[]=[Role.EMPLOYEE,Role.MERCHANT,Role.SALES_REPRESENTATIVE]
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,

@@ -1,6 +1,19 @@
 <div class="login-container">
   <app-notification></app-notification>
-  <div class="login-card">
+  <div class="login-card me-5">
+    <div class="login-header">
+      <h2 class="login-title">Accounts for test</h2>
+    </div>
+    @for (item of Emails; track $index) {
+
+      <hr/>
+        <p class="login-subtitle">
+          {{Role[$index]}} account: <br>{{item}}
+          <br>Password: {{Passwords[$index]}}
+        </p>
+      }
+  </div>
+  <div class="login-card ms-5">
     <div class="login-header">
       <h2 class="login-title">Welcome Back!</h2>
       <p class="login-subtitle">Sign in to your account</p>

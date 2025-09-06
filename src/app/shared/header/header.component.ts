@@ -348,7 +348,6 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
                 }
                 orderParams.merchantId = userId;
                 break;
-            case Role.DELEGATE:
             case Role.SALES_REPRESENTATIVE:
                 orderUrlBase = '/delivery/orders/details';
                 if (!userId) {
