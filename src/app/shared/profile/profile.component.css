@@ -45,7 +45,6 @@
   font-weight: 400;
 }
 
-/* Enhanced tab navigation to support 3 tabs with better spacing */
 .tab-navigation {
   display: flex;
   background: white;
@@ -116,7 +115,6 @@
   color: #6b7280;
 }
 
-/* Added styles for profile view tab with read-only information display */
 .profile-view {
   padding: 1.5rem;
 }
@@ -182,6 +180,16 @@
 
 .badge.bg-success {
   background-color: #10b981;
+  color: white;
+}
+
+.badge.bg-danger {
+  background-color: #dc2626;
+  color: white;
+}
+
+.badge.bg-secondary {
+  background-color: #6b7280;
   color: white;
 }
 
@@ -361,7 +369,98 @@
   opacity: 1;
 }
 
-/* Enhanced mobile responsiveness for 3-tab layout */
+.info-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.special-prices-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.special-prices-list li {
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.governorate-item {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.permissions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.permission-module {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.module-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, max-content));
+  gap: 0.75rem;
+}
+
+.permission-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.permission-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #2d5689;
+}
+
+.permission-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+  display: block;
+}
+
+.no-permissions {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
 @media (max-width: 768px) {
   .profile-container {
     padding: 1rem;
@@ -405,6 +504,10 @@
     padding: 0.75rem;
   }
 
+  .permissions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, max-content));
+  }
+
   .form-actions {
     justify-content: center;
     flex-direction: column;
@@ -424,6 +527,14 @@
 
   .tab-button i {
     font-size: 1rem;
+  }
+
+  .permission-card {
+    padding: 0.4rem 0.8rem;
+  }
+
+  .permission-text {
+    font-size: 0.8rem;
   }
 }
 

@@ -29,7 +29,6 @@
     </div>
   </div>
 
-  <!-- Updated tab navigation to include 3 separate tabs: Profile, Edit, Change Password -->
   <!-- Tab Navigation -->
   <div class="tab-navigation">
     <button
@@ -55,7 +54,6 @@
     </button>
   </div>
 
-  <!-- Added Profile View Tab - displays user information in read-only format -->
   <!-- Profile View Tab -->
   <div class="tab-content" *ngIf="activeTab === 'profile'">
     <div class="content-card">
@@ -74,10 +72,10 @@
             <div class="info-value">{{ userProfile?.name || 'Not provided' }}</div>
           </div>
 
-          <div class="info-item">
+          <!-- <div class="info-item">
             <label class="info-label">Username</label>
             <div class="info-value">{{ userProfile?.userName || 'Not provided' }}</div>
-          </div>
+          </div> -->
 
           <div class="info-item">
             <label class="info-label">Email Address</label>
@@ -94,10 +92,10 @@
             <div class="info-value">{{ userProfile?.address || 'Not provided' }}</div>
           </div>
 
-          <div class="info-item">
+          <!-- <div class="info-item">
             <label class="info-label">Hire Date</label>
             <div class="info-value">{{ userProfile?.hireDate | date }}</div>
-          </div>
+          </div> -->
 
           <div class="info-item">
             <label class="info-label">Role</label>
@@ -110,6 +108,82 @@
             <label class="info-label">Account Status</label>
             <div class="info-value">
               <span class="badge bg-success">Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Employee-specific data -->
+        <div *ngIf="userRole === 'Employee'" class="info-section">
+          <h4 class="section-title">Employee Permissions</h4>
+          <div class="permissions-container">
+            <div class="permission-module" *ngFor="let module of userProfile?.permissions | keyvalue">
+              <h5 class="module-title">{{ module.key }}</h5>
+              <div class="permissions-grid">
+                <div class="permission-card" *ngFor="let permission of module.value">
+                  <span class="permission-text">{{ permission }}</span>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!(userProfile?.permissions | keyvalue)?.length" class="no-permissions">
+              No permissions assigned
+            </div>
+          </div>
+        </div>
+
+        <!-- Merchant-specific data -->
+        <div *ngIf="userProfile?.role === 'Merchant'" class="info-section">
+          <h4 class="section-title">Merchant Details</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label class="info-label">Store Name</label>
+              <div class="info-value">{{ userProfile?.storeName || 'Not provided' }}</div>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Special Pickup</label>
+              <div class="info-value">
+                <span class="badge" [class.bg-success]="userProfile?.specialPickUp" [class.bg-danger]="!userProfile?.specialPickUp">
+                  {{ userProfile?.specialPickUp ? 'Enabled' : 'Disabled' }}
+                </span>
+              </div>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Rejected Order Percentage</label>
+              <div class="info-value">{{ userProfile?.rejectedOrederPercentage || 0 }}%</div>
+            </div>
+            <div class="info-item full-width">
+              <label class="info-label">Special Prices</label>
+              <div class="info-value" *ngIf="userProfile?.specialPrices?.length; else noSpecialPrices">
+                <ul class="special-prices-list">
+                  <li *ngFor="let price of userProfile?.specialPrices">
+                    {{ price.name }}: {{ price.specialPrice | currency }}
+                  </li>
+                </ul>
+              </div>
+              <ng-template #noSpecialPrices>
+                <div class="info-value">No special prices available</div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- ShippingRepresentative-specific data -->
+        <div *ngIf="userProfile?.role === 'Delivery'" class="info-section">
+          <h4 class="section-title">Shipping Representative Details</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label class="info-label">Company Percentage</label>
+              <div class="info-value">{{ userProfile?.companyPersentage || 'Not provided' }}</div>
+            </div>
+            <div class="info-item full-width">
+              <label class="info-label">Governorates</label>
+              <div class="info-value" *ngIf="userProfile?.governorates?.length; else noGovernorates">
+                <span *ngFor="let governorate of userProfile?.governorates; let last = last" class="governorate-item">
+                  {{ governorate }}{{ !last ? ', ' : '' }}
+                </span>
+              </div>
+              <ng-template #noGovernorates>
+                <div class="info-value">No governorates assigned</div>
+              </ng-template>
             </div>
           </div>
         </div>
@@ -127,7 +201,6 @@
     </div>
   </div>
 
-  <!-- Renamed from 'profile' to 'edit' tab for editing profile information -->
   <!-- Edit Profile Tab -->
   <div class="tab-content" *ngIf="activeTab === 'edit'">
     <div class="content-card">
@@ -158,7 +231,7 @@
           </div>
 
           <!-- Username -->
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label for="userName" class="form-label">Username <span class="text-danger">*</span></label>
             <input
               type="text"
@@ -171,7 +244,7 @@
               <div *ngIf="profileForm.get('userName')?.errors?.['required']">Username is required.</div>
               <div *ngIf="profileForm.get('userName')?.errors?.['minlength']">Username must be at least 3 characters long.</div>
             </div>
-          </div>
+          </div> -->
 
           <!-- Email -->
           <div class="form-group">
@@ -215,16 +288,6 @@
               rows="3"
               placeholder="Enter your address"></textarea>
           </div>
-
-          <!-- Hire Date -->
-          <!-- <div class="form-group">
-            <label for="hireDate" class="form-label">Hire Date</label>
-            <input
-              type="date"
-              id="hireDate"
-              class="form-control"
-              formControlName="hireDate">
-          </div> -->
         </div>
 
         <div class="form-actions">
@@ -238,6 +301,7 @@
           <button
             type="submit"
             class="btn btn-primary"
+            [class.is-invalid]="profileForm.get('phoneNumber')?.invalid && profileForm.get('phoneNumber')?.touched"
             [disabled]="profileForm.invalid || profileLoading">
             <span *ngIf="profileLoading" class="spinner-border spinner-border-sm me-2"></span>
             <i *ngIf="!profileLoading" class="bi bi-check-circle me-2"></i>
