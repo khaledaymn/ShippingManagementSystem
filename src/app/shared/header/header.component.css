@@ -337,6 +337,11 @@
   transform: translateY(0) scale(1);
 }
 
+.dropdown-user-details {
+  /* margin-left: 30px */
+  margin: auto;
+}
+
 .dropdown-header {
   padding: 16px 0;
 }
