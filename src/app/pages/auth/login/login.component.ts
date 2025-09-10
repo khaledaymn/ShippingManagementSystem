@@ -25,27 +25,27 @@ export class LoginComponent implements OnInit {
   isTestAccountsExpanded: boolean = false; // Track the test accounts card expansion
   Emails:string[] =[
     "admin@gmail.com",
+    "noura.ahmed@company.com",
+    "youssef.omar@company.com",
+    "amira.hassan@company.com",
     "marwa.hany@store.com",
     "amira.khaled@company.com",
-    "ahmed.said@company.com",
-    "fatima.mohamed@company.com",
-    "omar.hassan@company.com"
   ]
   Passwords: string[]= [
     "P@ssword123",
+    "Noura#456",
+    "Youssef$789",
+    "Amira!101",
     "Marwa#7890",
     "Amira!3456",
-    "Ahmed$4321",
-    "Fatima@9876",
-    "Omar#6543"
   ]
   Role:string[]=[
     Role.ADMIN,
+    'Supervisor',
+    'Operator',
+    'Coordinator',
     Role.MERCHANT,
     Role.SALES_REPRESENTATIVE,
-    Role.EMPLOYEE,
-    Role.EMPLOYEE,
-    Role.EMPLOYEE
   ]
   constructor(
     private fb: FormBuilder,
