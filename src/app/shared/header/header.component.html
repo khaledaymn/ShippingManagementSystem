@@ -6,11 +6,14 @@
       [attr.aria-expanded]="isMobileMenuOpen"
       aria-label="Toggle mobile menu"
     >
-      <i
+      <!-- <i
         class="bi"
         [class.bi-list]="!isMobileMenuOpen"
         [class.bi-x]="isMobileMenuOpen"
-      ></i>
+      ></i> -->
+      <i
+      class="bi"
+      [ngClass]="isMobileMenuOpen ? 'bi-x-lg' : 'bi-list'"></i>
     </button>
     <!-- Conditionally show page-title or search bar based on isMobile -->
     <!--<h1 class="page-title" *ngIf="!isMobile">ShipSmart</h1> -->

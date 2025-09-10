@@ -1,4 +1,4 @@
-import { Component, type OnInit } from "@angular/core"
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { Router, RouterOutlet } from "@angular/router"
 import { HeaderComponent } from "./shared/header/header.component"
@@ -41,79 +41,80 @@ export class AppComponent implements OnInit {
   userRole: string | null = null
 
   // Sidebar configuration
-  sidebarConfig = {
-    brandTitle: "ShipSmart",
-    brandSubtitle: "employee",
-    brandIcon: "/Logo.png",
-    userRole: "employee",
-    menuItems: [
-      {
-        id: "dashboard",
-        title: "Dashboard",
-        icon: "bi-speedometer2",
-        url: "/employee/dashboard",
-      },
-      {
-        id: "orders",
-        title: "Orders",
-        icon: "bi-cart",
-        children: [
-          {
-            id: "orders-list",
-            title: "All Orders",
-            icon: "bi-list-ul",
-            url: "/employee/orders",
-            badge: "employee",
-          },
-          {
-            id: "orders-create",
-            title: "Create Order",
-            icon: "bi-plus-circle",
-            url: "/employee/orders/create",
-            badge: "employee",
-          },
-        ],
-      },
-      {
-        id: "users",
-        title: "Users",
-        icon: "bi-person",
-        children: [
-          {
-            id: "employees",
-            title: "Employees",
-            icon: "bi-person-check",
-            url: "/employee/users/employees",
-            badge: "Admin",
-          },
-          {
-            id: "merchants",
-            title: "Merchants",
-            icon: "bi-shop",
-            url: "/employee/users/merchants",
-            badge: "Admin",
-          },
-          {
-            id: "shipping-representatives",
-            title: "Shipping Representatives",
-            icon: "bi-truck",
-            url: "/employee/users/shipping-representatives",
-            badge: "Admin",
-          },
-        ],
-      },
-      {
-        id: "settings",
-        title: "Settings",
-        icon: "bi-gear",
-        url: "/employee/settings/general-settings",
-      },
-    ],
-  }
+  // sidebarConfig = {
+  //   brandTitle: "ShipSmart",
+  //   brandSubtitle: "employee",
+  //   brandIcon: "/Logo.png",
+  //   userRole: "employee",
+  //   menuItems: [
+  //     {
+  //       id: "dashboard",
+  //       title: "Dashboard",
+  //       icon: "bi-speedometer2",
+  //       url: "/employee/dashboard",
+  //     },
+  //     {
+  //       id: "orders",
+  //       title: "Orders",
+  //       icon: "bi-cart",
+  //       children: [
+  //         {
+  //           id: "orders-list",
+  //           title: "All Orders",
+  //           icon: "bi-list-ul",
+  //           url: "/employee/orders",
+  //           badge: "employee",
+  //         },
+  //         {
+  //           id: "orders-create",
+  //           title: "Create Order",
+  //           icon: "bi-plus-circle",
+  //           url: "/employee/orders/create",
+  //           badge: "employee",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       id: "users",
+  //       title: "Users",
+  //       icon: "bi-person",
+  //       children: [
+  //         {
+  //           id: "employees",
+  //           title: "Employees",
+  //           icon: "bi-person-check",
+  //           url: "/employee/users/employees",
+  //           badge: "Admin",
+  //         },
+  //         {
+  //           id: "merchants",
+  //           title: "Merchants",
+  //           icon: "bi-shop",
+  //           url: "/employee/users/merchants",
+  //           badge: "Admin",
+  //         },
+  //         {
+  //           id: "shipping-representatives",
+  //           title: "Shipping Representatives",
+  //           icon: "bi-truck",
+  //           url: "/employee/users/shipping-representatives",
+  //           badge: "Admin",
+  //         },
+  //       ],
+  //     },
+  //     {
+  //       id: "settings",
+  //       title: "Settings",
+  //       icon: "bi-gear",
+  //       url: "/employee/settings/general-settings",
+  //     },
+  //   ],
+  // }
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -137,7 +138,7 @@ export class AppComponent implements OnInit {
     const storedRole = localStorage.getItem("userRole") as UserRole
     if (storedRole && ["employee", "delivery", "merchant"].includes(storedRole)) {
       this.currentUserRole = storedRole
-      this.sidebarConfig.userRole = storedRole
+      //this.sidebarConfig.userRole = storedRole
     }
   }
 
@@ -145,25 +146,29 @@ export class AppComponent implements OnInit {
     if (item.url) {
       this.isMobileSidebarOpen = false
       this.router.navigate([item.url])
+      this.cdr.detectChanges()
     }
   }
 
   onMobileSidebarToggle(isOpen: boolean): void {
     this.isMobileSidebarOpen = isOpen
+    this.cdr.detectChanges()
   }
 
   onHeaderMobileMenuToggle(): void {
     this.isMobileSidebarOpen = !this.isMobileSidebarOpen
+    this.cdr.detectChanges()
   }
 
   onCloseModals(): void {
     this.isMobileSidebarOpen = false
+    this.cdr.detectChanges()
   }
 
   switchUserRole(role: UserRole): void {
     this.currentUserRole = role
     localStorage.setItem("userRole", role)
-    this.sidebarConfig.userRole = role
+   // this.sidebarConfig.userRole = role
   }
 
   logout(): void {

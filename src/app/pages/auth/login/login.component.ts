@@ -21,9 +21,31 @@ export class LoginComponent implements OnInit {
   showPassword = false
   isAuthenticated = false;
   isHasRole = false;
-  Emails:string[] =["admin@gmail.com","marwa.hany@store.com",'amira.khaled@company.com']
-  Passwords: string[]= ['P@ssword123','Marwa#7890','Amira!3456']
-  Role:string[]=[Role.EMPLOYEE,Role.MERCHANT,Role.SALES_REPRESENTATIVE]
+  expandedIndex: number | null = null; // Track the expanded accordion item
+  Emails:string[] =[
+    "admin@gmail.com",
+    "marwa.hany@store.com",
+    "amira.khaled@company.com",
+    "ahmed.said@company.com",
+    "fatima.mohamed@company.com",
+    "omar.hassan@company.com"
+  ]
+  Passwords: string[]= [
+    "P@ssword123",
+    "Marwa#7890",
+    "Amira!3456",
+    "Ahmed$4321",
+    "Fatima@9876",
+    "Omar#6543"
+  ]
+  Role:string[]=[
+    Role.ADMIN,
+    Role.MERCHANT,
+    Role.SALES_REPRESENTATIVE,
+    Role.EMPLOYEE,
+    Role.EMPLOYEE,
+    Role.EMPLOYEE
+  ]
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -46,6 +68,10 @@ export class LoginComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword
+  }
+
+  toggleAccordion(index: number): void {
+    this.expandedIndex = this.expandedIndex === index ? null : index; // Toggle the accordion item
   }
 
   onSubmit(): void {

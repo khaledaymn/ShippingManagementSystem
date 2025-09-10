@@ -1,21 +1,17 @@
-/* Employee-specific sidebar customizations */
 :host {
   display: block;
 }
 
-/* Employee role specific styling */
 ::ng-deep .role-badge.employee {
   background-color: rgba(16, 185, 129, 0.15);
   color: #059669;
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-/* Employee brand header customization */
 ::ng-deep .sidebar-header {
   background: linear-gradient(135deg, #059669, #10b981);
 }
 
-/* Employee active menu item styling */
 ::ng-deep .menu-link.active,
 ::ng-deep .submenu-link.active {
   color: #059669;

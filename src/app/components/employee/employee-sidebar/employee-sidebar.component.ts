@@ -19,19 +19,18 @@ export class EmployeeSidebarComponent {
   sidebarConfig: SidebarConfig;
 
   private permissionModuleMapping: { [key: string]: string } = {
-    'dashboard': 'Dashboard',
-    'settings': 'Settings',
-    'weight-settings': 'Settings',
-    'shipping-types-settings': 'ChargeTypes',
-    'permissions': 'Permissions',
-    'branches': 'Branches',
-    'employees': 'Employees',
-    'merchants': 'Merchants',
+    'dashboard':'Dashboard',
+    'settings':'Settings',
+    'weight-settings':'Settings',
+    'shipping-types-settings':'ChargeTypes',
+    'permissions':'Permissions',
+    'branches':'Branchs',
+    'governorates':'Governorates',
+    'cities':'Cities',
+    'employees':'Employees',
+    'merchants':'Merchants',
     'sales-representatives': 'Delivary',
-    'governorates': 'Governorates',
-    'cities': 'Cities',
     'orders': 'Orders',
-    'order-reports': 'Orders', // غير مدرج في modules
   };
 
   constructor(private authService: AuthService) {
@@ -83,7 +82,7 @@ export class EmployeeSidebarComponent {
           ],
         },
         {
-          id: "places",
+          id: "governorates",
           title: "Places",
           icon: "bi-geo-alt",
           children: [
@@ -102,7 +101,7 @@ export class EmployeeSidebarComponent {
           ],
         },
         {
-          id: "users",
+          id: "employees",
           title: "Users",
           icon: "bi-people",
           children: [
@@ -143,17 +142,23 @@ export class EmployeeSidebarComponent {
     return menuItems
       .map(item => {
         if (item.id === 'dashboard') {
-        return item;
-      }
-      if (this.authService.getUserRole() === 'Admin') {
-        return item;
-      }
+          return item;
+        }
+
+        if (this.authService.getUserRole() === 'Admin') {
+          return item;
+        }
 
         const moduleName = this.permissionModuleMapping[item.id] || item.id;
 
         if (item.children) {
           const filteredChildren = this.filterMenuItems(item.children);
-          if (filteredChildren.length === 0 && !this.authService.hasPermission(moduleName, 'View')) {
+          console.log('ffffffffffff',filteredChildren);
+
+          if (!this.authService.hasPermission(moduleName, 'View')) {
+            return null;
+          }
+          if (filteredChildren.length === 0) {
             return null;
           }
           return { ...item, children: filteredChildren };

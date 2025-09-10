@@ -28,11 +28,11 @@ export class GovernoratesViewComponent implements OnInit, OnDestroy {
     pagination: true,
     pageSizeOptions: [5, 10, 25, 50],
     columns: [
-      { key: "name", label: "Governorate Name", sortable: true, type: "text", align: "left" },
+      { key: "name", label: "Governorate Name", sortable: true, type: "text", align: "center" },
       { key: "isDeleted", label: "Status", sortable: false, type: "action", align: "center" }
     ],
     actions: [
-      { action: "edit", label: "Edit", icon: "bi-pencil", color: "primary" },
+      { action: "edit", label: "Edit", icon: "bi-pencil", color: "primary", visible: () => this.canEdit},
       // { action: "update", label: "Toggle Status", icon: "bi-arrow-repeat", color: "warning" }
     ],
     filters: [
@@ -116,25 +116,14 @@ export class GovernoratesViewComponent implements OnInit, OnDestroy {
     this.canEdit = this.authService.hasPermission("Governorates", "Edit") || userRole === "Admin";
     this.canDelete = this.authService.hasPermission("Governorates", "Delete") || userRole === "Admin";
 
-    if (!this.canCreate && !this.canEdit && !this.canDelete) {
-      this.router.navigate(["/unauthorized"]);
-      return;
-    }
-
     if (!this.canDelete) {
       if (this.tableConfig.actions) {
-        this.tableConfig.actions = this.tableConfig.actions.filter((action) => action.action !== "delete");
+        this.tableConfig.actions = this.tableConfig.actions.filter((action) => action.action !== "update");
       }
-    }
+      this.tableConfig.columns = this.tableConfig.columns.filter(
+        (col) => col.key !== 'isDeleted'
+      );
 
-    if (!this.canEdit) {
-      if (this.tableConfig.actions) {
-      this.tableConfig.actions = this.tableConfig.actions.filter((action) => action.action !== "edit");
-      }
-    }
-
-    if (!this.canEdit && !this.canDelete) {
-      this.tableConfig.actions = [];
     }
   }
 

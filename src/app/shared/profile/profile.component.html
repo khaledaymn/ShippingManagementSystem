@@ -117,7 +117,7 @@
           <h4 class="section-title">Employee Permissions</h4>
           <div class="permissions-container">
             <div class="permission-module" *ngFor="let module of userProfile?.permissions | keyvalue">
-              <h5 class="module-title">{{ module.key }}</h5>
+              <h5 class="module-title">{{ ModuleName(module.key) || module.key }}</h5>
               <div class="permissions-grid">
                 <div class="permission-card" *ngFor="let permission of module.value">
                   <span class="permission-text">{{ permission }}</span>

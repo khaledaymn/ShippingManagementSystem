@@ -1,6 +1,4 @@
 import { Routes } from '@angular/router';
-import { EmployeeSidebarComponent } from './components/employee/employee-sidebar/employee-sidebar.component';
-// import { DashboardComponent } from './shared/dashboard/dashboard.component';
 import { EmployeeDashboardComponent } from './components/employee/employee-dashboard/employee-dashboard.component';
 import { StandardsViewComponent } from './components/employee/settings/standards-view/standards-view.component';
 import { StandardsEditComponent } from './components/employee/settings/standards-edit/standards-edit.component';
@@ -13,7 +11,6 @@ import { PermissionsEditComponent } from './components/employee/permissions/perm
 import { LoginComponent } from './pages/auth/login/login.component';
 import { ForgotPasswordComponent } from './pages/auth/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
-import { permissionGuard } from './core/guards/permission.guard';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { Role } from './core/models/user';
@@ -121,17 +118,17 @@ export const routes: Routes = [
           {
             path: 'branches',
             component: BranchesViewComponent,
-            canActivate: [permissionOrRoleGuard('Branches', 'View', [Role.ADMIN])],
+            canActivate: [permissionOrRoleGuard('Branchs', 'View', [Role.ADMIN])],
           },
           {
             path: 'branches/create',
             component: BranchesEditComponent,
-            canActivate: [permissionOrRoleGuard('Branches', 'Create', [Role.ADMIN])],
+            canActivate: [permissionOrRoleGuard('Branchs', 'Create', [Role.ADMIN])],
           },
           {
             path: 'branches/edit/:id',
             component: BranchesEditComponent,
-            canActivate: [permissionOrRoleGuard('Branches', 'Edit', [Role.ADMIN])],
+            canActivate: [permissionOrRoleGuard('Branchs', 'Edit', [Role.ADMIN])],
           },
         ],
       },

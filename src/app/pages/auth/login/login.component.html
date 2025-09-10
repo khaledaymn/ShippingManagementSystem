@@ -1,79 +1,115 @@
 <div class="login-container">
-  <app-notification></app-notification>
-  <div class="login-card me-5">
-    <div class="login-header">
-      <h2 class="login-title">Accounts for test</h2>
+  <div class="login-wrapper">
+    <!-- Login Card -->
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">Welcome Back!</h1>
+        <p class="login-subtitle">Sign in to your account</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Enter your email"
+              [ngClass]="{ 'is-invalid': loginForm.get('email')?.touched && loginForm.get('email')?.invalid }"
+            />
+            <i class="icon fas fa-envelope"></i>
+          </div>
+          @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+            <div class="error-message">
+              @if (loginForm.get('email')?.errors?.['required']) {
+                <span>Email is required.</span>
+              }
+              @if (loginForm.get('email')?.errors?.['email']) {
+                <span>Please enter a valid email.</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              placeholder="Enter your password"
+              [ngClass]="{ 'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid }"
+            />
+            <i class="icon fas fa-lock toggle-password" (click)="togglePasswordVisibility()"></i>
+          </div>
+          @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+            <div class="error-message">
+              @if (loginForm.get('password')?.errors?.['required']) {
+                <span>Password is required.</span>
+              }
+              @if (loginForm.get('password')?.errors?.['minlength']) {
+                <span>Password must be at least 6 characters.</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-options">
+          <div class="remember-me">
+            <input type="checkbox" id="rememberMe" formControlName="rememberMe" />
+            <label for="rememberMe">Remember me</label>
+          </div>
+          <a href="#" class="forgot-password-link">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="login-button" [disabled]="isLoading">
+          @if (isLoading) {
+            <span class="spinner"></span>
+          }
+          Login
+        </button>
+
+        @if (errorMessage) {
+          <div class="alert">{{ errorMessage }}</div>
+        }
+      </form>
     </div>
-    @for (item of Emails; track $index) {
 
-      <hr/>
-        <p class="login-subtitle">
-          {{Role[$index]}} account: <br>{{item}}
-          <br>Password: {{Passwords[$index]}}
-        </p>
-      }
-  </div>
-  <div class="login-card ms-5">
-    <div class="login-header">
-      <h2 class="login-title">Welcome Back!</h2>
-      <p class="login-subtitle">Sign in to your account</p>
+    <!-- Test Accounts Card -->
+    <div class="test-accounts-card">
+      <div class="test-accounts">
+        <div class="test-accounts-header">
+          <h3 class="test-accounts-title">Accounts for Test</h3>
+        </div>
+        <p class="test-accounts-info">Click on a role to view account details</p>
+        <div class="test-accounts-list">
+          @for (item of Emails; track $index) {
+            <div class="test-account-item">
+              <div class="test-account-header" (click)="toggleAccordion($index)">
+                <div class="test-account-header-content">
+                  <i class="fas fa-user-circle header-icon"></i>
+                  <span class="test-account-role">{{ Role[$index] }}</span>
+                </div>
+                <i class="fas" [ngClass]="expandedIndex === $index ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              </div>
+              @if (expandedIndex === $index) {
+                <div class="test-account-details">
+                  <div class="test-account-email">
+                    <i class="fas fa-envelope detail-icon"></i>
+                    <span class="email-label">Email:</span> {{ item }}
+                  </div>
+                  <div class="test-account-password">
+                    <i class="fas fa-lock detail-icon"></i>
+                    <span class="password-label">Password:</span> {{ Passwords[$index] }}
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
     </div>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <div class="input-wrapper">
-          <input
-            id="email"
-            type="email"
-            formControlName="email"
-            placeholder="Enter your email"
-            [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-          />
-          <i class="bi bi-envelope icon"></i>
-        </div>
-        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
-          <div *ngIf="loginForm.get('email')?.errors?.['required']">Email is required.</div>
-          <div *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email.</div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <div class="input-wrapper">
-          <input
-            id="password"
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="Enter your password"
-            [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-          />
-          <i
-            class="icon toggle-password"
-            [class.bi-eye-slash]="showPassword"
-            [class.bi-eye]="!showPassword"
-            (click)="togglePasswordVisibility()"
-          ></i>
-        </div>
-        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
-          <div *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</div>
-          <div *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters.</div>
-        </div>
-      </div>
-
-      <div class="form-options">
-        <div class="remember-me">
-          <input type="checkbox" id="rememberMe" formControlName="rememberMe" />
-          <label for="rememberMe">Remember me</label>
-        </div>
-        <a routerLink="/auth/forgot-password" class="forgot-password-link">Forgot Password?</a>
-      </div>
-
-      <button type="submit" class="login-button" [disabled]="isLoading">
-        <span *ngIf="isLoading" class="spinner"></span>
-        <span *ngIf="!isLoading">Login</span>
-      </button>
-
-      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-    </form>
   </div>
 </div>

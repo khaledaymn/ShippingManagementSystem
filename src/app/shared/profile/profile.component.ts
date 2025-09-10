@@ -233,4 +233,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.error = null;
     }, 3000);
   }
+
+  ModuleName(name: string){
+    switch(name){
+      case 'Branchs':
+        return 'Branches'
+      case 'ChargeTypes':
+        return 'Shipping Types'
+      case 'RejectedReasons':
+        return 'Rejected Reasons'
+      default :
+        return null
+    }
+  }
 }

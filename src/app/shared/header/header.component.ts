@@ -9,7 +9,8 @@ import {
   inject,
   Output,
   EventEmitter,
-  Input
+  Input,
+  ChangeDetectorRef
 } from "@angular/core"
 import { CommonModule } from "@angular/common"
 import { FormsModule } from "@angular/forms"
@@ -65,6 +66,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly merchantService = inject(MerchantService)
   private readonly orderService = inject(OrderService)
   private readonly shippingRepresentativeService = inject(ShippingRepresentativeService)
+  private readonly cdr = inject(ChangeDetectorRef)
 
   // Component state
   searchQuery = ""
@@ -198,6 +200,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private checkMobileView(): void {
     this.isMobile = window.innerWidth <= 768
+    this.cdr.detectChanges()
   }
 
   private handleGlobalKeyboardShortcuts(event: KeyboardEvent): void {
@@ -481,6 +484,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   toggleMobileMenu(): void {
     console.log('Header: Emitting mobileMenuToggle') // Debug log
     this.mobileMenuToggle.emit()
+    this.cdr.detectChanges()
   }
 
   confirmLogout(): void {
@@ -520,6 +524,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     console.log('Header: Emitting closeModals') // Debug log
     this.closeModals.emit()
+    this.cdr.detectChanges()
   }
 
   private showHelp(): void {
