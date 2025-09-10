@@ -10,7 +10,7 @@ import { NotificationComponent } from "../../../shared/notification/notification
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, NotificationComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.css"],
 })
@@ -22,6 +22,7 @@ export class LoginComponent implements OnInit {
   isAuthenticated = false;
   isHasRole = false;
   expandedIndex: number | null = null; // Track the expanded accordion item
+  isTestAccountsExpanded: boolean = false; // Track the test accounts card expansion
   Emails:string[] =[
     "admin@gmail.com",
     "marwa.hany@store.com",
@@ -72,6 +73,10 @@ export class LoginComponent implements OnInit {
 
   toggleAccordion(index: number): void {
     this.expandedIndex = this.expandedIndex === index ? null : index; // Toggle the accordion item
+  }
+
+  toggleTestAccountsCard(): void {
+    this.isTestAccountsExpanded = !this.isTestAccountsExpanded; // Toggle the test accounts card
   }
 
   onSubmit(): void {
