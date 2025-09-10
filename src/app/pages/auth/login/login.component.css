@@ -30,9 +30,9 @@ body {
 .login-wrapper {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 15px; /* Reduced gap between cards */
   width: 100%;
-  max-width: 900px;
+  max-width: 800px; /* Reduced max-width for the wrapper */
   justify-content: center;
   align-items: flex-start; /* Each card has its own height */
 }
@@ -41,11 +41,11 @@ body {
   background: rgba(255, 255, 255, 0.95);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  padding: 40px;
+  border-radius: 15px; /* Slightly smaller border-radius */
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15); /* Reduced shadow */
+  padding: 30px; /* Reduced padding */
   width: 100%;
-  max-width: 450px;
+  max-width: 400px; /* Reduced max-width */
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -54,39 +54,39 @@ body {
 
 .test-accounts-card {
   background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  padding: 0; /* Remove default padding to handle header and details separately */
+  border-radius: 15px; /* Slightly smaller border-radius */
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15); /* Reduced shadow */
+  padding: 0; /* Keep padding 0 for header/details control */
   width: 100%;
-  max-width: 450px;
+  max-width: 400px; /* Reduced max-width */
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   flex: 1; /* Allow it to grow but respect max-width */
 }
 
 .test-accounts-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  transform: translateY(-8px); /* Reduced hover lift */
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.25); /* Reduced shadow */
 }
 
 .login-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  transform: translateY(-8px); /* Reduced hover lift */
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.25); /* Reduced shadow */
 }
 
 .login-header {
-  margin-bottom: 30px;
+  margin-bottom: 25px; /* Reduced margin */
 }
 
 .login-title {
-  font-size: 2.5em;
+  font-size: 2em; /* Reduced font size */
   color: #1e293b;
   font-weight: 700;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Slightly smaller shadow */
 }
 
 .login-subtitle {
-  font-size: 1.2em;
+  font-size: 1em; /* Reduced font size */
   color: #4b5563;
   font-weight: 300;
 }
@@ -94,7 +94,7 @@ body {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px; /* Reduced gap */
 }
 
 .form-group {
@@ -104,12 +104,12 @@ body {
 
 .form-group label {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 8px; /* Reduced margin */
   font-weight: 500;
   color: #1e293b;
-  font-size: 0.95em;
+  font-size: 0.85em; /* Reduced font size */
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px; /* Slightly smaller letter spacing */
   white-space: nowrap; /* Keep label on one line */
 }
 
@@ -119,12 +119,12 @@ body {
 
 .input-wrapper input {
   width: 100%;
-  padding: 14px 15px;
-  padding-right: 50px;
+  padding: 12px 15px; /* Reduced padding */
+  padding-right: 40px; /* Adjusted for smaller icon */
   border: none;
-  border-radius: 10px;
+  border-radius: 8px; /* Smaller border-radius */
   background: rgba(255, 255, 255, 0.8);
-  font-size: 1em;
+  font-size: 0.9em; /* Reduced font size */
   color: #1e293b;
   transition: all 0.3s ease;
   box-sizing: border-box;
@@ -138,17 +138,17 @@ body {
 
 .input-wrapper input:focus {
   background: #fff;
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5); /* Reduced shadow */
   outline: none;
 }
 
 .input-wrapper .icon {
   position: absolute;
-  right: 15px;
+  right: 12px; /* Adjusted for smaller input */
   top: 50%;
   transform: translateY(-50%);
   color: #6b7280;
-  font-size: 1.2em;
+  font-size: 1em; /* Reduced icon size */
   transition: color 0.3s ease;
 }
 
@@ -166,11 +166,11 @@ body {
 
 .error-message {
   color: #ef4444;
-  font-size: 0.85em;
-  margin-top: 8px;
+  font-size: 0.75em; /* Reduced font size */
+  margin-top: 6px; /* Reduced margin */
   background: rgba(239, 68, 68, 0.1);
-  padding: 5px 10px;
-  border-radius: 5px;
+  padding: 4px 8px; /* Reduced padding */
+  border-radius: 4px; /* Smaller border-radius */
   overflow-wrap: break-word;
   word-break: break-word;
 }
@@ -179,22 +179,22 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.9em;
+  font-size: 0.8em; /* Reduced font size */
   color: #1e293b;
 }
 
 .remember-me {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px; /* Reduced gap */
 }
 
 .remember-me input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  width: 16px; /* Reduced checkbox size */
+  height: 16px;
   accent-color: #3b82f6;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 3px; /* Smaller border-radius */
 }
 
 .forgot-password-link {
@@ -212,17 +212,17 @@ body {
 .login-button {
   background: linear-gradient(90deg, #3b82f6, #1e40af);
   color: #fff;
-  padding: 15px 20px;
+  padding: 12px 18px; /* Reduced padding */
   border: none;
-  border-radius: 10px;
-  font-size: 1.2em;
+  border-radius: 8px; /* Smaller border-radius */
+  font-size: 1em; /* Reduced font size */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 8px; /* Reduced gap */
   position: relative;
   overflow: hidden;
 }
@@ -248,8 +248,8 @@ body {
 }
 
 .login-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px); /* Reduced hover lift */
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); /* Reduced shadow */
 }
 
 .login-button:disabled {
@@ -259,11 +259,11 @@ body {
 }
 
 .spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid #fff;
+  border: 3px solid rgba(255, 255, 255, 0.3); /* Reduced border size */
+  border-top: 3px solid #fff;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 20px; /* Reduced spinner size */
+  height: 20px;
   animation: spin 1s linear infinite;
 }
 
@@ -277,10 +277,10 @@ body {
 }
 
 .alert {
-  padding: 12px 15px;
-  border-radius: 8px;
-  margin-top: 20px;
-  font-size: 0.95em;
+  padding: 10px 12px; /* Reduced padding */
+  border-radius: 6px; /* Smaller border-radius */
+  margin-top: 15px; /* Reduced margin */
+  font-size: 0.85em; /* Reduced font size */
   text-align: left;
   background: rgba(239, 68, 68, 0.2);
   color: #ef4444;
@@ -292,12 +292,12 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 15px; /* Reduced padding */
   cursor: pointer;
   background: #3b82f6;
   color: #fff;
-  border-radius: 16px 16px 0 0;
-  font-size: 1.3em;
+  border-radius: 12px 12px 0 0; /* Smaller border-radius */
+  font-size: 1.1em; /* Reduced font size */
   font-weight: 600;
   transition: background 0.3s ease, transform 0.3s ease;
 }
@@ -308,22 +308,22 @@ body {
 }
 
 .test-accounts-details {
-  padding: 40px;
+  padding: 30px; /* Reduced padding */
   background: #ffffff;
-  border-radius: 0 0 16px 16px;
-  animation: slideDown 0.6s ease-in-out;
+  border-radius: 0 0 12px 12px; /* Smaller border-radius */
+  animation: slideDown 0.5s ease-in-out; /* Slightly faster animation */
 }
 
 .test-accounts-title {
-  font-size: 1.5em;
+  font-size: 1.2em; /* Reduced font size */
   color: #1e293b;
   font-weight: 600;
 }
 
 .test-accounts-info {
-  font-size: 1.1em;
+  font-size: 0.9em; /* Reduced font size */
   color: #4b5563;
-  margin-bottom: 20px;
+  margin-bottom: 15px; /* Reduced margin */
   font-weight: 300;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -332,31 +332,31 @@ body {
 .test-accounts-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px; /* Reduced gap */
 }
 
 .test-account-item {
-  border-radius: 16px;
+  border-radius: 12px; /* Smaller border-radius */
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); /* Reduced shadow */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .test-account-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  transform: translateY(-3px); /* Reduced hover lift */
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3); /* Reduced shadow */
 }
 
 .test-account-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 15px; /* Reduced padding */
   cursor: pointer;
   background: #3b82f6;
   color: #fff;
-  border-radius: 16px 16px 0 0;
-  font-size: 1.3em;
+  border-radius: 12px 12px 0 0; /* Smaller border-radius */
+  font-size: 1em; /* Reduced font size */
   font-weight: 600;
   transition: background 0.3s ease, transform 0.3s ease;
 }
@@ -369,11 +369,11 @@ body {
 .test-account-header-content {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px; /* Reduced gap */
 }
 
 .header-icon {
-  font-size: 1.4em;
+  font-size: 1.1em; /* Reduced icon size */
   color: #ffffff;
 }
 
@@ -384,20 +384,20 @@ body {
 }
 
 .test-account-details {
-  padding: 20px;
+  padding: 15px; /* Reduced padding */
   background: #ffffff;
-  border-radius: 0 0 16px 16px;
-  animation: slideDown 0.6s ease-in-out;
+  border-radius: 0 0 12px 12px; /* Smaller border-radius */
+  animation: slideDown 0.5s ease-in-out; /* Slightly faster animation */
 }
 
 .test-account-email,
 .test-account-password {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.2em;
+  gap: 8px; /* Reduced gap */
+  font-size: 0.9em; /* Reduced font size */
   color: #1e293b;
-  margin-bottom: 12px;
+  margin-bottom: 10px; /* Reduced margin */
   overflow-wrap: break-word;
   word-break: break-word;
 }
@@ -407,7 +407,7 @@ body {
   font-weight: 500;
   color: #4b5563;
   white-space: nowrap; /* Keep "Email:" and "Password:" on one line */
-  margin-right: 5px; /* Small spacing between label and value */
+  margin-right: 4px; /* Reduced spacing */
 }
 
 .test-account-email span,
@@ -417,7 +417,7 @@ body {
 }
 
 .detail-icon {
-  font-size: 1.2em;
+  font-size: 0.9em; /* Reduced icon size */
   color: #3b82f6;
   flex-shrink: 0;
 }
@@ -425,7 +425,7 @@ body {
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-15px);
+    transform: translateY(-10px); /* Reduced translate distance */
   }
   to {
     opacity: 1;
@@ -436,17 +436,17 @@ body {
 @media (max-width: 600px) {
   .login-wrapper {
     flex-direction: column;
-    gap: 15px;
+    gap: 10px; /* Reduced gap */
   }
 
   .login-card,
   .test-accounts-card {
-    margin: 15px;
+    margin: 10px; /* Reduced margin */
     max-width: 100%;
   }
 
   .login-card {
-    padding: 30px 20px;
+    padding: 25px 15px; /* Further reduced padding */
   }
 
   .test-accounts-card {
@@ -454,50 +454,50 @@ body {
   }
 
   .test-accounts-details {
-    padding: 30px 20px;
+    padding: 25px 15px; /* Further reduced padding */
   }
 
   .login-title {
-    font-size: 2em;
+    font-size: 1.8em; /* Further reduced font size */
   }
 
   .login-subtitle {
-    font-size: 1.1em;
+    font-size: 0.9em; /* Further reduced font size */
   }
 
   .login-button {
-    font-size: 1.1em;
-    padding: 12px 15px;
+    font-size: 0.9em; /* Further reduced font size */
+    padding: 10px 12px; /* Further reduced padding */
   }
 
   .test-accounts-title {
-    font-size: 1.4em;
+    font-size: 1.1em; /* Further reduced font size */
   }
 
   .test-accounts-info {
-    font-size: 1em;
+    font-size: 0.85em; /* Further reduced font size */
   }
 
   .test-account-header {
-    font-size: 1.1em;
-    padding: 14px;
+    font-size: 0.9em; /* Further reduced font size */
+    padding: 12px; /* Further reduced padding */
   }
 
   .header-icon {
-    font-size: 1.2em;
+    font-size: 1em; /* Further reduced icon size */
   }
 
   .test-account-email,
   .test-account-password {
-    font-size: 1em;
+    font-size: 0.85em; /* Further reduced font size */
   }
 
   .detail-icon {
-    font-size: 1em;
+    font-size: 0.85em; /* Further reduced icon size */
   }
 
   .email-label,
   .password-label {
-    font-size: 1em; /* Adjust label size for mobile */
+    font-size: 0.9em; /* Further reduced font size */
   }
 }
