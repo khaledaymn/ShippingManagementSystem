@@ -11,9 +11,7 @@
         [class.bi-list]="!isMobileMenuOpen"
         [class.bi-x]="isMobileMenuOpen"
       ></i> -->
-      <i
-      class="bi"
-      [ngClass]="isMobileMenuOpen ? 'bi-x-lg' : 'bi-list'"></i>
+      <i class="bi" [ngClass]="isMobileMenuOpen ? 'bi-x-lg' : 'bi-list'"></i>
     </button>
     <!-- Conditionally show page-title or search bar based on isMobile -->
     <!--<h1 class="page-title" *ngIf="!isMobile">ShipSmart</h1> -->
@@ -176,6 +174,7 @@
             class="dropdown-item"
             (click)="settings(); closeDropdown()"
             role="menuitem"
+            [hidden]="!showSettings()"
           >
             <i class="bi bi-gear"></i> Settings
           </button>

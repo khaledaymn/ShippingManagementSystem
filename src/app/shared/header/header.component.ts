@@ -218,6 +218,14 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  showSettings(): Boolean{
+    const isAdmin = this.authService.hasRole(Role.ADMIN)
+    const hasPermission = this.authService.hasPermission('Settings','View')
+    console.log(isAdmin, hasPermission);
+
+    return isAdmin || hasPermission
+  }
+
   search(): void {
     if (this.searchQuery.trim()) {
       this.performSearch(this.searchQuery)

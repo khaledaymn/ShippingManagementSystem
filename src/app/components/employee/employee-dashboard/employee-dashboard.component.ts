@@ -415,13 +415,13 @@ export class EmployeeDashboardComponent implements OnInit, OnDestroy {
         color: "#10b981",
         description: "Create a new order",
       },
-      {
-        title: "Reports",
-        icon: "bi-graph-up",
-        route: "/employee/reports",
-        color: "#8b5cf6",
-        description: "View performance reports",
-      },
+      // {
+      //   title: "Reports",
+      //   icon: "bi-graph-up",
+      //   route: "/employee/reports",
+      //   color: "#8b5cf6",
+      //   description: "View performance reports",
+      // },
       {
         title: "Settings",
         icon: "bi-gear",
