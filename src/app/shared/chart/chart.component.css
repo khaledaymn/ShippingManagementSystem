@@ -6,6 +6,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
   transition: all 0.3s ease;
+  width: 100%; /* Ensure card takes full container width */
+  box-sizing: border-box;
 }
 
 .chart-card-creative:hover {
@@ -31,6 +33,7 @@
 .enhanced-chart {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border: 2px solid #e2e8f0;
+  width: 100%; /* Make chart container fluid */
 }
 
 .chart-stats {
@@ -59,8 +62,10 @@
 /* Enhanced Line Chart */
 .line-chart-enhanced {
   position: relative;
-  width: 280px;
-  height: 600px;
+  width: 100%; /* Use full width of container */
+  max-width: 280px; /* Maintain max width for larger screens */
+  height: 60vw; /* Scale height relative to viewport width */
+  max-height: 600px; /* Cap height for larger screens */
   margin: 0 auto;
 }
 
@@ -112,42 +117,42 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  padding: 30px 0;
+  padding: 5%; /* Use percentage for responsive padding */
 }
 
 .chart-label-enhanced {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  font-size: 0.75rem;
+  font-size: clamp(0.65rem, 2vw, 0.75rem); /* Responsive font size */
   color: #64748b;
   font-weight: 500;
 }
 
 .month-number {
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
   font-weight: 600;
   color: #1e293b;
 }
 
 .month-name {
-  font-size: 0.625rem;
+  font-size: clamp(0.5rem, 1.5vw, 0.625rem);
   color: #94a3b8;
   margin-top: 0.125rem;
 }
 
 .chart-values-enhanced {
   position: absolute;
-  bottom: -25px;
+  bottom: -5%; /* Relative positioning */
   left: 0;
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 0 30px;
+  padding: 0 5%; /* Responsive padding */
 }
 
 .chart-value-enhanced {
-  font-size: 0.75rem;
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
   color: #64748b;
   font-weight: 500;
   text-align: center;
@@ -160,7 +165,7 @@
   color: white;
   padding: 0.75rem;
   border-radius: 8px;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   pointer-events: none;
   z-index: 10;
@@ -187,15 +192,16 @@
 }
 
 .tooltip-month {
-  font-size: 0.75rem;
+  font-size: clamp(0.65rem, 1.8vw, 0.75rem);
   opacity: 0.8;
 }
 
 .tooltip-value {
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
   font-weight: 600;
 }
 
+/* Tooltip arrow */
 .performance-tooltip::after {
   content: "";
   position: absolute;
@@ -209,8 +215,10 @@
 /* Enhanced Radial Chart with Multi-Ring Design */
 .radial-chart-creative {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 100%;
+  max-width: 300px;
+  height: 30vw; /* Scale height relative to viewport */
+  max-height: 300px;
   margin: 0 auto 1.5rem auto;
 }
 
@@ -227,7 +235,7 @@
 
 .radial-segment:hover {
   filter: url(#glow) brightness(1.2);
-  transform-origin: 150px 150px;
+  transform-origin: center;
   animation: radialSegmentGlow 1s ease-in-out infinite alternate;
 }
 
@@ -258,8 +266,10 @@
   text-align: center;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 50%;
-  width: 80px;
-  height: 80px;
+  width: 20vw; /* Responsive width */
+  max-width: 80px;
+  height: 20vw;
+  max-height: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -269,14 +279,14 @@
 }
 
 .center-value-creative {
-  font-size: 1.75rem;
+  font-size: clamp(1.5rem, 4vw, 1.75rem);
   font-weight: 700;
   color: #1e293b;
   line-height: 1;
 }
 
 .center-label-creative {
-  font-size: 0.75rem;
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
   color: #374151;
   font-weight: 500;
   margin-top: 0.25rem;
@@ -286,6 +296,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  width: 100%;
 }
 
 .legend-item-creative {
@@ -311,14 +322,14 @@
 }
 
 .legend-text {
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 2.2vw, 0.875rem);
   color: #374151;
   font-weight: 500;
   flex: 1;
 }
 
 .legend-value {
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 2.2vw, 0.875rem);
   color: #1e293b;
   font-weight: 600;
 }
@@ -334,11 +345,13 @@
   .chart-stats {
     flex-direction: row;
     gap: 1rem;
+    flex-wrap: wrap; /* Allow stats to wrap for better fit */
   }
 
   .line-chart-enhanced {
-    width: 250px;
-    height: 500px;
+    max-width: 250px;
+    height: 65vw; /* Adjust height for medium screens */
+    max-height: 500px;
   }
 
   .chart-legend-creative {
@@ -353,25 +366,29 @@
   }
 
   .line-chart-enhanced {
-    width: 200px;
-    height: 400px;
+    max-width: 200px;
+    height: 70vw; /* Further adjust height for small screens */
+    max-height: 400px;
   }
 
   .radial-chart-creative {
-    width: 250px;
-    height: 250px;
+    max-width: 250px;
+    height: 35vw;
+    max-height: 250px;
   }
 
   .radial-center {
-    width: 60px;
-    height: 60px;
+    width: 25vw;
+    max-width: 60px;
+    height: 25vw;
+    max-height: 60px;
   }
 
   .center-value-creative {
-    font-size: 1.25rem;
+    font-size: clamp(1rem, 3.5vw, 1.25rem);
   }
 
   .center-label-creative {
-    font-size: 0.625rem;
+    font-size: clamp(0.5rem, 1.8vw, 0.625rem);
   }
 }
