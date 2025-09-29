@@ -41,6 +41,7 @@ import { merchantDashboardComponent } from './components/merchant/merchant-dashb
 import { MerchantOrdersViewComponent } from './components/merchant/order/order-view/order-view.component';
 import { MerchantOrderDetailsComponent } from './components/merchant/order/order-details/order-details.component';
 import { MerchantOrdersAddComponent } from './components/merchant/order/order-add/order-add.component';
+import { TestComponent } from './core/services/test';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
@@ -297,6 +298,10 @@ export const routes: Routes = [
   {
     path: 'unauthorized',
     component: UnauthorizedComponent,
+  },
+  {
+    path:'test',
+    component: TestComponent
   },
   {
     path: '**',
